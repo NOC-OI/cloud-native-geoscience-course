@@ -61,10 +61,16 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/additional_material.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/aio.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/discuss.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/extra_exercises.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/images.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/index.html</loc>
@@ -130,19 +136,37 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/additional_material.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/aio.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/discuss.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/extra_exercises.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/images.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/index.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/instructor-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/key-points.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/profiles.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/reference.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/key-points.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/profiles.html</loc>
