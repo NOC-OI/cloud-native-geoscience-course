@@ -1,0 +1,167 @@
+{
+    "metadata": {
+        ".zattrs": {},
+        ".zgroup": {
+            "zarr_format": 2
+        },
+        "sos_abs/.zarray": {
+            "chunks": [
+                1,
+                500,
+                500
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dimension_separator": ".",
+            "dtype": "<f4",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                182,
+                3605,
+                4320
+            ],
+            "zarr_format": 2
+        },
+        "sos_abs/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "time_counter",
+                "y",
+                "x"
+            ],
+            "cell_methods": "time: mean (interval: 450 s)",
+            "coordinates": "time_centered",
+            "interval_operation": "450 s",
+            "interval_write": "1 d",
+            "long_name": "sea_surface_absolute_salinity",
+            "online_operation": "average",
+            "standard_name": "sea_surface_salinity",
+            "units": "g/kg"
+        },
+        "time_centered/.zarray": {
+            "chunks": [
+                1
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dimension_separator": ".",
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                182
+            ],
+            "zarr_format": 2
+        },
+        "time_centered/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "time_counter"
+            ],
+            "calendar": "standard",
+            "long_name": "Time axis",
+            "standard_name": "time",
+            "time_origin": "1900-01-01 00:00:00",
+            "units": "seconds since 1900-01-01"
+        },
+        "time_counter/.zarray": {
+            "chunks": [
+                31
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dimension_separator": ".",
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                182
+            ],
+            "zarr_format": 2
+        },
+        "time_counter/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "time_counter"
+            ],
+            "calendar": "standard",
+            "long_name": "Time axis",
+            "standard_name": "time",
+            "time_origin": "1900-01-01 00:00:00",
+            "units": "seconds since 1900-01-01"
+        },
+        "x/.zarray": {
+            "chunks": [
+                4320
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                4320
+            ],
+            "zarr_format": 2
+        },
+        "x/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "x"
+            ],
+            "long_name": "Longitude",
+            "standard_name": "longitude",
+            "units": "degrees_east"
+        },
+        "y/.zarray": {
+            "chunks": [
+                3605
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                3605
+            ],
+            "zarr_format": 2
+        },
+        "y/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "y"
+            ],
+            "long_name": "Latitude",
+            "standard_name": "latitude",
+            "units": "degrees_north"
+        }
+    },
+    "zarr_consolidated_format": 1
+}

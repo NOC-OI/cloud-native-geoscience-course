@@ -1,22 +1,29 @@
-# This template CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to replace its contents
-# with information about your lesson.
-# Remember to update this file periodically, 
-# ensuring that the author list and other fields remain accurate.
-
 cff-version: 1.2.0
-title: FIXME
+title: "Cloud-Native Architectures and Modern Data Formats for Geoscience"
 message: >-
-  Please cite this lesson using the information in this file
-  when you refer to it in publications, and/or if you
-  re-use, adapt, or expand on the content in your own
-  training material.
+  Please cite this lesson using the metadata from this file when referring to
+  or reusing this training material.
 type: dataset
 authors:
-  - given-names: FIXME
-    family-names: FIXME
+  - given-names: Tobias
+    family-names: Ferreira
+    orcid: "https://orcid.org/0000-0002-0888-9751"
+    affiliation: "National Oceanography Centre"
 abstract: >-
-  FIXME Replace this with a short abstract describing the
-  lesson, e.g. its target audience and main intended
-  learning objectives.
+  A Carpentries-style training lesson on cloud-native architectures and modern
+  data formats for geoscience, covering workflows for oceanography, climate,
+  and meteorology data at multi-terabyte scale. Topics include Zarr,
+  chunking, object storage, conversion from traditional formats,
+  parallel processing, Icechunk, VirtualiZarr, STAC, and visualization.
 license: CC-BY-4.0
+url: "https://github.com/NOC-OI/cloud-native-geoscience-course"
+repository-code: "https://github.com/NOC-OI/cloud-native-geoscience-course"
+keywords:
+  - cloud-native
+  - geoscience
+  - oceanography
+  - climate
+  - meteorology
+  - zarr
+  - object storage
+  - the carpentries
