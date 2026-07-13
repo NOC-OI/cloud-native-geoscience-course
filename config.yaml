@@ -60,21 +60,21 @@ contact: 'team@carpentries.org'
 # Order of episodes in your lesson
 episodes:
 - 01-intro.md
-- 02-numpy.md
-- 03-matplotlib.md
-- 04-lists.md
-- 05-loop.md
-- 06-files.md
-- 07-cond.md
-- 08-func.md
-- 09-xxx.md
-- 10-xxx.md
-- 11-xxx.md
-- 12-xxx.md
-- 13-xxx.md
-- 14-xxx.md
-- 15-xxx.md
-- 16-xxx.md
+- 02-ndata-challenges.md
+- 03-cloudnative-formats.md
+- 04-zarr.md
+- 05-python-zarr.md
+- 06-chunks.md
+- 07-parallel.md
+- 08-handson-zarr.md
+- 09-object_store.md
+- 10-conversion-workflow.md
+- 11-case-studies.md
+- 12-icechunk.md
+- 13-virtualizarr.md
+- 14-stac.md
+- 15-visualisation.md
+- 16-best-practices.md
 
 # Information for Learners
 learners:

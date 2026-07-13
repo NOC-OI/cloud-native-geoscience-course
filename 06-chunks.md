@@ -1,0 +1,465 @@
+---
+title: How to Choose Chunks for Analysis and Processing at Scale
+teaching: 20
+exercises: 10
+---
+
+:::::::::::::::::::::::::::::::::::::::::: objectives
+
+- "Understand what chunks are and how they affect performance for large datasets."
+- "Relate common analysis workflows (time series, spatial averages, ensembles) to chunk layouts."
+- "Use Python (zarr and xarray) to inspect chunk shapes in a Zarr store."
+- "Rechunk a Zarr dataset, save it, and observe how analysis performance changes."
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::: questions
+
+- "What is a chunk, and why does its shape matter for performance?"
+- "How should I choose chunk sizes for different types of analysis?"
+- "What are the trade-offs between large and small chunks?"
+- "How can I rechunk a Zarr dataset and save it for future use?"
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+## What are chunks?
+
+In Zarr (and in many array-based systems), a **chunk** is a small N-dimensional block of an array that is stored and accessed as a unit. Instead of storing one giant array in a single file or object, we:
+
+- Divide the array into chunks (e.g. `(time, lat, lon) = (10, 100, 100)` per chunk).
+- Store each chunk separately (e.g. as a separate object in a directory or bucket).
+- Read and write data chunk-by-chunk when we need it.
+
+Chunks influence:
+
+- **I/O patterns**: which parts of the dataset are read from storage.
+- **Parallelism**: how work can be distributed across many processes or threads.
+- **Compression effectiveness**: how well data compresses within each chunk.
+- **Metadata overhead**: number of chunks and associated bookkeeping.
+
+Choosing good chunk shapes is critical when you move from "toy" datasets to large-scale reanalysis, ensemble, or high-resolution model data.
+
+
+## Thinking in dimensions and workloads
+
+To choose chunk shapes, start from your dimensions and typical workloads.
+
+Common dimensions in ocean, climate, and meteorology:
+
+- `time`
+- `lat`, `lon` (or `x`, `y`)
+- `level` (pressure or model levels; depth in the ocean)
+- `member` (ensemble member)
+
+Common workloads:
+
+- **Time series at a point**: e.g. temperature at one location over many years.
+- **Spatial averages per time step**: e.g. global mean temperature as a function of time.
+- **Regional subsets**: e.g. data over a specific basin or region.
+- **Vertical profiles**: e.g. temperature vs. depth at a given location and time.
+- **Ensemble statistics**: e.g. mean and spread across `member`.
+
+Each workload benefits from certain chunk layouts:
+
+- Time series: chunks that include many time steps for a small spatial region.
+- Spatial averages per time step: chunks that include complete spatial slices (or large spatial blocks) for a small number of time steps.
+- Ensemble statistics: chunks that include multiple ensemble members together, if members are frequently used together.
+- Cloud/web visualisation: use smaller, spatially aligned chunks, often around 256×256 or 512×512 pixels (~100-1000 MB size), so that map tiles can be read efficiently and only the needed region is transferred.
+- Large HPC analysis: use larger chunks that reduce scheduler overhead and work well with Dask, as long as the chunks still fit comfortably in memory (10-100 MB size).
+
+There is no single "best" chunking: it depends on which workloads are most important for your users.
+
+
+![Chunk strategy. Source: Matt Piagge (UKCEH)](fig/chunk_strategy.png)
+
+
+## Inspecting chunk shapes in a Zarr store
+
+Let's take a look on one of our example Zarr datasets to see how chunks are laid out.
+You can inspect chunk shapes using xarray:
+
+```python
+import xarray as xr
+
+ds = xr.open_zarr("data/example.zarr")
+print(ds)
+
+temp = ds["temperature"]
+print("Dimensions:", temp.dims)
+print("Shape:", temp.shape)
+print("Chunks:", temp.data.chunks)
+```
+
+Seeing `shape` and `dims` helps you reason about how the current chunking might align with your workloads.
+
+
+::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 1 - Relate current chunking to workloads
+
+Using your example Zarr dataset:
+
+1. Inspect the `temperature` array's `shape` and `chunks` using `zarr`.
+2. Map the dimensions to names (e.g. interpret `(time, lat, lon, level)` from context or attributes and following the CF conventions).
+3. For each of these workloads, decide whether the current chunking seems "friendly" or "unfriendly":
+
+   - Time series at a point.
+   - Spatial mean per time step.
+   - Regional subset (e.g. a North Atlantic box).
+
+Write down a short note for each explaining your reasoning.
+
+::::::::::::::: solution
+
+If chunks are "tall in time" but small in space, time series at a point may be efficient, while spatial averages may require reading many chunks.
+If chunks cover large spatial regions but few time steps, spatial averages may be efficient, but time series at a point may involve scanning many small chunks over time.
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## Trade-offs: small vs large chunks
+
+Some general guidelines:
+
+- **Chunk size in bytes**: often a target of a few MB per chunk (e.g. 1-100 MB), depending on storage and compute environment.
+  - Too small: many tiny reads and lots of metadata overhead.
+  - Too large: slow reads and poor parallelism, especially over networks.
+
+- **Chunk shape in dimensions**:
+  - Align chunks with common access patterns (e.g. contiguous in time for time series, or contiguous in space for spatial stats).
+  - Avoid chunking along rarely used dimensions (e.g. `member` or `level`) unless you often process across them.
+
+Other considerations:
+
+- **Compression**: homogeneous data (e.g. spatial fields) may compress better than mixed data; chunking can influence compression ratios.
+- **Storage backend**: local disk vs. S3 vs. GCS may have different optimal chunk sizes due to latency and throughput.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+## Rechunking with xarray
+
+Rechunking means changing the way a dataset is divided into chunks. This matters because the best chunk layout depends on how the data will be used: for example, one layout may be better for reading time series, while another may be better for reading maps or writing cloud-optimized storage.
+
+With xarray, rechunking is simplest when you want to make a smaller change to the chunk layout.
+
+### Step 1: Open the dataset
+
+Start by opening the original Zarr dataset.
+
+```python
+import xarray as xr
+
+ds = xr.open_zarr("data/example.zarr")
+print(ds)
+```
+
+### Step 2: Choose a new chunk layout
+
+Decide how you want the dataset to be chunked. For example, you might want chunks that are larger in time and smaller in space.
+
+```python
+ds_chunked = ds.chunk({"time": 10, "lat": 100, "lon": 100})
+```
+
+### Step 3: Check the new chunking
+
+Inspect the rechunked dataset to confirm that the chunk layout looks right.
+
+```python
+print(ds_chunked)
+print(ds_chunked["temperature"].chunks)
+```
+
+### Step 4: Write the rechunked data to a new Zarr store
+
+Save the dataset with the new chunk layout.
+
+```python
+ds_chunked.to_zarr("data/example_rechunked.zarr", mode="w")
+```
+
+This approach is convenient, but it is not always the most efficient for very large datasets. If the original and target chunk layouts are very different, rechunking can require substantial temporary storage and memory.
+
+## Rechunking with Rechunker
+
+[Rechunker](https://rechunker.readthedocs.io/) is a library designed specifically for rechunking large array datasets efficiently. It is useful when you want to move from one chunk layout to another without loading the whole dataset into memory at once.
+
+### Step 1: Open the source dataset
+
+Load the original dataset and choose the variable you want to rechunk.
+
+```python
+import xarray as xr
+from rechunker import rechunk
+
+ds = xr.open_zarr("data/example.zarr")
+source = ds["temperature"]
+```
+
+### Step 2: Decide on the target chunking
+
+Choose the chunk shape you want in the final dataset.
+
+```python
+target_chunks = (10, 100, 100)
+```
+
+### Step 3: Set up temporary and target stores
+
+Rechunker writes through a temporary store before producing the final Zarr output.
+
+```python
+target_store = "data/example_rechunked.zarr"
+temp_store = "data/example_rechunk_temp.zarr"
+```
+
+### Step 4: Build the rechunking plan
+
+Create the plan that describes how the rechunking should happen.
+
+```python
+plan = rechunk(
+    source,
+    target_chunks,
+    max_mem="1GB",
+    target_store=target_store,
+    temp_store=temp_store,
+)
+```
+
+### Step 5: Run the plan
+
+Execute the rechunking operation.
+
+```python
+plan.execute()
+```
+
+Rechunker is useful when you want more control over memory use and storage layout, especially for large datasets that are awkward to rewrite directly.
+
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## Rechunk can be expensive
+
+In some cases, rechunking can take a long time, especially if the original and target chunk layouts are very different. For example, a study on Zarr data[^nguyean_etal2023] in cloud-based object stores found that:
+
+
+| Chunking strategy                                    |                  Rechunk time |
+| ---------------------------------------------------- | ----------------------------: |
+| Large chunks                                         |                 **~6.66 min** |
+| Recommended compromise (best overall access pattern) |                **~22.44 min** |
+| Very small chunks                                    | **~46 h** |
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+## Choosing between methods
+
+- Use **xarray `.chunk()` + `.to_zarr()`** for simple, smaller rechunking tasks.
+- Use **Rechunker** when you need a more memory-aware rechunking workflow for large datasets.
+
+The best choice depends on the size of the dataset, the storage backend, and the access pattern you want to optimise.
+
+In this lesson, we will focus on the simpler xarray rechunking approach, but you should be aware of Rechunker for larger-scale workflows.
+
+::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 2 - Designing a new chunk scheme
+
+Using the same dataset, think through the following:
+
+1. Identify your **priority workload** for this dataset (e.g. time series analysis, spatial means, ensemble statistics).
+2. Propose a chunk scheme (e.g. `{"time": 20, "lat": 180, "lon": 180}`) that you expect to work well for that workload.
+3. Consider the likely chunk size in bytes (rough estimation is fine) and whether it seems reasonable (not too small, not too large).
+
+You do not need to run the code yet; focus on design:
+
+- Write down your proposed chunk sizes per dimension.
+- Explain how they help your chosen workload.
+- Note any trade-offs you are making for other workloads.
+
+::::::::::::::: solution
+
+Learners should choose chunk sizes that reflect their dominant workloads and keep chunk sizes in a plausible range.
+For example, for time series analysis, they might choose relatively large time chunks and moderate spatial blocks; for spatial analysis, they might choose chunks that cover entire latitude or longitude bands.
+Recognising that one dataset may need different chunking schemes for different scenarios is a key insight.
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 3 - Rechunk and compare
+
+Try the following on your example dataset:
+
+1. Implement a rechunking scheme you designed in Exercise 2, saving to a new Zarr store.
+2. Measure the time to compute:
+   - A global mean time series (`mean(dim=("lat", "lon"))`).
+   - A regional mean time series (e.g. a subset in `lat`/`lon`).
+3. Compare the timings between the original and rechunked stores and discuss any differences.
+
+If your dataset or environment is small, focus on:
+
+- Comparing the **number of chunks** involved in each operation (you can inspect `temp.data.chunks` when using dask).
+- Discussing how chunk layout might matter for larger datasets or cloud environments.
+
+
+For example, you might run something like this:
+
+```python
+import time
+
+t0 = time.time()
+# your operation here with the original store
+t1 = time.time()
+print("Original store time:", t1 - t0, "seconds")
+
+t0 = time.time()
+# your operation here with the rechunked store
+t1 = time.time()
+print("Rechunked store time:", t1 - t0, "seconds")
+```
+
+::::::::::::::: solution
+
+You may observe modest timing differences or simply see that the number of chunks touched by each operation changes.
+The key takeaway is that chunking is not just a storage detail: it can have a real impact on compute cost, especially when running at scale on large climate or ocean datasets in the cloud.
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+## Sharding: grouping chunks together
+
+
+
+
+
+Sharding is a way to keep the *logical* benefits of small chunks while reducing the *physical* cost of storing too many tiny objects.
+
+A simple way to explain it is:
+
+- **Chunks** control the unit of computation and data access.
+- **Shards** control how many chunks are packed into each stored object.
+
+You can think of chunks as individual pages, and a shard as a binder holding many pages. We still read the page we need, but we do not have to store every page as its own separate file.
+
+This is especially useful in cloud object storage, where millions of very small objects can be inefficient to manage. With sharding, Zarr can keep a fine-grained internal chunk structure for analysis, while storing multiple chunks together in fewer, larger objects.
+
+This means you can keep chunks small for efficient analysis, while using sharding to avoid creating an excessive number of files or objects.
+
+![A sharded Zarr showing how chunk data is grouped into shard files. Source: https://element84.com/software-engineering/is-zarr-the-new-cog/](fig/sharding2.png){alt="A sharded Zarr showing how chunk data is grouped into shard files."}
+
+### Why sharding helps
+
+Sharding can be useful when:
+
+- You want **small chunks** for fast, selective reads.
+- You want to **reduce object counts** in cloud storage.
+- You want to reduce filesystem overhead from very large numbers of files.
+- You want to keep the benefits of chunk-based analysis without paying the full cost of storing each chunk separately.
+
+### Trade-offs
+
+Sharding is not always the best choice. If your workload frequently reads only a tiny part of one shard, you may transfer more data than necessary. Sharding also makes partial writes more complicated, because updating one chunk may require rewriting part of a shard.
+
+For that reason, shard layout should reflect the way the data will actually be used. For example, if users usually read neighbouring map tiles together, you might group spatial chunks into the same shard. If they usually read time series, you might group chunks along time instead.
+
+### Zarr v3 sharding example
+
+Zarr Python v3 supports sharded arrays directly when you create the array. In the example below, the array has small chunks for analysis, but those chunks are grouped into larger shards for storage.
+
+```python
+import numpy as np
+import zarr
+
+arr = zarr.create_array(
+    "data/example_sharded.zarr",
+    shape=(1000, 1000),
+    dtype="int32",
+    zarr_format=3,
+    chunks=(10, 10),
+    shards=(100, 100),
+)
+
+arr[:] = np.random.randint(0, 100, size=(1000, 1000))
+```
+
+In this example:
+
+- `chunks=(10, 10)` means the data are split into small 10×10 chunks for fine-grained access.
+- `shards=(100, 100)` means many of those chunks are packed into a larger 100×100 shard for storage.
+
+You can open the array again and inspect it in the same way:
+
+```python
+import zarr
+
+arr = zarr.open("data/example_sharded.zarr", mode="r")
+print(arr.shape)
+print(arr.chunks)
+print(arr.dtype)
+```
+
+### Using xarray with sharded Zarr
+
+xarray can open a sharded Zarr store the same way it opens other Zarr datasets, so the sharding is mostly a storage detail from the analyst's point of view.
+
+```python
+import xarray as xr
+
+ds = xr.open_zarr("data/example_sharded.zarr")
+print(ds)
+
+temp = ds["temperature"]
+print(temp.dims)
+print(temp.shape)
+print(temp.chunks)
+```
+
+This is useful because xarray still lets you work with labelled dimensions and high-level operations, while Zarr v3 handles the storage layout underneath.
+
+### When to use sharding
+
+Sharding is most helpful when:
+
+- you want many small chunks for analysis,
+- but you do not want a huge number of objects or files,
+- especially in cloud object storage or large shared filesystems.
+
+
+
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## Chunking and sharding are not the same
+
+Chunking answers the question: **what is the unit of computation and access?**
+
+Sharding answers the question: **how are those chunks physically packed into storage objects?**
+
+A dataset may use small chunks for flexible analysis, but store those chunks inside larger shards to make cloud storage more efficient.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+:::::::::::::::::::::::::::::::::::::::::: keypoints
+
+- "Chunks are N-dimensional blocks that control how data is stored and accessed in Zarr."
+- "Chunk shapes should be chosen based on dominant workloads (time series, spatial averages, ensembles) and practical constraints like chunk size in bytes."
+- "Rechunking can reorganise a dataset to better match performance needs, at the cost of an initial rewrite step."
+- "Tools like zarr and xarray make it possible to inspect chunk layouts, design new schemes, and save rechunked Zarr stores for analysis at scale."
+- "Sharding is a technique that groups multiple chunks into larger storage objects, reducing overhead while keeping the benefits of chunked access."
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+[^nguyean_etal2023]: Nguyean, T., et al. (2023). *Impact of Chunk Size on Read Performance of Zarr Data in Cloud-based Object Stores*. https://essopenarchive.org/doi/pdf/10.1002/essoar.10511054.2?download=true
