@@ -1,7 +1,6 @@
 ---
 title: Invited Case Studies
-teaching: 10
-exercises: 20
+teaching: 40
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives

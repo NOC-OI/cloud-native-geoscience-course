@@ -72,7 +72,7 @@ Benefits:
 
 GeoZarr's **multiscales** convention formalises how to store and describe these pyramids in Zarr.
 
-![Multiscale pyramid example](geozarr_multiscale.png)
+![Multiscale pyramid example](fig/geozarr_multiscale.png)
 
 ## GeoZarr: geospatial conventions for Zarr
 
@@ -257,91 +257,32 @@ In both cases, multiscale metadata is important because it tells the viewer whic
 
 In this lesson, we will not go deep into front-end code, but we will show a simple browser example that learners can run locally and point at their own multiscale Zarr store.
 
-### Simple HTML example for zarr-maps
+### Simple HTML example
 
-Here is a minimal HTML file that uses **zarr-maps** with **OpenLayers** to visualise a multiscale Zarr store in the browser. Please update the `zarrUrl` variable to point to your own multiscale Zarr dataset.
+In the [zarr-maps-openlayers.html](files/zarr-maps-openlayers.html) file, we provide a minimal HTML page that uses **zarr-maps** with **OpenLayers** to visualise a multiscale zarr dataset in the browser. It follows the documented `ZarrLayer` options from the zarr-maps getting-started guide and can be served as a static HTML page.
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zarr-maps OpenLayers Example</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol/ol.css" />
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-    }
+The lesson renders the same example inline below so learners can inspect it directly in the page:
 
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-</head>
-<body>
-  <div id="map"></div>
-
-  <script type="module">
-    import Map from "https://cdn.jsdelivr.net/npm/ol/Map.js";
-    import View from "https://cdn.jsdelivr.net/npm/ol/View.js";
-    import TileLayer from "https://cdn.jsdelivr.net/npm/ol/layer/Tile.js";
-    import OSM from "https://cdn.jsdelivr.net/npm/ol/source/OSM.js";
-
-    // Update this import if your zarr-maps build uses a different path
-    import { ZarrLayer } from "https://cdn.jsdelivr.net/npm/zarr-maps/dist/ol.js";
-
-    // TODO: Update these values to match your dataset
-    const zarrUrl = "https://example.com/path/to/converted_multiscale.zarr";
-    const variable = "salinity";
-
-    const map = new Map({
-      target: "map",
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: new View({
-        center: ,
-        zoom: 2,
-        projection: "EPSG:3857",
-      }),
-    });
-
-    const zarrLayer = new ZarrLayer({
-      url: zarrUrl,
-      variable: variable,
-      colormap: "viridis",
-      scale: ,
-    });
-
-    // Load Zarr metadata before adding the layer to the map
-    await zarrLayer.load();
-    map.addLayer(zarrLayer);
-  </script>
-</body>
-</html>
-```
+<iframe
+  src="files/zarr-maps-openlayers.html"
+  title="Zarr-maps OpenLayers example"
+  style="width: 100%; height: 800px; border: 1px solid #d0d7de; border-radius: 0.75rem;"
+  loading="lazy"
+></iframe>
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 3 - Explore your multiscale Zarr in the browser
 
-1. Save the HTML file above as `geozarr_example.html`.
-2. Upload your multiscale Zarr store to an object store and make it accessible via HTTPS (or serve it locally with an appropriate static server).
-3. Edit `zarrUrl` in the HTML file to point to your multiscale Zarr URL.
-4. Run a local web server in the directory containing `geozarr_example.html`:
+1. Upload your multiscale Zarr store to an object store and make it accessible via HTTPS (or serve it locally with an appropriate static server).
+2. In the page above, edit the `zarrUrl` and `variable`, add your multiscale zarr dataset. You can edit it directly in the browser, or you can get the [HTML file](files/zarr-maps-openlayers.html) and edit it to point to your multiscale Zarr store and the variable you want to visualise.
+4. Run a local web server in the directory containing `zarr-maps-openlayers.html`:
 
    ```bash
    python -m http.server 8000
    ```
 
-   Then open `http://localhost:8000/geozarr_example.html` in your browser.
+   Then open `http://localhost:8000/zarr-maps-openlayers.html` in your browser.
 
 5. Pan and zoom the map, observing how data loads and renders at different scales.
 
@@ -352,8 +293,8 @@ Questions:
 
 ::::::::::::::: solution
 
-Learners should experience direct browser-based visualisation of their multiscale Zarr data.
-They will see how multiscale pyramids and chunking decisions affect the responsiveness and smoothness of interaction.
+You should experience direct browser-based visualisation of your multiscale Zarr data.
+You will see how multiscale pyramids and chunking decisions affect the responsiveness and smoothness of interaction.
 
 :::::::::::::::::::::::::
 
