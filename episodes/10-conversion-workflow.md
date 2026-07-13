@@ -1,7 +1,7 @@
 ---
 title: Conversion Workflow of Traditional Formats to Zarr
 teaching: 25
-exercises: 15
+exercises: 25
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
