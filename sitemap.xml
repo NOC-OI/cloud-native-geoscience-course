@@ -4,7 +4,13 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/01-intro.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/02-ndata-challenges.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/02-numpy.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/03-cloudnative-formats.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/03-matplotlib.html</loc>
@@ -13,7 +19,16 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/04-lists.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/04-zarr.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/05-loop.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/05-python-zarr.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/06-chunks.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/06-files.html</loc>
@@ -22,28 +37,58 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/07-cond.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/07-parallel.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/08-func.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/08-handson-zarr.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/09-object_store.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/09-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/10-conversion-workflow.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/10-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/11-case-studies.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/11-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/12-icechunk.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/12-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/13-virtualizarr.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/13-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/14-stac.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/14-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/15-visualisation.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/15-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/16-best-practices.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/16-xxx.html</loc>
@@ -79,7 +124,13 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/01-intro.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/02-ndata-challenges.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/02-numpy.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-matplotlib.html</loc>
@@ -88,7 +139,16 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-lists.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-zarr.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/05-loop.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/05-python-zarr.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-chunks.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-files.html</loc>
@@ -97,28 +157,58 @@
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-cond.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/08-func.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/08-handson-zarr.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/09-object_store.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/09-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/10-conversion-workflow.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/10-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/11-case-studies.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/11-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/12-icechunk.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/12-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-virtualizarr.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/14-stac.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/14-xxx.html</loc>
   </url>
   <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/15-visualisation.html</loc>
+  </url>
+  <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/15-xxx.html</loc>
+  </url>
+  <url>
+    <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/16-best-practices.html</loc>
   </url>
   <url>
     <loc>https://noc-oi.github.io/cloud-native-geoscience-course/instructor/16-xxx.html</loc>
