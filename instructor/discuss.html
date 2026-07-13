@@ -390,7 +390,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Discussion</h1>
-        <p>Last updated on 2026-07-03 |
+        <p>Last updated on 2026-07-13 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/learners/discuss.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -403,8 +403,95 @@
         </div>
 
         
-<section><h2 class="section-heading" id="rules-of-debugging">Rules of Debugging<a class="anchor" aria-label="anchor" href="#rules-of-debugging"></a></h2>
-<hr class="half-width"><!--
+
+<section><h2 class="section-heading" id="frequently-asked-questions">Frequently Asked Questions<a class="anchor" aria-label="anchor" href="#frequently-asked-questions"></a></h2>
+<hr class="half-width"><p>This page collects common questions that go beyond the core exercises
+and can help you apply the lesson in real projects.</p>
+</section><section><h2 class="section-heading" id="when-should-i-convert-to-zarr-versus-using-virtualizarr">When should I convert to Zarr versus using VirtualiZarr?<a class="anchor" aria-label="anchor" href="#when-should-i-convert-to-zarr-versus-using-virtualizarr"></a></h2>
+<hr class="half-width"><p>Use full conversion to Zarr when you need repeated, high-performance
+access, especially for heavy analysis and visualization workflows.</p>
+<p>Use virtualization approaches when full conversion is too expensive
+in time, storage, or governance constraints, and you need a bridge from
+legacy files to cloud-native access.</p>
+<p>In practice, teams often start virtual, then convert high-value
+datasets to physical Zarr once usage patterns are clear.</p>
+</section><section><h2 class="section-heading" id="why-is-my-zarr-workflow-still-slow-after-conversion">Why is my Zarr workflow still slow after conversion?<a class="anchor" aria-label="anchor" href="#why-is-my-zarr-workflow-still-slow-after-conversion"></a></h2>
+<hr class="half-width"><p>Common causes are:</p>
+<ul><li>Chunking does not match access patterns (for example, time-series
+access with space-oriented chunks).</li>
+<li>Too many small reads from object storage.</li>
+<li>Metadata not consolidated, increasing remote metadata requests.</li>
+<li>Reading more variables or timesteps than needed.</li>
+</ul><p>Start by profiling your most common query pattern, then redesign
+chunks and processing around that pattern.</p>
+</section><section><h2 class="section-heading" id="how-do-i-choose-chunk-sizes">How do I choose chunk sizes?<a class="anchor" aria-label="anchor" href="#how-do-i-choose-chunk-sizes"></a></h2>
+<hr class="half-width"><p>There is no universal chunk size. A good strategy is:</p>
+<ul><li>Identify your dominant analysis pattern (time slices, vertical
+profiles, map tiles, full fields).</li>
+<li>Choose chunks that minimize remote requests for that pattern.</li>
+<li>Test with representative workloads.</li>
+<li>Revisit choices as workflows evolve.</li>
+</ul><p>Treat chunking as a design decision, not a default setting.</p>
+</section><section><h2 class="section-heading" id="when-should-i-use-zarr-v2-or-v3">When should I use Zarr v2 or v3?<a class="anchor" aria-label="anchor" href="#when-should-i-use-zarr-v2-or-v3"></a></h2>
+<hr class="half-width"><p>Both can work well. Choose based on tool support and interoperability
+needs in your institution.</p>
+<p>If your ecosystem is already stable on v2, consistency may be more
+important than switching immediately. If you are building new pipelines
+and your tools support it, v3 may provide cleaner long-term alignment
+with modern standards.</p>
+</section><section><h2 class="section-heading" id="how-should-i-organize-scientific-data-in-object-storage">How should I organize scientific data in object storage?<a class="anchor" aria-label="anchor" href="#how-should-i-organize-scientific-data-in-object-storage"></a></h2>
+<hr class="half-width"><p>Use clear, predictable naming conventions and folder-like prefixes
+based on domain, dataset, version, and processing level.</p>
+<p>Keep data layout and metadata layout consistent. If you use catalogs
+(for example STAC), ensure links and metadata stay synchronized with
+actual object paths.</p>
+</section><section><h2 class="section-heading" id="stac-and-zarr-do-i-need-both">STAC and Zarr: do I need both?<a class="anchor" aria-label="anchor" href="#stac-and-zarr-do-i-need-both"></a></h2>
+<hr class="half-width"><p>They solve different problems:</p>
+<ul><li>Zarr stores multidimensional data efficiently for analysis.</li>
+<li>STAC supports discovery, indexing, and interoperability across
+datasets.</li>
+</ul><p>Most production architectures benefit from both: Zarr for storage and
+compute, STAC for catalog and discovery.</p>
+</section><section><h2 class="section-heading" id="how-do-i-handle-dataset-updates-and-reproducibility">How do I handle dataset updates and reproducibility?<a class="anchor" aria-label="anchor" href="#how-do-i-handle-dataset-updates-and-reproducibility"></a></h2>
+<hr class="half-width"><p>Use explicit versioning policies and avoid silent overwrites. Tools
+like Icechunk can help track versions and enable reproducible
+analysis.</p>
+<p>At minimum:</p>
+<ul><li>Record dataset version in metadata.</li>
+<li>Keep immutable references for published analyses.</li>
+<li>Document how and when updates are produced.</li>
+</ul></section><section><h2 class="section-heading" id="what-is-a-practical-migration-path-from-netcdf-workflows">What is a practical migration path from NetCDF workflows?<a class="anchor" aria-label="anchor" href="#what-is-a-practical-migration-path-from-netcdf-workflows"></a></h2>
+<hr class="half-width"><ol style="list-style-type: decimal"><li>Start with one representative dataset and one common analysis use
+case.</li>
+<li>Convert or virtualize and benchmark end-to-end performance.</li>
+<li>Add metadata and catalog entries.</li>
+<li>Validate scientific equivalence against the original workflow.</li>
+<li>Scale out only after the pilot is stable.</li>
+</ol></section><section><h2 class="section-heading" id="visualization-in-the-browser-what-should-i-expect">Visualization in the browser: what should I expect?<a class="anchor" aria-label="anchor" href="#visualization-in-the-browser-what-should-i-expect"></a></h2>
+<hr class="half-width"><p>Interactive maps with cloud-hosted Zarr are feasible and useful, but
+performance depends on multiscale organization, chunk strategy, and
+network conditions.</p>
+<p>For responsive visualization:</p>
+<ul><li>Prefer multiscale pyramids for map interaction.</li>
+<li>Limit requested variables and dimensions.</li>
+<li>Use suitable color scales and value ranges.</li>
+</ul></section><section><h2 class="section-heading" id="discussion-prompts-for-instructors-and-learners">Discussion Prompts for Instructors and Learners<a class="anchor" aria-label="anchor" href="#discussion-prompts-for-instructors-and-learners"></a></h2>
+<hr class="half-width"><ul><li>Which part of your current workflow is the best first candidate for
+cloud-native migration?</li>
+<li>Which trade-off is hardest in your context: cost, performance,
+interoperability, or team capacity?</li>
+<li>What metadata and catalog improvements would have the highest impact
+in your institution?</li>
+<li>Which lesson component is most immediately actionable for your
+day-to-day work?</li>
+</ul></section><section><h2 class="section-heading" id="additional-resources">Additional Resources<a class="anchor" aria-label="anchor" href="#additional-resources"></a></h2>
+<hr class="half-width"><ul><li>Lesson repository: <a href="https://github.com/NOC-OI/cloud-native-geoscience-course" class="external-link uri">https://github.com/NOC-OI/cloud-native-geoscience-course</a>
+</li>
+<li>STAC specification: <a href="https://stacspec.org/" class="external-link uri">https://stacspec.org/</a>
+</li>
+<li>Zarr specification: <a href="https://zarr.dev/" class="external-link uri">https://zarr.dev/</a>
+</li>
+</ul><!--
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  --></section></div> <!-- / div.lesson-content -->
@@ -462,7 +549,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/discuss.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/discuss.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-03",
+  "dateModified": "2026-07-13",
   "datePublished": "2026-07-13"
 }
 

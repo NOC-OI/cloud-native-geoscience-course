@@ -883,7 +883,7 @@ answers.</p>
   Solution (example answers)
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <ol style="list-style-type: decimal">
 <li>NetCDF (or cloud‑native Zarr) with CF conventions for internal
@@ -972,7 +972,7 @@ the situation?</li>
   Solution (example points)
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <ol style="list-style-type: decimal">
 <li>Without <code>units</code>, users cannot be sure whether
@@ -1237,7 +1237,7 @@ complex?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>A typical output might show dimensions such as <code>time</code>,
 <code>lat</code>, <code>lon</code>, and <code>depth</code>, coordinate
@@ -1307,7 +1307,7 @@ originating centre, parameter names)?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>NetCDF datasets typically have a clear structure with explicit
 dimensions and variables, while GRIB datasets may have fewer explicit
@@ -1360,7 +1360,7 @@ dimensions, size, organisation, and sharing.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>Doubling the horizontal resolution roughly quadruples the number of
 grid points, increasing data volume per time step. Increasing frequency
@@ -1773,7 +1773,7 @@ available in a cloud-native form.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>Many common workflows still depend on downloading or opening large
 files even when only a small subset is needed. A cloud-native approach
@@ -2213,7 +2213,7 @@ array use?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>The Zarr store behaves like a hierarchical container: the
 <code>Group</code> printed by <code>zarr.open_group</code> lists child
@@ -2261,7 +2261,7 @@ and operations.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>A chunk shape such as <code>(10, 100, 100)</code> represents 10 time
 steps over a 100×100 spatial block. Chunk shapes that are “tall in time”
@@ -2978,7 +2978,7 @@ seems “friendly” or “unfriendly”:</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>If chunks are “tall in time” but small in space, time series at a
 point may be efficient, while spatial averages may require reading many
@@ -3251,7 +3251,7 @@ and whether it seems reasonable (not too small, not too large).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>Learners should choose chunk sizes that reflect their dominant
 workloads and keep chunk sizes in a plausible range. For example, for
@@ -3319,7 +3319,7 @@ cloud environments.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <p>You may observe modest timing differences or simply see that the
 number of chunks touched by each operation changes. The key takeaway is
@@ -4463,7 +4463,7 @@ week).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4533,7 +4533,7 @@ year).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4602,7 +4602,7 @@ similar) and extract its time series:</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb18">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -7653,7 +7653,7 @@ discoverable?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>Learners should end up with a small STAC catalog on disk that
 describes their Zarr dataset in terms of space, time, and metadata. They
@@ -7723,7 +7723,7 @@ time as your collection of Zarr datasets grows?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>Learners should recognise that static STAC is ideal for simple,
 low‑maintenance publishing, while database-backed STAC scales better for
@@ -7805,7 +7805,7 @@ documentation)?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>STAC makes their Zarr datasets visible in a generic browser without
 writing custom UI code. You can see how the hierarchical structure of
@@ -7968,7 +7968,7 @@ only for a small area).</li>
 </ul>
 <p>GeoZarr’s <strong>multiscales</strong> convention formalises how to
 store and describe these pyramids in Zarr.</p>
-<figure><img src="geozarr_multiscale.png" alt="Multiscale pyramid example" class="figure mx-auto d-block"><div class="figcaption">Multiscale pyramid example</div>
+<figure><img src="fig/geozarr_multiscale.png" alt="Multiscale pyramid example" class="figure mx-auto d-block"><div class="figcaption">Multiscale pyramid example</div>
 </figure></section><section><h2 class="section-heading" id="geozarr-geospatial-conventions-for-zarr">GeoZarr: geospatial conventions for Zarr<a class="anchor" aria-label="anchor" href="#geozarr-geospatial-conventions-for-zarr"></a>
 </h2>
 <hr class="half-width">
@@ -8038,7 +8038,7 @@ the next exercise.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>Learners should think about how many overview levels they need and
 how chunk sizes map to typical map tiles. They will connect multiscale
@@ -8148,7 +8148,7 @@ out?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -8254,80 +8254,18 @@ show a simple browser example that learners can run locally and point at
 their own multiscale Zarr store.</p>
 </div>
 <div class="section level3">
-<h3 id="simple-html-example-for-zarr-maps">Simple HTML example for zarr-maps<a class="anchor" aria-label="anchor" href="#simple-html-example-for-zarr-maps"></a>
+<h3 id="simple-html-example">Simple HTML example<a class="anchor" aria-label="anchor" href="#simple-html-example"></a>
 </h3>
-<p>Here is a minimal HTML file that uses <strong>zarr-maps</strong> with
-<strong>OpenLayers</strong> to visualise a multiscale Zarr store in the
-browser. Please update the <code>zarrUrl</code> variable to point to
-your own multiscale Zarr dataset.</p>
-<div class="codewrapper sourceCode" id="cb6">
-<h3 class="code-label">HTML<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode html" tabindex="0"><code class="sourceCode html"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="ot"> lang</span><span class="op">=</span><span class="st">"en"</span><span class="dt">&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>  <span class="dt">&lt;</span><span class="kw">meta</span><span class="ot"> charset</span><span class="op">=</span><span class="st">"UTF-8"</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>  <span class="dt">&lt;</span><span class="kw">meta</span><span class="ot"> name</span><span class="op">=</span><span class="st">"viewport"</span><span class="ot"> content</span><span class="op">=</span><span class="st">"width=device-width, initial-scale=1.0"</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Zarr-maps OpenLayers Example<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>  <span class="dt">&lt;</span><span class="kw">link</span><span class="ot"> rel</span><span class="op">=</span><span class="st">"stylesheet"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"https://cdn.jsdelivr.net/npm/ol/ol.css"</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a>  <span class="dt">&lt;</span><span class="kw">style</span><span class="dt">&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a>    html<span class="op">,</span> body {</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>      <span class="kw">margin</span><span class="ch">:</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a>      <span class="kw">padding</span><span class="ch">:</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>      <span class="kw">width</span><span class="ch">:</span> <span class="dv">100</span><span class="dt">%</span><span class="op">;</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>      <span class="kw">height</span><span class="ch">:</span> <span class="dv">100</span><span class="dt">%</span><span class="op">;</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>    }</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a></span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a>    <span class="pp">#map</span> {</span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a>      <span class="kw">width</span><span class="ch">:</span> <span class="dv">100</span><span class="dt">%</span><span class="op">;</span></span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1" aria-label="code-block-6-18"></a>      <span class="kw">height</span><span class="ch">:</span> <span class="dv">100</span><span class="dt">%</span><span class="op">;</span></span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1" aria-label="code-block-6-19"></a>    }</span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1" aria-label="code-block-6-20"></a>  <span class="dt">&lt;/</span><span class="kw">style</span><span class="dt">&gt;</span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1" aria-label="code-block-6-21"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1" aria-label="code-block-6-22"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1" aria-label="code-block-6-23"></a>  <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> id</span><span class="op">=</span><span class="st">"map"</span><span class="dt">&gt;&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1" aria-label="code-block-6-24"></a></span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1" aria-label="code-block-6-25"></a>  <span class="dt">&lt;</span><span class="kw">script</span><span class="ot"> type=</span><span class="st">"module"</span><span class="dt">&gt;</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1" aria-label="code-block-6-26"></a>    <span class="im">import</span> <span class="bu">Map</span> <span class="im">from</span> <span class="st">"https://cdn.jsdelivr.net/npm/ol/Map.js"</span><span class="op">;</span></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1" aria-label="code-block-6-27"></a>    <span class="im">import</span> View <span class="im">from</span> <span class="st">"https://cdn.jsdelivr.net/npm/ol/View.js"</span><span class="op">;</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1" aria-label="code-block-6-28"></a>    <span class="im">import</span> TileLayer <span class="im">from</span> <span class="st">"https://cdn.jsdelivr.net/npm/ol/layer/Tile.js"</span><span class="op">;</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1" aria-label="code-block-6-29"></a>    <span class="im">import</span> OSM <span class="im">from</span> <span class="st">"https://cdn.jsdelivr.net/npm/ol/source/OSM.js"</span><span class="op">;</span></span>
-<span id="cb6-30"><a href="#cb6-30" tabindex="-1" aria-label="code-block-6-30"></a></span>
-<span id="cb6-31"><a href="#cb6-31" tabindex="-1" aria-label="code-block-6-31"></a>    <span class="co">// Update this import if your zarr-maps build uses a different path</span></span>
-<span id="cb6-32"><a href="#cb6-32" tabindex="-1" aria-label="code-block-6-32"></a>    <span class="im">import</span> { ZarrLayer } <span class="im">from</span> <span class="st">"https://cdn.jsdelivr.net/npm/zarr-maps/dist/ol.js"</span><span class="op">;</span></span>
-<span id="cb6-33"><a href="#cb6-33" tabindex="-1" aria-label="code-block-6-33"></a></span>
-<span id="cb6-34"><a href="#cb6-34" tabindex="-1" aria-label="code-block-6-34"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: Update these values to match your dataset</span></span>
-<span id="cb6-35"><a href="#cb6-35" tabindex="-1" aria-label="code-block-6-35"></a>    <span class="kw">const</span> zarrUrl <span class="op">=</span> <span class="st">"https://example.com/path/to/converted_multiscale.zarr"</span><span class="op">;</span></span>
-<span id="cb6-36"><a href="#cb6-36" tabindex="-1" aria-label="code-block-6-36"></a>    <span class="kw">const</span> variable <span class="op">=</span> <span class="st">"salinity"</span><span class="op">;</span></span>
-<span id="cb6-37"><a href="#cb6-37" tabindex="-1" aria-label="code-block-6-37"></a></span>
-<span id="cb6-38"><a href="#cb6-38" tabindex="-1" aria-label="code-block-6-38"></a>    <span class="kw">const</span> map <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>({</span>
-<span id="cb6-39"><a href="#cb6-39" tabindex="-1" aria-label="code-block-6-39"></a>      <span class="dt">target</span><span class="op">:</span> <span class="st">"map"</span><span class="op">,</span></span>
-<span id="cb6-40"><a href="#cb6-40" tabindex="-1" aria-label="code-block-6-40"></a>      <span class="dt">layers</span><span class="op">:</span> [</span>
-<span id="cb6-41"><a href="#cb6-41" tabindex="-1" aria-label="code-block-6-41"></a>        <span class="kw">new</span> <span class="fu">TileLayer</span>({</span>
-<span id="cb6-42"><a href="#cb6-42" tabindex="-1" aria-label="code-block-6-42"></a>          <span class="dt">source</span><span class="op">:</span> <span class="kw">new</span> <span class="fu">OSM</span>()<span class="op">,</span></span>
-<span id="cb6-43"><a href="#cb6-43" tabindex="-1" aria-label="code-block-6-43"></a>        })<span class="op">,</span></span>
-<span id="cb6-44"><a href="#cb6-44" tabindex="-1" aria-label="code-block-6-44"></a>      ]<span class="op">,</span></span>
-<span id="cb6-45"><a href="#cb6-45" tabindex="-1" aria-label="code-block-6-45"></a>      <span class="dt">view</span><span class="op">:</span> <span class="kw">new</span> <span class="fu">View</span>({</span>
-<span id="cb6-46"><a href="#cb6-46" tabindex="-1" aria-label="code-block-6-46"></a>        <span class="dt">center</span><span class="op">:</span> <span class="op">,</span></span>
-<span id="cb6-47"><a href="#cb6-47" tabindex="-1" aria-label="code-block-6-47"></a>        <span class="dt">zoom</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span></span>
-<span id="cb6-48"><a href="#cb6-48" tabindex="-1" aria-label="code-block-6-48"></a>        <span class="dt">projection</span><span class="op">:</span> <span class="st">"EPSG:3857"</span><span class="op">,</span></span>
-<span id="cb6-49"><a href="#cb6-49" tabindex="-1" aria-label="code-block-6-49"></a>      })<span class="op">,</span></span>
-<span id="cb6-50"><a href="#cb6-50" tabindex="-1" aria-label="code-block-6-50"></a>    })<span class="op">;</span></span>
-<span id="cb6-51"><a href="#cb6-51" tabindex="-1" aria-label="code-block-6-51"></a></span>
-<span id="cb6-52"><a href="#cb6-52" tabindex="-1" aria-label="code-block-6-52"></a>    <span class="kw">const</span> zarrLayer <span class="op">=</span> <span class="kw">new</span> <span class="fu">ZarrLayer</span>({</span>
-<span id="cb6-53"><a href="#cb6-53" tabindex="-1" aria-label="code-block-6-53"></a>      <span class="dt">url</span><span class="op">:</span> zarrUrl<span class="op">,</span></span>
-<span id="cb6-54"><a href="#cb6-54" tabindex="-1" aria-label="code-block-6-54"></a>      <span class="dt">variable</span><span class="op">:</span> variable<span class="op">,</span></span>
-<span id="cb6-55"><a href="#cb6-55" tabindex="-1" aria-label="code-block-6-55"></a>      <span class="dt">colormap</span><span class="op">:</span> <span class="st">"viridis"</span><span class="op">,</span></span>
-<span id="cb6-56"><a href="#cb6-56" tabindex="-1" aria-label="code-block-6-56"></a>      <span class="dt">scale</span><span class="op">:</span> <span class="op">,</span></span>
-<span id="cb6-57"><a href="#cb6-57" tabindex="-1" aria-label="code-block-6-57"></a>    })<span class="op">;</span></span>
-<span id="cb6-58"><a href="#cb6-58" tabindex="-1" aria-label="code-block-6-58"></a></span>
-<span id="cb6-59"><a href="#cb6-59" tabindex="-1" aria-label="code-block-6-59"></a>    <span class="co">// Load Zarr metadata before adding the layer to the map</span></span>
-<span id="cb6-60"><a href="#cb6-60" tabindex="-1" aria-label="code-block-6-60"></a>    <span class="cf">await</span> zarrLayer<span class="op">.</span><span class="fu">load</span>()<span class="op">;</span></span>
-<span id="cb6-61"><a href="#cb6-61" tabindex="-1" aria-label="code-block-6-61"></a>    map<span class="op">.</span><span class="fu">addLayer</span>(zarrLayer)<span class="op">;</span></span>
-<span id="cb6-62"><a href="#cb6-62" tabindex="-1" aria-label="code-block-6-62"></a>  <span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
-<span id="cb6-63"><a href="#cb6-63" tabindex="-1" aria-label="code-block-6-63"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb6-64"><a href="#cb6-64" tabindex="-1" aria-label="code-block-6-64"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre>
-</div>
+<p>In the <a href="files/zarr-maps-openlayers.html">zarr-maps-openlayers.html</a>
+file, we provide a minimal HTML page that uses
+<strong>zarr-maps</strong> with <strong>OpenLayers</strong> to visualise
+a multiscale zarr dataset in the browser. It follows the documented
+<code>ZarrLayer</code> options from the zarr-maps getting-started guide
+and can be served as a static HTML page.</p>
+<p>The lesson renders the same example inline below so learners can
+inspect it directly in the page:</p>
+<iframe src="files/zarr-maps-openlayers.html" title="Zarr-maps OpenLayers example" style="width: 100%; height: 800px; border: 1px solid #d0d7de; border-radius: 0.75rem;" loading="lazy">
+</iframe>
 <div id="exercise-3---explore-your-multiscale-zarr-in-the-browser" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -8338,23 +8276,25 @@ your own multiscale Zarr dataset.</p>
 the browser</h3>
 <div class="callout-content">
 <ol style="list-style-type: decimal">
-<li><p>Save the HTML file above as
-<code>geozarr_example.html</code>.</p></li>
 <li><p>Upload your multiscale Zarr store to an object store and make it
 accessible via HTTPS (or serve it locally with an appropriate static
 server).</p></li>
-<li><p>Edit <code>zarrUrl</code> in the HTML file to point to your
-multiscale Zarr URL.</p></li>
+<li><p>In the page above, edit the <code>zarrUrl</code> and
+<code>variable</code>, add your multiscale zarr dataset. You can edit it
+directly in the browser, or you can get the <a href="files/zarr-maps-openlayers.html">HTML file</a> and edit it to
+point to your multiscale Zarr store and the variable you want to
+visualise.</p></li>
 <li>
 <p>Run a local web server in the directory containing
-<code>geozarr_example.html</code>:</p>
-<div class="codewrapper sourceCode" id="cb7">
+<code>zarr-maps-openlayers.html</code>:</p>
+<div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
 </div>
-<p>Then open <code>http://localhost:8000/geozarr_example.html</code> in
-your browser.</p>
+<p>Then open
+<code>http://localhost:8000/zarr-maps-openlayers.html</code> in your
+browser.</p>
 </li>
 <li><p>Pan and zoom the map, observing how data loads and renders at
 different scales.</p></li>
@@ -8374,12 +8314,11 @@ size) to improve performance?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
-<p>Learners should experience direct browser-based visualisation of
-their multiscale Zarr data. They will see how multiscale pyramids and
-chunking decisions affect the responsiveness and smoothness of
-interaction.</p>
+<p>You should experience direct browser-based visualisation of your
+multiscale Zarr data. You will see how multiscale pyramids and chunking
+decisions affect the responsiveness and smoothness of interaction.</p>
 </div>
 </div>
 </div>
@@ -8408,7 +8347,7 @@ levels.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
 <p>Learners should experience direct browser-based visualisation of
 their multiscale Zarr data. They will see how multiscale pyramids and
@@ -8545,7 +8484,7 @@ governance?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>Learners should surface different architectural patterns and see that
 there is no single “correct” solution. The key outcome is a thoughtful
@@ -8590,7 +8529,7 @@ something you might actually use in your own work.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>Learners will leave with a concrete, personalised set of practices
 they can apply beyond the course. This consolidates the lessons into
