@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zarr-maps OpenLayers Example</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+    }
+
+    #app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      width: 100%;
+      height: 100%;
+    }
+
+    #panel {
+      box-sizing: border-box;
+      padding: 1rem;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-right: 1px solid rgba(148, 163, 184, 0.2);
+      overflow: auto;
+    }
+
+    #panel h1 {
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem;
+    }
+
+    #panel p {
+      margin: 0 0 1rem;
+      line-height: 1.4;
+      color: #cbd5e1;
+    }
+
+    #dimensions {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .dimension-control {
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .dimension-control label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+
+    .dimension-control select,
+    .dimension-control button {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 0.55rem 0.65rem;
+      font: inherit;
+    }
+
+    .dimension-control button {
+      cursor: pointer;
+      margin-top: 0.25rem;
+      background: #1e293b;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside id="panel">
+      <h1>Temperature pyramid</h1>
+      <p>
+        This example uses zarr-maps with OpenLayers to render the
+        <strong>temperature-pyramid_v3</strong> dataset and lets learners change
+        any available non-spatial dimensions.
+      </p>
+      <div id="dimensions"></div>
+    </aside>
+    <div id="map"></div>
+  </div>
+
+  <script type="module">
+    import { Map, View, Tile as TileLayer, OSM, fromLonLat } from "https://esm.sh/ol@latest?bundle";
+    import { ZarrLayer } from "https://esm.sh/zarr-maps/ol?bundle";
+
+    const zarrUrl = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/noc-npd-era5-demo/npd-eorca1-era5v1/gn/T1y/tos_con";
+    const variable = "tos_con";
+
+    const map = new Map({
+      target: "map",
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        })
+      ],
+      view: new View({
+        center: fromLonLat([0, 0]),
+        zoom: 2,
+        projection: "EPSG:3857"
+      })
+    });
+
+    const zarrLayer = new ZarrLayer({
+      url: zarrUrl,
+      variable,
+      colormap: "hot",
+      scale: [0, 27],
+      zarrVersion: 3,
+      crs: "EPSG:3857",
+      maxZoom: 12,
+      opacity: 0.85
+    });
+
+    await zarrLayer.load();
+
+    map.addLayer(zarrLayer);
+
+    const dimensionsContainer = document.getElementById("dimensions");
+    const provider = zarrLayer.provider;
+    const dimensionValues = provider?.dimensionValues ?? {};
+    const currentSelectors = structuredClone(provider?.selectors ?? {});
+
+    const controlRows = [];
+
+    const updateLayer = async () => {
+      await zarrLayer.updateSelectors(currentSelectors);
+      if (typeof zarrLayer.changed === "function") {
+        zarrLayer.changed();
+      }
+    };
+
+    for (const [dimension, values] of Object.entries(dimensionValues)) {
+      if (!Array.isArray(values) || values.length <= 1) {
+        continue;
+      }
+
+      if (dimension === "lat" || dimension === "lon") {
+        continue;
+      }
+
+      const row = document.createElement("div");
+      row.className = "dimension-control";
+
+      const label = document.createElement("label");
+      label.textContent = dimension;
+      label.htmlFor = `dimension-${dimension}`;
+
+      const select = document.createElement("select");
+      select.id = `dimension-${dimension}`;
+
+      values.forEach((value, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = typeof value === "string" ? value : String(value);
+        select.appendChild(option);
+      });
+
+      const initialSelected = currentSelectors[dimension]?.selected ?? 0;
+      select.value = String(initialSelected);
+
+      select.addEventListener("change", async event => {
+        const target = event.currentTarget;
+        if (!(target instanceof HTMLSelectElement)) return;
+
+        currentSelectors[dimension] = {
+          type: "index",
+          selected: Number(target.value)
+        };
+        await updateLayer();
+      });
+
+      row.append(label, select);
+      controlRows.push(row);
+    }
+
+    const resetButton = document.createElement("button");
+    resetButton.type = "button";
+    resetButton.textContent = "Reset dimension slices";
+    resetButton.addEventListener("click", async () => {
+      for (const key of Object.keys(currentSelectors)) {
+        currentSelectors[key] = structuredClone(provider?.selectors?.[key] ?? currentSelectors[key]);
+      }
+
+      controlRows.forEach(row => {
+        const select = row.querySelector("select");
+        if (select) {
+          const dimension = select.id.replace("dimension-", "");
+          const selected = currentSelectors[dimension]?.selected ?? 0;
+          select.value = String(selected);
+        }
+      });
+
+      await updateLayer();
+    });
+
+    controlRows.push(resetButton);
+    dimensionsContainer.append(...controlRows);
+  </script>
+</body>
+</html>

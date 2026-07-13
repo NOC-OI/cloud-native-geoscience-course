@@ -25,67 +25,29 @@ Reference workshop page (timing source):
 
 ## Workshop Timing and Materials
 
-The table below maps the workshop schedule to this repository's lesson materials, using the current episode names.
+The table below maps the workshop schedule to this repository's lesson materials:
 
-### Day 1 - Foundations and Formats
 
-| Time (UTC-3) | Session | Material |
-|:--|:--|:--|
-| 09:15 | Course introduction, goals, and setup | [01 - Introduction to Data Formats, Metadata, and Vocabulary][episode01] |
-| 09:45 | Introduction to data formats, metadata, and vocabulary | [01 - Introduction to Data Formats, Metadata, and Vocabulary][episode01] |
-| 10:20 | Challenges of n-dimensional data | [02 - Challenges of N-dimensional Data][episode02] |
-| 11:00 | What are cloud-native formats? | [03 - What Are Cloud-Native Formats?][episode03] |
-| 11:20 | Zarr: data model, metadata, and chunked storage | [04 - Zarr - Data Model, Metadata, and Chunked Storage][episode04] |
-| 13:30 | Python tools for working with Zarr | [05 - Python Tools for Working with Zarr][episode05] |
-| 15:00 | Hands-on: Zarr datasets | [08 - Hands-On with Open Zarr Datasets Using Python][episode08] |
-| 15:50 | Hands-on: Zarr datasets (continued) | [08 - Hands-On with Open Zarr Datasets Using Python][episode08] |
-| 16:20 | How to choose chunks for analysis and processing at scale | [06 - How to Choose Chunks for Analysis and Processing at Scale][episode06] |
+## Episodes
 
-### Day 2 - Storage, Conversion, and Processing
-
-| Time (UTC-3) | Session | Material |
-|:--|:--|:--|
-| 09:10 | Object storage: concepts, remote access, and organizing data in the cloud | [09 - Object Storage - Concepts, Remote Access, and Data Organization in the Cloud][episode09] |
-| 10:00 | Scientific data layouts in object storage | [09 - Object Storage - Concepts, Remote Access, and Data Organization in the Cloud][episode09] |
-| 11:00 | Converting traditional formats to Zarr | [10 - Conversion Workflow of Traditional Formats to Zarr][episode10] |
-| 13:30 | Parallel processing | [07 - Parallel Processing for Zarr][episode07] |
-| 15:10 | Hands-on: conversion and processing pipeline | [10 - Conversion Workflow of Traditional Formats to Zarr][episode10] |
-| 15:50 | Hands-on: conversion and processing pipeline (continued) | [07 - Parallel Processing for Zarr][episode07] + [10 - Conversion Workflow of Traditional Formats to Zarr][episode10] |
-
-### Day 3 - Versioning, Interoperability, and Visualization
-
-| Time (UTC-3) | Session | Material |
-|:--|:--|:--|
-| 09:10 | Data versioning with Icechunk | [12 - Data Versioning with Icechunk][episode12] |
-| 11:00 | Talk session: how are other institutions using Zarr? | [11 - Invited Case Studies][episode11] |
-| 11:45 | Creating virtual Zarr stores with Virtualizarr | [13 - Creating Virtual Zarr Stores with Virtualizarr][episode13] |
-| 12:20 | Organizing Zarr data in the cloud with STAC | [14 - Zarr Data Organization in the Cloud with STAC][episode14] |
-| 13:30 | Organizing Zarr data in the cloud with STAC (continued) | [14 - Zarr Data Organization in the Cloud with STAC][episode14] |
-| 13:50 | Visualization: multiscale Zarr and GeoZarr | [15 - Visualization - Multiscale Zarr and GeoZarr][episode15] |
-| 14:50 | Hands-on: visualizing data in the cloud | [15 - Visualization - Multiscale Zarr and GeoZarr][episode15] |
-| 15:50 | Hands-on: visualizing data in the cloud (continued) | [15 - Visualization - Multiscale Zarr and GeoZarr][episode15] |
-| 16:30 | Discussion: architectures and best practices | [16 - Architectures and Best Practices][episode16] |
-
-## Episode Index
-
-| # | Episode |
-|--:|:--|
-| 1 | [Introduction to Data Formats, Metadata, and Vocabulary][episode01] |
-| 2 | [Challenges of N-dimensional Data][episode02] |
-| 3 | [What Are Cloud-Native Formats?][episode03] |
-| 4 | [Zarr - Data Model, Metadata, and Chunked Storage][episode04] |
-| 5 | [Python Tools for Working with Zarr][episode05] |
-| 6 | [How to Choose Chunks for Analysis and Processing at Scale][episode06] |
-| 7 | [Parallel Processing for Zarr][episode07] |
-| 8 | [Hands-On with Open Zarr Datasets Using Python][episode08] |
-| 9 | [Object Storage - Concepts, Remote Access, and Data Organization in the Cloud][episode09] |
-| 10 | [Conversion Workflow of Traditional Formats to Zarr][episode10] |
-| 11 | [Invited Case Studies][episode11] |
-| 12 | [Data Versioning with Icechunk][episode12] |
-| 13 | [Creating Virtual Zarr Stores with Virtualizarr][episode13] |
-| 14 | [Zarr Data Organization in the Cloud with STAC][episode14] |
-| 15 | [Visualization - Multiscale Zarr and GeoZarr][episode15] |
-| 16 | [Architectures and Best Practices][episode16] |
+| # | Episode | Time | Question(s) |
+|--:|:---------|:----:|:------------|
+| 1 | [Introduction to Data Formats, Metadata, and Vocabulary][episode01] | 30 | What are the main data formats used to store ocean and atmosphere data?<br>What is metadata, and how does it help other people find and understand my data?<br>What is a controlled vocabulary, and why is it better than free text?<br>Which international standards should I be aware of when publishing environmental data?<br>How do these standards connect to modern cloud-native formats like Zarr? |
+| 2 | [Challenges of N-dimensional Data][episode02] | 30 | How do NetCDF, GRIB, and HDF5 organise large n-dimensional arrays?<br>Why have typical datasets in meteorology and oceanography grown so much in size?<br>What happens when we open these files in standard tools like xarray?<br>Why is it important to share data in a way that supports partial access rather than whole-file downloads?<br>How do chunking and parallel processing affect performance, scalability, and memory use? |
+| 3 | [What Are Cloud-Native Formats?][episode03] | 20 | What makes a format cloud-native?<br>Why are traditional file-based formats not always a good fit for cloud storage?<br>Which cloud-native or cloud-optimized approaches are relevant for Earth system data?<br>How do cloud-native formats change the way we work with environmental data? |
+| 4 | [Zarr - Data Model, Metadata, and Chunked Storage][episode04] | 30 | What is Zarr, and how does its data model differ from formats like NetCDF or HDF5?<br>How does Zarr store metadata about arrays and groups?<br>What is chunked storage in Zarr, and why is it useful for large multidimensional datasets?<br>How is Zarr changing the way ocean, climate, and meteorological data are stored and accessed? |
+| 5 | [Python Tools for Working with Zarr][episode05] | 30 | What Python packages are commonly used to work with Zarr data?<br>How can I inspect a Zarr store directly with the `zarr` library?<br>How does xarray represent Zarr datasets as labelled N-dimensional data?<br>When does the data actually get loaded into memory?<br>What basic xarray operations are useful for oceanography, climate, and meteorology? |
+| 6 | [How to Choose Chunks for Analysis and Processing at Scale][episode06] | 30 | What is a chunk, and why does its shape matter for performance?<br>How should I choose chunk sizes for different types of analysis?<br>What are the trade-offs between large and small chunks?<br>How can I rechunk a Zarr dataset and save it for future use? |
+| 7 | [Parallel Processing for Zarr][episode07] | 40 | Why do we need parallel processing for large Zarr datasets?<br>How does Dask parallelise xarray and Zarr computations?<br>How do chunking and lazy loading support parallel work?<br>What other parallelism tools do Python users sometimes combine with Zarr? |
+| 8 | [Hands-On with Open Zarr Datasets Using Python][episode08] | 45 | Which publicly available Zarr datasets can I use for experimentation and learning?<br>How do I open Zarr datasets from cloud object storage (Google Cloud, AWS S3) with Python?<br>How do irregular grids, ragged arrays, and ensembles appear in Zarr + xarray?<br>How do chunks and storage layout influence how I analyse these datasets? |
+| 9 | [Object Storage - Concepts, Remote Access, and Data Organization in the Cloud][episode09] | 40 | What is an object store, and how is it different from storing data on a server filesystem?<br>Why is object storage a good fit for large-scale data sharing and cloud-native science?<br>How does object storage support secure, concurrent, and parallel access?<br>How can I use commercial cloud object stores and self-hosted solutions like MinIO? |
+| 10 | [Conversion Workflow of Traditional Formats to Zarr][episode10] | 45 | Why convert NetCDF data to Zarr, and what changes in the way we access and process data?<br>How do we choose chunk sizes for Zarr when starting from NetCDF files?<br>How can we use Dask and xarray to convert and write data to Zarr efficiently?<br>How do we test that the converted data is usable and correct (e.g. computing mean values)? |
+| 11 | [Invited Case Studies][episode11] | 40 | How are different teams and organisations actually converting and serving data in practice?<br>What problems do they face, and which solutions have worked well (or badly)?<br>What lessons can we take from their architectures and workflows for our own projects? |
+| 12 | [Data Versioning with Icechunk][episode12] | 40 | What problems arise when we use plain Zarr for shared, evolving datasets?<br>How does Icechunk add safety, consistency, and reproducibility on top of Zarr?<br>How can we use transactions to update data atomically and avoid partial writes?<br>How can we reference and replay specific versions of data for reproducible analysis? |
+| 13 | [Creating Virtual Zarr Stores with Virtualizarr][episode13] | 40 | Why might we prefer a virtual Zarr store over fully converting data to Zarr?<br>How do we create a virtual dataset from NetCDF files already on the server?<br>How does a virtual Zarr store look when opened with xarray?<br>What do we gain by virtualising instead of copying all the data? |
+| 14 | [Zarr Data Organization in the Cloud with STAC][episode14] | 40 | How does STAC help us organise and discover Zarr data cubes in the cloud?<br>What is the difference between a STAC Catalog, Collection, and Item?<br>How can we programmatically build STAC metadata for our Zarr datasets?<br>Why might we store STAC metadata in a database instead of a set of JSON files? |
+| 15 | [Visualization - Multiscale Zarr and GeoZarr][episode15] | 40 | How does chunking affect interactive visualisation of Zarr data in the cloud?<br>What is a multiscale pyramid, and why does it come from Cloud-Optimized GeoTIFF ideas?<br>What does GeoZarr add on top of Zarr for geospatial visualisation?<br>How can we use Topozarr to create multiscale Zarr from our example dataset and explore it in a browser? |
+| 16 | [Architectures and Best Practices][episode16] | 25 | What does a good cloud-native architecture for geospatial and climate data look like?<br>How do we decide when to use physical Zarr, virtual Zarr, STAC, Icechunk, GeoZarr, and multiscale pyramids?<br>What practices help keep data systems robust, reproducible, and future-proof? |
 
 ## Contributing
 

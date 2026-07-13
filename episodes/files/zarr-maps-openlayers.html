@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zarr-maps OpenLayers Example</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    #controls {
+      box-sizing: border-box;
+      align-items: flex-end;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      color: #e2e8f0;
+    }
+
+    #dataset {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1rem;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    #dataset .control {
+      min-width: 260px;
+    }
+
+    #dataset .control.narrow {
+      min-width: 140px;
+    }
+
+    #load-dataset {
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #e5e7eb;
+      padding: 0.45rem 0.9rem;
+      font: inherit;
+      cursor: pointer;
+      height: fit-content;
+    }
+
+    #load-dataset:hover {
+      background: #27364b;
+    }
+
+    #dataset-status {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      min-width: 100%;
+    }
+
+    #dataset-status.error {
+      color: #f87171;
+    }
+
+    #dataset-inputs {
+      display: flex;
+      gap: 1rem;
+    }
+
+    #styles {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .control {
+      gap: 0.3rem;
+      min-width: 140px;
+    }
+
+    .control label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+
+    .control select,
+    .control input {
+      box-sizing: border-box;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 0.4rem 0.55rem;
+      font: inherit;
+      width: 100%;
+    }
+
+    .range-control {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .range-control input {
+      width: 70px;
+    }
+
+    #dimensions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    #custom_edit {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+
+    #map {
+      flex: 1;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="controls">
+      <div id="dataset">
+        <div id="dataset-inputs">
+          <div class="control">
+            <label for="dataset-url">Zarr URL</label>
+            <input type="text" id="dataset-url" placeholder="https://example.com/data.zarr" value="https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/noc-npd-era5-demo/npd-eorca025-era5v1/gn/T1y_4d/thetao_con" />
+          </div>
+          <div class="control narrow">
+            <label for="dataset-variable">Variable</label>
+            <input type="text" id="dataset-variable" placeholder="variable name" value="thetao_con" />
+          </div>
+          <button type="button" id="load-dataset">Load dataset</button>
+        </div>
+        <div id="dataset-status"></div>
+      </div>
+      <div id="custom_edit">
+        <div id="dimensions"></div>
+        <div id="styles">
+          <div class="control">
+            <label for="colormap-select">Colormap</label>
+            <select id="colormap-select">
+              <option value="viridis">viridis</option>
+              <option value="plasma">plasma</option>
+              <option value="inferno">inferno</option>
+              <option value="magma">magma</option>
+              <option value="cividis">cividis</option>
+              <option value="turbo">turbo</option>
+              <option value="hot">hot</option>
+              <option value="jet">jet</option>
+              <option value="coolwarm">coolwarm</option>
+              <option value="RdBu">RdBu</option>
+              <option value="BrBG" selected>BrBG</option>
+              <option value="YlOrRd">YlOrRd</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Color limits</label>
+            <div class="range-control">
+              <input type="number" id="scale-min" value="0" step="1" />
+              <input type="number" id="scale-max" value="27" step="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <script type="module">
+    import Map from "https://esm.sh/ol@latest/Map.js";
+    import View from "https://esm.sh/ol@latest/View.js";
+    import TileLayer from "https://esm.sh/ol@latest/layer/Tile.js";
+    import OSM from "https://esm.sh/ol@latest/source/OSM.js";
+    import { fromLonLat } from "https://esm.sh/ol@latest/proj.js";
+    import { ZarrLayer } from "https://esm.sh/zarr-maps/ol?bundle";
+
+    const DEFAULT_URL = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/noc-npd-era5-demo/npd-eorca025-era5v1/gn/T1y_4d/thetao_con";
+    const DEFAULT_VARIABLE = "thetao_con";
+
+    const map = new Map({
+      target: "map",
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        })
+      ],
+      view: new View({
+        center: fromLonLat([0, 0]),
+        zoom: 2,
+        projection: "EPSG:3857"
+      })
+    });
+
+    const dimensionsContainer = document.getElementById("dimensions");
+    const colormapSelect = document.getElementById("colormap-select");
+    const scaleMinInput = document.getElementById("scale-min");
+    const scaleMaxInput = document.getElementById("scale-max");
+
+    const urlInput = document.getElementById("dataset-url");
+    const variableInput = document.getElementById("dataset-variable");
+    const loadButton = document.getElementById("load-dataset");
+    const statusEl = document.getElementById("dataset-status");
+
+    let zarrLayer = null;
+
+    const setStatus = (message, isError = false) => {
+      statusEl.textContent = message;
+      statusEl.classList.toggle("error", isError);
+    };
+
+    const refreshLayer = () => {
+      if (zarrLayer && typeof zarrLayer.changed === "function") {
+        zarrLayer.changed();
+      }
+    };
+
+    const clearDimensionControls = () => {
+      dimensionsContainer.innerHTML = "";
+    };
+
+    const buildDimensionControls = currentSelectors => {
+      clearDimensionControls();
+
+      const dimensionValues = zarrLayer.provider?.dimensionValues ?? {};
+
+      for (const [dimension, values] of Object.entries(dimensionValues)) {
+        if (!Array.isArray(values) || values.length <= 1) {
+          continue;
+        }
+
+        if (dimension === "lat" || dimension === "lon") {
+          continue;
+        }
+
+        const control = document.createElement("div");
+        control.className = "control";
+
+        const label = document.createElement("label");
+        label.textContent = dimension;
+        label.htmlFor = `dimension-${dimension}`;
+
+        const select = document.createElement("select");
+        select.id = `dimension-${dimension}`;
+
+        values.forEach((value, index) => {
+          const option = document.createElement("option");
+          option.value = String(index);
+          option.textContent = typeof value === "string" ? value : String(value);
+          select.appendChild(option);
+        });
+
+        const initialSelected = currentSelectors[dimension]?.selected ?? 0;
+        select.value = String(initialSelected);
+
+        select.addEventListener("change", async event => {
+          const target = event.currentTarget;
+          if (!(target instanceof HTMLSelectElement)) return;
+
+          currentSelectors[dimension] = {
+            type: "index",
+            selected: Number(target.value)
+          };
+          await zarrLayer.updateSelectors(currentSelectors);
+          refreshLayer();
+        });
+
+        control.append(label, select);
+        dimensionsContainer.appendChild(control);
+      }
+    };
+
+    const loadDataset = async ({ url, variable }) => {
+      loadButton.disabled = true;
+      setStatus("Loading dataset…");
+
+      try {
+        const colormap = colormapSelect.value;
+        const scale = [Number(scaleMinInput.value), Number(scaleMaxInput.value)];
+
+        const options = {
+          url,
+          variable,
+          colormap,
+          scale,
+          crs: "EPSG:3857",
+          maxZoom: 12,
+          opacity: 0.85
+        };
+
+        const newLayer = new ZarrLayer(options);
+        await newLayer.load();
+
+        if (zarrLayer) {
+          map.removeLayer(zarrLayer);
+        }
+
+        zarrLayer = newLayer;
+        map.addLayer(zarrLayer);
+
+        const currentSelectors = structuredClone(zarrLayer.provider?.selectors ?? {});
+        buildDimensionControls(currentSelectors);
+
+        setStatus(`Loaded "${variable}" from ${url}`);
+      } catch (error) {
+        console.error(error);
+        setStatus(`Failed to load dataset: ${error?.message ?? error}`, true);
+      } finally {
+        loadButton.disabled = false;
+      }
+    };
+
+    loadButton.addEventListener("click", () => {
+      const url = urlInput.value.trim();
+      const variable = variableInput.value.trim();
+
+      if (!url || !variable) {
+        setStatus("Please provide both a Zarr URL and a variable name.", true);
+        return;
+      }
+
+      loadDataset({ url, variable });
+    });
+
+    colormapSelect.addEventListener("change", async event => {
+      const target = event.currentTarget;
+      if (!(target instanceof HTMLSelectElement) || !zarrLayer) return;
+
+      zarrLayer.updateStyle({ colormap: target.value });
+      refreshLayer();
+    });
+
+    const applyScale = async () => {
+      if (!zarrLayer) return;
+
+      const min = Number(scaleMinInput.value);
+      const max = Number(scaleMaxInput.value);
+      if (Number.isNaN(min) || Number.isNaN(max)) return;
+
+      zarrLayer.updateStyle({ scale: [min, max] });
+      refreshLayer();
+    };
+
+    scaleMinInput.addEventListener("change", applyScale);
+    scaleMaxInput.addEventListener("change", applyScale);
+
+    // Load the default dataset on startup
+    loadDataset({ url: DEFAULT_URL, variable: DEFAULT_VARIABLE });
+  </script>
+</body>
+</html>
