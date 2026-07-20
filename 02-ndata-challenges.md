@@ -112,12 +112,12 @@ print(ds.attrs)
 Think about:
 
 - Which dimensions does this dataset use (e.g. `time`, `lat`, `lon`, `depth`)?
-- How would the structure change if we added ensemble members or more vertical levels?
+- How would the structure change if we added ensemble members or vertical levels?
 - What might become difficult as the dataset grows larger or more complex?
 
 ::::::::::::::: solution
 
-A typical output might show dimensions such as `time`, `lat`, `lon`, and `depth`, coordinate variables, and global attributes describing source, institution, and conventions.
+This dataset has dimensions for "time" (`valid_time`), "lat" (`latitude`), and `lon` (`longitude`), with corresponding coordinate variables. Attributes provide metadata about the dataset, such as the source, institution, and conventions used.
 Adding ensemble members or more levels would introduce additional dimensions, increasing the size of the dataset and potentially complicating access patterns.
 
 :::::::::::::::::::::::::
@@ -132,23 +132,14 @@ Adding ensemble members or more levels would introduce additional dimensions, in
 Many forecast products are distributed in GRIB, while climate or reanalysis products may be available as NetCDF. To get a feeling for differences:
 
 1. Open a NetCDF example (e.g. `data/ocean_temperature.nc`) with xarray.
-2. Open a GRIB example (e.g. `data/era5_example.grib`) with xarray using the `cfgrib` engine.
+2. Open a GRIB example (e.g. `data/ocean_temperature.grib`) with xarray using the `cfgrib` engine.
 3. Compare what `print(ds)` shows for each: dimensions, data variables, coordinates, and attributes.
 
-Example:
+To open a GRIB file, you may need to use engine="cfgrib" in `xr.open_dataset()`:
 
 ```python
-import xarray as xr
-
-# NetCDF example
-ds_nc = xr.open_dataset("data/ocean_temperature.nc")
-print(ds_nc)
-print(ds_nc.dims)
-print(ds_nc.data_vars)
-
-# GRIB example
 ds_grib = xr.open_dataset(
-    "data/era5_example.grib",
+    "data/ocean_temperature.grib",
     engine="cfgrib",
 )
 print(ds_grib)
@@ -164,7 +155,7 @@ Questions to discuss:
 
 ::::::::::::::: solution
 
-NetCDF datasets typically have a clear structure with explicit dimensions and variables, while GRIB datasets may have fewer explicit dimensions and rely on encoded metadata. GRIB files often contain multiple fields in one file, which can appear more fragmented, whereas NetCDF files are usually organised around variables and dimensions in a single data model.
+Both files expose a very similar data model when opened with xarray. They contain the same spatial grid (721 × 1440), 120 time steps, and a single variable (sst). The main difference is in the temporal and auxiliary coordinates: the NetCDF file uses valid_time as its dimension, whereas the GRIB file uses time as the dimension and retains additional GRIB-specific coordinates such as step, surface, and number. The GRIB dataset also preserves extra metadata, such as the GRIB edition, while the NetCDF file presents a simplified CF-compliant representation. In general, NetCDF stores dimensions, variables, and metadata explicitly, whereas GRIB is a message-based format where much of the metadata is encoded within each field.
 
 :::::::::::::::::::::::::
 
@@ -193,9 +184,11 @@ You do not need to implement anything; focus on reasoning about dimensions, size
 
 ::::::::::::::: solution
 
-Doubling the horizontal resolution roughly quadruples the number of grid points, increasing data volume per time step. Increasing frequency from monthly to hourly multiplies the number of time steps by roughly 24×-30×, and adding more time steps to cover a 30‑year period multiplies data volume again.
+Doubling the horizontal resolution would increase the number of latitude and longitude points, giving about four times more grid cells at each time step. Changing the output from monthly to hourly and extending the dataset to 30 years would greatly increase the number of time steps, making the dataset much larger overall.
 
-A naive strategy of storing everything in a single file, downloading that file locally, and always reading full arrays would quickly become impractical: files would be slow to move, hard to store on laptops, and every collaborator might end up keeping their own large copy. This motivates more careful file organisation (splitting archives, choosing good dimensions), **and** better access and sharing strategies (server‑side subsetting, remote APIs, or cloud‑native approaches discussed later).
+A single file would become difficult to store, move, and analyse, so it would be better to split the data into smaller files. Opening and working with the full dataset would also become slower and could require more memory than is available on a typical computer.
+
+Sharing the dataset by giving everyone a local copy would be inefficient because of its size and could lead to different versions of the data. A better option would be to store the dataset on a shared server or in cloud storage, so everyone can access the same data without downloading the entire archive.
 
 :::::::::::::::::::::::::
 

@@ -47,7 +47,9 @@ The `zarr` package provides low-level access to Zarr stores, allowing you to:
 - Read and write data into arrays.
 - View and edit attributes (metadata).
 
-On the data directory, open the Zarr store `data/ocean_temperature.zarr`
+On the data directory, we have a Zarr store called `data/ocean_temperature.zarr`. This store contains a single group with one array, representing sea surface temperature data from the ERA5 reanalysis dataset. The array is chunked in time and space, and has metadata attributes such as units and long names.
+
+We can open the Zarr store `data/ocean_temperature.zarr` using the `zarr` library:
 
 ```python
 import zarr
@@ -97,12 +99,12 @@ import zarr
 
 root = zarr.open_group("data/ocean_temperature.zarr", mode="r")
 print(list(root.arrays()))
-temp = root["temperature"]
-print(temp)
-print("Shape:", temp.shape)
-print("Chunks:", temp.chunks)
-print("Data type:", temp.dtype)
-print("Array attributes:", temp.attrs)
+sst = root["sst"]
+print(sst)
+print("Shape:", sst.shape)
+print("Chunks:", sst.chunks)
+print("Data type:", sst.dtype)
+print("Array attributes:", sst.attrs)
 ```
 
 :::::::::::::::
@@ -162,10 +164,10 @@ Important points:
 The result is an xarray `Dataset`. Each variable is an xarray `DataArray`, and the metadata from the Zarr store is carried into the xarray structure.
 
 ```python
-temp = ds["temperature"]
-print(temp)
-print("Temperature dims:", temp.dims)
-print("Temperature attrs:", temp.attrs)
+sst = ds["sst"]
+print(sst)
+print("SST dims:", sst.dims)
+print("SST attrs:", sst.attrs)
 ```
 
 ::::::::::::::::::::::::::::::::::::::: challenge
@@ -193,6 +195,21 @@ Xarray organises the dataset into named dimensions and separates data variables 
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## NetCDF vs Zarr with xarray
+
+If we open the same dataset in NetCDF format, we can use `xr.open_dataset`:
+
+```python
+ds_netcdf = xr.open_dataset("data/ocean_temperature.nc")
+print(ds_netcdf)
+```
+
+You will see that the structure is very similar to the Zarr version. The main difference is that NetCDF is a single file, while Zarr is a directory of chunked arrays. But xarray provides a consistent interface for both formats, so analysis code can be reused.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
 ### Basic xarray operations
 
 For this lesson, keep xarray to a small set of core operations:
@@ -203,17 +220,27 @@ For this lesson, keep xarray to a small set of core operations:
 - Plot a slice quickly with `.plot()`.
 
 ```python
-surface = ds["temperature"].sel(depth=0)
-time_slice = ds["temperature"].sel(time=slice("2020-01-01", "2020-01-31"))
-global_mean = ds["temperature"].mean(dim=("lat", "lon"))
-point_ts = ds["temperature"].sel(lat=0.0, lon=0.0, method="nearest")
+time_slice = ds["sst"].sel(valid_time=slice("2025-01-01T00:00:00", "2025-01-02T00:00:00"))
+global_mean = ds["sst"].mean(dim=("latitude", "longitude"))
+point_ts = ds["sst"].sel(latitude=0.0, longitude=0.0, method="nearest")
+isel_slice = ds["sst"].isel(valid_time=0, latitude=100, longitude=200)
 ```
 
 In the operations above, the data is not loaded into memory until you request values or plot the results. For example, the following code will trigger data loading and plotting:
 
 ```python
-surface.sel(time="2020-01-01").plot()
+# map plot
+time_slice.sel(valid_time="2025-01-01T00:00:00").plot()
+```
+
+```python
+# time series plot
 point_ts.plot()
+```
+
+```python
+# just to see a point value
+print(isel_slice.values)
 ```
 
 These operations are especially useful for environmental data, because they keep the code readable and let you work with named coordinates rather than raw array positions.
@@ -230,15 +257,15 @@ A useful rule of thumb is:
 For example, this mainly inspects metadata:
 
 ```python
-print(ds["temperature"])
-print(ds["temperature"].dims)
-print(ds["temperature"].attrs)
+print(ds["sst"])
+print(ds["sst"].dims)
+print(ds["sst"].attrs)
 ```
 
 But this requests actual data values:
 
 ```python
-ds["temperature"].isel(time=0).values
+ds["sst"].isel(time=0).values
 ```
 
 This distinction is one of the main reasons Zarr works well for large environmental datasets: you can explore the dataset structure first, and only load the parts you need for analysis.
@@ -247,33 +274,11 @@ This distinction is one of the main reasons Zarr works well for large environmen
 
 ## Exercise 3 - First analysis on a Zarr dataset
 
-Using your example Zarr dataset and xarray:
+Using the `data/ocean_temperature.zarr` dataset and xarray:
 
-1. Inspect the available variables and pick one that makes sense for a simple analysis (e.g. sea surface temperature).
+1. Inspect the available variables and pick the sea surface temperature.
 2. Compute a spatial mean over latitude and longitude and inspect the resulting time series.
 3. Select a small spatial region (e.g. a box around a particular ocean basin) and compute a mean for that region.
-
-Example:
-
-```python
-import xarray as xr
-
-ds = xr.open_zarr("data/ocean_temperature.zarr")
-
-# Adjust variable and dimension names to match your dataset
-temp = ds["temperature"]
-
-# Global mean time series
-global_ts = temp.mean(dim=("lat", "lon"))
-print(global_ts)
-
-# Regional mean (example box)
-regional_ts = temp.sel(lat=slice(-30, 30), lon=slice(-60, 0)).mean(dim=("lat", "lon"))
-print(regional_ts)
-
-# Additional plotting if desired
-regional_ts.plot()
-```
 
 Questions:
 
@@ -282,6 +287,25 @@ Questions:
 - How comfortable do you feel with xarray's basic usage now?
 
 ::::::::::::::: solution
+
+```python
+import xarray as xr
+
+ds = xr.open_zarr("data/ocean_temperature.zarr")
+
+sst = ds["sst"]
+
+# Global mean time series
+global_ts = sst.mean(dim=("latitude", "longitude"))
+print(global_ts)
+
+# Regional mean (example box)
+regional_ts = sst.sel(latitude=slice(-30, 30), longitude=slice(-60, 0)).mean(dim=("latitude", "longitude"))
+print(regional_ts)
+
+# Additional plotting if desired
+regional_ts.plot()
+```
 
 xarray's labelled dimensions and high‑level methods (`.mean`, `.sel`, `.plot`) make common operations much more expressive and less error‑prone than raw array indexing.
 Opening Zarr datasets with xarray offers a consistent interface across storage formats, laying the groundwork for later lessons on performance, chunking, and cloud‑native workflows.
@@ -294,14 +318,14 @@ Opening Zarr datasets with xarray offers a consistent interface across storage f
 
 ## Exercise 3 - Read only a small part
 
-Use xarray to open the Zarr dataset, then select only a small part of it. Select temperature data for the first month of 2020, for a small region in the Brazilian Southest Coast (min lat: -30, max lat: -20, min lon: -50, max lon: -40). Compute the mean of that subset.
+Use xarray to open the Zarr dataset, then select only a small part of it. Select temperature data for the first hour of 2025, for a small region in the Brazilian Southest Coast (min lat: -30, max lat: -20, min lon: -50, max lon: -40). Compute the mean of that subset.
 
 Questions:
 
 - Did you need to load the full dataset?
 - What parts were actually read into memory?
 - Why is this useful for large datasets?
-
+- What would be the comparison if you had to load a NetCDF file instead?
 
 ::::::::::::::: solution
 
@@ -309,9 +333,9 @@ Questions:
 import xarray as xr
 
 ds = xr.open_zarr("data/ocean_temperature.zarr")
-temp = ds["temperature"]
+sst = ds["sst"]
 
-subset = temp.sel(time="2020-01-01", lat=slice(-30, -20), lon=slice(-50, -40))
+subset = sst.sel(time="2025-01-01T00:00:00", latitude=slice(-30, -20), longitude=slice(-50, -40))
 print(subset)
 print(subset.mean())
 ```
