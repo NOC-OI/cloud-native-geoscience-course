@@ -22,7 +22,7 @@ exercises: 5
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## Why this matters
+## “Hey, let’s not download the whole file every time.” (Cheipesh, 2018)
 
 Environmental data is growing rapidly in size and complexity, and traditional approaches based on downloading files are becoming increasingly impractical for scientific work. Users often cannot reasonably wait to download, store, and process very large files locally, especially when they only need a subset of the data.
 
@@ -96,7 +96,7 @@ It also enables new services: web-based explorers, interactive notebooks, and sc
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise - Spot the cloud-native opportunity
+## Exercise 1 - Spot the cloud-native opportunity
 
 Think about a dataset you use in your own work, such as a reanalysis product, climate model output, or an ocean observing dataset.
 
@@ -115,7 +115,43 @@ Then describe how that task might change if the dataset were available in a clou
 
 ::::::::::::::: solution
 
-Many common workflows still depend on downloading or opening large files even when only a small subset is needed. A cloud-native approach would make it easier to inspect metadata, access subsets directly, reduce duplicate downloads, and support shared analysis from central storage.
+There is no single correct answer, but many datasets are still accessed by downloading files or reading them from shared storage, even when only a small part of the data is needed.
+
+For example, if you only want to extract sea surface temperature for one location over one month, you may still need to open a very large file. With a cloud-native dataset, you could first inspect the metadata, then read only the variable, time period, and region you need. This reduces data transfer, speeds up analysis, and allows multiple users to work from the same shared dataset without creating many local copies.
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 2 - Thinking in chunks
+
+Imagine a global sea surface temperature dataset stored as a Zarr archive.
+
+For each task below, discuss which part of the dataset you would expect to read:
+
+1. Plot sea surface temperature for one day over the whole world.
+2. Extract a 10-year time series at one location.
+3. Compute the average temperature over the North Atlantic for one month.
+
+Questions:
+
+- Would you expect to read the whole dataset or only part of it?
+- Why is it useful for the data to be stored in chunks instead of one large file?
+- How might the choice of chunk layout affect the speed of these different tasks?
+
+::::::::::::::: solution
+
+One of the main ideas behind Zarr is that data is divided into many smaller chunks. Instead of reading an entire dataset, software can load only the chunks needed for a particular operation.
+
+For example:
+
+- A global map for one day mainly needs chunks covering that single time step.
+- A time series at one location mainly needs chunks containing that location through time.
+- A regional average only needs chunks covering the selected region and time period.
+
+Different analyses benefit from different chunk layouts, so choosing an appropriate chunking strategy is an important part of working with Zarr datasets.
 
 :::::::::::::::::::::::::
 

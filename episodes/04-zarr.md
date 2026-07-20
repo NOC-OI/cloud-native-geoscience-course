@@ -49,54 +49,67 @@ Zarr version 2 is the older, widely used storage specification. In Zarr v2, the 
 
 At the top level, you usually see:
 
-- [**`.zgroup`**](data/zarr_group_metadata.json) for group metadata.
-- [**`.zattrs`**](data/zarr_group_attributes.json) for user-defined attributes.
-- [**`.zmetadata`**](data/zarr_consolidated_metadata.json) for consolidated metadata, when enabled.
+- `.zgroup` for group metadata.
+- `.zattrs` for user-defined attributes.
+- `.zmetadata` for consolidated metadata, when enabled.
 
 Inside the group, each array usually appears as its own directory, and that array directory contains:
 
-- [**`.zarray`**](data/zarr_array_metadata.json) for array metadata.
-- [**`.zattrs`**](data/zarr_array_attributes.json) for array-specific attributes.
+- `.zarray` for array metadata.
+- `.zattrs` for array-specific attributes.
 - Chunk files, named by their chunk coordinates, such as `0.0.0`, `0.0.1`, `1.0.0`, and so on.
 
 A simple Zarr v2 layout might look like this:
 
-```text
-sos_abs.zarr/
+```bash
+tree -L 2 data/ocean_temperature_v2.zarr
+```
+
+```output
+ocean_temperature_v2.zarr/
 ├── .zattrs
 ├── .zgroup
 ├── .zmetadata
-├── sos_abs/
+├── sst/
 │   ├── .zarray
 │   ├── .zattrs
 │   ├── 0.0.0
 │   ├── 0.0.1
 │   ├── 0.1.0
 │   └── ...
-├── time_centered/
+├── valid_time/
 │   ├── .zarray
 │   ├── .zattrs
 │   └── ...
-├── time_counter/
+├── longitude/
 │   ├── .zarray
 │   ├── .zattrs
 │   └── ...
-├── x/
-│   ├── .zarray
-│   ├── .zattrs
-│   └── ...
-└── y/
+└── latitude/
     ├── .zarray
     ├── .zattrs
     └── ...
 ```
 
-In this example, `sos_abs` is one data variable, while `time_centered`, `time_counter`, `x`, and `y` are coordinate arrays. Each array has its own `.zarray` file describing the array shape, data type, chunk layout, fill value, and other storage settings.
+In this example, `sst` is one data variable, while `valid_time`, `longitude`, and `latitude` are coordinate arrays. Each array has its own `.zarray` file describing the array shape, data type, chunk layout, fill value, and other storage settings.
 
-This tells us that the `sos_abs` array is three-dimensional, stored in chunks of size `1 × 250 × 250`, and encoded as 32-bit floating-point values. The actual chunk data is stored separately in files such as `0.0.0`, `0.0.1`, `0.1.0`, and so on.
+To see the `.zgroup`, `.zattrs`, and `.zmetadata` of this zarr dataset, you can run the following command in a terminal:
+
+```bash
+cat data/ocean_temperature_v2.zarr/.zgroup
+cat data/ocean_temperature_v2.zarr/.zattrs
+cat data/ocean_temperature_v2.zarr/.zmetadata
+```
+
+To see the `.zarray` metadata for the `sst` array, you can run:
+
+```bash
+cat data/ocean_temperature_v2.zarr/sst/.zarray
+```
+
+This tells us that the `sst` array is three-dimensional, stored in chunks of size `10 × 100 × 100`, and encoded as 32-bit floating-point values. The actual chunk data is stored separately in files such as `0.0.0`, `0.0.1`, `0.1.0`, and so on.
 
 A key feature of Zarr v2 is that the metadata is small, human-readable, and easy to inspect without opening the full dataset. That makes it convenient for browsing dataset structure and understanding how the data are organised before any analysis begins.
-
 
 ![Zarr V2. Source: https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/](fig/zarrv2.png){alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files."}
 
@@ -115,35 +128,39 @@ At a high level, a Zarr v3 store still contains groups, arrays, and chunks, but 
 
 A simplified Zarr v3 structure might look like this:
 
-```text
-sos_abs.zarr/
+
+```bash
+tree -L 2 data/ocean_temperature.zarr
+```
+
+```output
+ocean_temperature.zarr/
 ├── zarr.json
 ├── sos_abs/
 │   ├── zarr.json
-│   ├── c/0/0/0
-│   ├── c/0/0/1
-│   ├── c/0/1/0
-│   └── ...
-├── time_centered/
+│   └── c
+│       ├── 0/0/1
+│       ├── 0/1/0
+│       └── ...
+├── valid_time/
 │   ├── zarr.json
-│   └── c/0
-├── time_counter/
+│   └── c
+│       └── ...
+├── longitude/
 │   ├── zarr.json
-│   └── c/0
-├── x/
+│   └── c
+│       └── ...
+└── latitude/
 │   ├── zarr.json
-│   └── c/0
-└── y/
-    ├── zarr.json
-    └── c/0
+│   └── c
+│       └── ...
 ```
 
 In this example, the root `zarr.json` describes the top-level group, and each array has its own `zarr.json` file describing its shape, chunk grid, data type, codecs, and other metadata. The chunk data are stored separately under chunk key paths such as `c/0/0/0`.
 
-
 ![Zarr V3. Source: https://earthmover.io/blog/what-is-zarr/](fig/zarrv3.png){alt="Zarr V3 metadata structure, showing zarr.json files"}
 
-An [example of a Zarr v3 metadata file for an array](data/zarr_v3_array_metadata.json) might look like this:
+An example of a Zarr v3 metadata file for an array might look like this:
 
 ```json
 {
@@ -160,6 +177,13 @@ An [example of a Zarr v3 metadata file for an array](data/zarr_v3_array_metadata
   "fill_value": null,
   "dimension_separator": "/"
 }
+```
+
+To see the `zarr.json` metadata for the root group and for the `sst` array, you can run:
+
+```bash
+cat data/ocean_temperature.zarr/zarr.json
+cat data/ocean_temperature.zarr/sst/zarr.json
 ```
 
 Zarr v3 also adds more explicit support for features such as sharding, where several chunks can be grouped together inside a larger storage object. This helps reduce the overhead of managing very large numbers of tiny files or keys, especially in cloud object storage.
@@ -183,9 +207,9 @@ This is one reason Zarr fits cloud workflows well: object storage and HTTP-based
 
 Imagine an ocean temperature dataset with dimensions:
 
-- `time = 3650`
-- `lat = 1800`
-- `lon = 3600`
+- `time = 120`
+- `lat = 721`
+- `lon = 1440`
 
 If this were stored as one giant array, even small operations could require reading a very large amount of data. With chunking, the dataset can instead be divided into smaller blocks, such as:
 
@@ -213,8 +237,6 @@ This trade-off is one reason newer Zarr work has added **sharding**.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-
 ## Why Zarr matters for oceanography, climate, and meteorology
 
 For these disciplines, Zarr brings several important shifts:
@@ -226,43 +248,132 @@ For these disciplines, Zarr brings several important shifts:
 
 In short, Zarr doesn't replace scientific semantics like CF or the Common Data Model—it gives us a new storage and access layer that works natively with cloud infrastructure and modern analysis tools.
 
-::::::::::::::::::::::::::::::::::::::: challenge
+## Inspect a Zarr store with Python
 
-## Exercise 1 - Inspecting a Zarr store with Python
+To inspect a Zarr store, we can use the `zarr` library in Python. For example, in the example datasets, we have a Zarr store called `data/ocean_temperature_with_groups.zarr`. This zarr store represents a subset of the ERA5 reanalysis dataset, with sea surface temperature data organised into pyramid groups and arrays.
 
-Assume you have a Zarr store in your lesson data directory, for example `data/ocean_temperature.zarr`, containing a hierarchical dataset with several arrays.
-
-1. Use the Python `zarr` library to open the store.
-2. Inspect the group hierarchy and list available arrays.
-3. Explore the metadata files (`.zarray`, `.zgroup`, `.zattrs`) for one array.
+To open this Zarr store, we can run:
 
 ```python
 import zarr
 
-store = zarr.open_group("data/ocean_temperature.zarr", mode="r")
-print(store)             # Overview of groups and arrays
-print(list(store.arrays()))  # List arrays
-print(list(store.groups()))  # List child groups
+store = zarr.open_group("data/ocean_temperature_with_groups.zarr", mode="r")
+print(store)
+```
 
+To see the arrays and groups inside the store, we can list them:
+
+```python
+print(list(store.arrays()))  # List arrays
+print(list(store.groups()))  # List groups
+```
+
+To see the arrays inside a specific group, we can access that group and list its arrays:
+
+```python
+# Show arrays inside group "1"
+print(list(store["1"].arrays()))
+```
+
+To see the information about the array `sst`, we can access it and print its shape, chunk shape, and data type:
+
+```python
 # Inspect a specific array
-temp = store["temperature"]
-print(temp)
-print(temp.shape, temp.chunks, temp.dtype)
+sst = store["1"]["sst"]
+print(sst)
+print(sst.shape, sst.chunks, sst.dtype)
 
 # Access attributes
-print(temp.attrs)
+print(dict(sst.attrs))
 ```
+
+::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 1 - Inspecting a Zarr store with Python
+
+Using the Zarr store called `data/ocean_temperature_with_groups.zarr`, this store contains a hierarchical dataset with sea surface temperature data organised into groups and arrays.
+
+It contains several arrays, including sea surface temperature (`sst`), valid time, latitude, and longitude.
+
+1. Use the Python `zarr` library to open the store.
+2. Inspect the group hierarchy and list available arrays, groups, and their attributes.
+3. Check the information about the `sst` array, including its shape, chunk shape, and data type.
+4. Explore the metadata files (`.zarray`, `.zgroup`, `.zattrs`) for one array.
 
 Questions:
 
 - How are arrays and groups organised in the store (e.g. top-level group, subgroups)?
-- What chunk shape and data type does the `temperature` array use?
+- What chunk shape and data type does the `sst` array use?
 - Which attributes (metadata) are present on the array and group?
+- Are we opening the entire dataset into memory, or just inspecting the structure?
 
 ::::::::::::::: solution
 
-The Zarr store behaves like a hierarchical container: the `Group` printed by `zarr.open_group` lists child arrays and groups, and each array shows shape, chunk shape, and data type.
-Inspecting `temp.attrs` reveals arbitrary metadata such as units, long names, CF standard names, and possibly application-specific tags, illustrating how Zarr combines a simple core model with flexible attributes.
+Code to inspect the Zarr store:
+
+```python
+import zarr
+
+store = zarr.open_group("data/ocean_temperature_with_groups.zarr", mode="r")
+print(store)
+
+print(list(store.arrays()))  # List arrays
+print(list(store.groups()))  # List groups
+
+# Show arrays inside group "1"
+print(list(store["1"].arrays()))
+
+# Inspect a specific array
+sst = store["1"]["sst"]
+print(sst)
+print(sst.shape, sst.chunks, sst.dtype)
+
+# Access attributes
+print(dict(sst.attrs))
+```
+
+Code to list the files and to see the content of the metadata files:
+
+```bash
+ls -R data/ocean_temperature_with_groups.zarr
+cat data/ocean_temperature_with_groups.zarr/zarr.json
+cat data/ocean_temperature_with_groups.zarr/1/sst/zarr.json
+```
+
+The Zarr store is organised as a hierarchical container. In this example, the root group does not contain any arrays directly:
+
+```bash
+ocean_temperature_with_groups.zarr
+├── 0/
+└── 1/
+├── sst
+├── valid_time
+├── latitude
+├── longitude
+├── spatial_ref
+└── number
+```
+
+The root `Group` contains two child groups (`0` and `1`). The `sst` variable is stored inside group `1`, together with its coordinate arrays (`valid_time`, `latitude`, and `longitude`) and additional metadata arrays.
+
+The `sst` array has:
+
+- Shape: `(10, 360, 720)`
+  - 10 time steps
+  - 360 latitude points
+  - 720 longitude points
+
+- Chunk shape: `(1, 360, 360)`
+
+- Data type: `float32`
+
+The chunking strategy stores one time step per chunk while splitting the longitude dimension into smaller spatial tiles. This allows efficient access when reading individual time slices or spatial subsets.
+
+The array attributes contain metadata inherited from the original GRIB dataset and CF-style information, including  `long_name` -> `"Sea surface temperature"`, for example.
+
+These attributes demonstrate how Zarr separates the data storage structure (groups, arrays, chunks) from the metadata description. This enables flexible storage of scientific datasets while preserving information required for interpretation and analysis.
+
+We are not loading the entire dataset into memory; we are only inspecting the structure and metadata. The actual data is read from disk or object storage only when we explicitly request it (e.g., by slicing the array). This lazy loading is a key feature of Zarr and xarray, allowing efficient handling of large datasets.
 
 :::::::::::::::::::::::::
 
@@ -274,19 +385,19 @@ Inspecting `temp.attrs` reveals arbitrary metadata such as units, long names, CF
 
 Using the same Zarr dataset, answer these conceptual questions:
 
-1. If your array has dimensions `(time, lat, lon)` and a chunk shape `(10, 100, 100)`, what does each chunk represent in terms of space and time?
+1. Your array has dimensions `(valid_time, latitude, longitude)` and a chunk shape `(10, 100, 100)`, what does each chunk represent in terms of space and time?
 2. How might different chunk shapes (e.g. more time vs. more space in each chunk) affect typical operations, such as:
    - Reading a time series at one grid point.
    - Computing a spatial mean for each time step.
 3. Imagine you are designing a Zarr layout for a high‑resolution global reanalysis. What types of operations would you prioritise when choosing chunk shapes?
 
-You do not need to change any code—focus on reasoning about chunks and operations.
+You do not need to change any code. Focus on reasoning about chunks and operations.
 
 ::::::::::::::: solution
 
 A chunk shape such as `(10, 100, 100)` represents 10 time steps over a 100×100 spatial block.
 Chunk shapes that are "tall in time" can be efficient for time series at specific locations, while chunk shapes that cover larger spatial regions may be better for spatial aggregates; in practice, chunk shapes are a compromise based on dominant workloads.
-This exercise prepares you to think critically about chunking decisions, sharding, and performance optimisation covered in later lessons (e.g. on cloud-native formats, Zarr V3 features, and tools like Icechunk and Virtualizarr).
+This exercise prepares you to think critically about chunking decisions, sharding (you will see later what this means), and performance optimisation covered in later lessons (e.g. on cloud-native formats, Zarr V3 features, and tools like Icechunk and Virtualizarr).
 
 :::::::::::::::::::::::::
 
