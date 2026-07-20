@@ -227,7 +227,8 @@
 
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
-        <ul><li><a href="#why-this-matters">Why this matters</a></li>
+        <ul><li><a href="#hey-lets-not-download-the-whole-file-every-time.-cheipesh-2018">“Hey, let’s not download the whole file every time.” (Cheipesh,
+2018)</a></li>
 <li><a href="#from-files-to-cloud-objects">From files to cloud objects</a></li>
 <li><a href="#what-makes-a-format-cloud-native">What makes a format cloud-native?</a></li>
 <li><a href="#key-formats-and-approaches-in-earth-science">Key formats and approaches in Earth science</a></li>
@@ -415,7 +416,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>What Are Cloud-Native Formats?</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-07-20 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/03-cloudnative-formats.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -461,7 +462,8 @@ sharing, and analysis.”</li>
 </div>
 </div>
 </div>
-<section><h2 class="section-heading" id="why-this-matters">Why this matters<a class="anchor" aria-label="anchor" href="#why-this-matters"></a></h2>
+<section><h2 class="section-heading" id="hey-lets-not-download-the-whole-file-every-time--cheipesh-2018">“Hey, let’s not download the whole file every time.” (Cheipesh,
+2018)<a class="anchor" aria-label="anchor" href="#hey-lets-not-download-the-whole-file-every-time--cheipesh-2018"></a></h2>
 <hr class="half-width"><p>Environmental data is growing rapidly in size and complexity, and
 traditional approaches based on downloading files are becoming
 increasingly impractical for scientific work. Users often cannot
@@ -600,13 +602,13 @@ archives”. It also enables new services: web-based explorers,
 interactive notebooks, and scalable processing pipelines that operate
 directly on cloud-native stores, as demonstrated in several tutorials
 that use ERA5 data in Zarr together with STAC metadata.</p>
-<div id="exercise---spot-the-cloud-native-opportunity" class="callout challenge">
+<div id="exercise-1---spot-the-cloud-native-opportunity" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise---spot-the-cloud-native-opportunity" class="callout-inner">
-<h3 class="callout-title">Exercise - Spot the cloud-native
+<div id="exercise-1---spot-the-cloud-native-opportunity" class="callout-inner">
+<h3 class="callout-title">Exercise 1 - Spot the cloud-native
 opportunity</h3>
 <div class="callout-content">
 <p>Think about a dataset you use in your own work, such as a reanalysis
@@ -631,13 +633,67 @@ available in a cloud-native form.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<p>Many common workflows still depend on downloading or opening large
-files even when only a small subset is needed. A cloud-native approach
-would make it easier to inspect metadata, access subsets directly,
-reduce duplicate downloads, and support shared analysis from central
-storage.</p>
+<p>There is no single correct answer, but many datasets are still
+accessed by downloading files or reading them from shared storage, even
+when only a small part of the data is needed.</p>
+<p>For example, if you only want to extract sea surface temperature for
+one location over one month, you may still need to open a very large
+file. With a cloud-native dataset, you could first inspect the metadata,
+then read only the variable, time period, and region you need. This
+reduces data transfer, speeds up analysis, and allows multiple users to
+work from the same shared dataset without creating many local
+copies.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="exercise-2---thinking-in-chunks" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<span class="callout-header">Challenge</span>
+<div id="exercise-2---thinking-in-chunks" class="callout-inner">
+<h3 class="callout-title">Exercise 2 - Thinking in chunks</h3>
+<div class="callout-content">
+<p>Imagine a global sea surface temperature dataset stored as a Zarr
+archive.</p>
+<p>For each task below, discuss which part of the dataset you would
+expect to read:</p>
+<ol style="list-style-type: decimal"><li>Plot sea surface temperature for one day over the whole world.</li>
+<li>Extract a 10-year time series at one location.</li>
+<li>Compute the average temperature over the North Atlantic for one
+month.</li>
+</ol><p>Questions:</p>
+<ul><li>Would you expect to read the whole dataset or only part of it?</li>
+<li>Why is it useful for the data to be stored in chunks instead of one
+large file?</li>
+<li>How might the choice of chunk layout affect the speed of these
+different tasks?</li>
+</ul></div>
+</div>
+</div>
+<div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
+  <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
+</button>
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div class="accordion-body">
+<p>One of the main ideas behind Zarr is that data is divided into many
+smaller chunks. Instead of reading an entire dataset, software can load
+only the chunks needed for a particular operation.</p>
+<p>For example:</p>
+<ul><li>A global map for one day mainly needs chunks covering that single
+time step.</li>
+<li>A time series at one location mainly needs chunks containing that
+location through time.</li>
+<li>A regional average only needs chunks covering the selected region
+and time period.</li>
+</ul><p>Different analyses benefit from different chunk layouts, so choosing
+an appropriate chunking strategy is an important part of working with
+Zarr datasets.</p>
 </div>
 </div>
 </div>
@@ -727,8 +783,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/03-cloudnative-formats.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/03-cloudnative-formats.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-14"
+  "dateModified": "2026-07-20",
+  "datePublished": "2026-07-20"
 }
 
   </script><script>

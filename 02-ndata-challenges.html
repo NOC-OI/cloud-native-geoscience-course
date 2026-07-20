@@ -416,7 +416,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Challenges of N-dimensional Data</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-07-20 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/02-ndata-challenges.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -587,7 +587,7 @@ reflects the n-dimensional nature of the data.</li>
 <p>Think about:</p>
 <ul><li>Which dimensions does this dataset use (e.g. <code>time</code>,
 <code>lat</code>, <code>lon</code>, <code>depth</code>)?</li>
-<li>How would the structure change if we added ensemble members or more
+<li>How would the structure change if we added ensemble members or
 vertical levels?</li>
 <li>What might become difficult as the dataset grows larger or more
 complex?</li>
@@ -599,14 +599,15 @@ complex?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
-<p>A typical output might show dimensions such as <code>time</code>,
-<code>lat</code>, <code>lon</code>, and <code>depth</code>, coordinate
-variables, and global attributes describing source, institution, and
-conventions. Adding ensemble members or more levels would introduce
-additional dimensions, increasing the size of the dataset and
-potentially complicating access patterns.</p>
+<p>This dataset has dimensions for “time” (<code>valid_time</code>),
+“lat” (<code>latitude</code>), and <code>lon</code>
+(<code>longitude</code>), with corresponding coordinate variables.
+Attributes provide metadata about the dataset, such as the source,
+institution, and conventions used. Adding ensemble members or more
+levels would introduce additional dimensions, increasing the size of the
+dataset and potentially complicating access patterns.</p>
 </div>
 </div>
 </div>
@@ -625,30 +626,22 @@ reanalysis products may be available as NetCDF. To get a feeling for
 differences:</p>
 <ol style="list-style-type: decimal"><li>Open a NetCDF example (e.g. <code>data/ocean_temperature.nc</code>)
 with xarray.</li>
-<li>Open a GRIB example (e.g. <code>data/era5_example.grib</code>) with
-xarray using the <code>cfgrib</code> engine.</li>
+<li>Open a GRIB example (e.g. <code>data/ocean_temperature.grib</code>)
+with xarray using the <code>cfgrib</code> engine.</li>
 <li>Compare what <code>print(ds)</code> shows for each: dimensions, data
 variables, coordinates, and attributes.</li>
-</ol><p>Example:</p>
+</ol><p>To open a GRIB file, you may need to use engine=“cfgrib” in
+<code>xr.open_dataset()</code>:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="co"># NetCDF example</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="bu">print</span>(ds_nc)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a><span class="co"># GRIB example</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a>ds_grib <span class="op">=</span> xr.open_dataset(</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a>    <span class="st">"data/era5_example.grib"</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a>    engine<span class="op">=</span><span class="st">"cfgrib"</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a>)</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a><span class="bu">print</span>(ds_grib)</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1" aria-label="code-block-2-15"></a><span class="bu">print</span>(ds_grib.dims)</span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1" aria-label="code-block-2-16"></a><span class="bu">print</span>(ds_grib.data_vars)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>ds_grib <span class="op">=</span> xr.open_dataset(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>    <span class="st">"data/ocean_temperature.grib"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>    engine<span class="op">=</span><span class="st">"cfgrib"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="bu">print</span>(ds_grib)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a><span class="bu">print</span>(ds_grib.dims)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a><span class="bu">print</span>(ds_grib.data_vars)</span></code></pre>
 </div>
 <p>Questions to discuss:</p>
 <ul><li>Do both files present regular grids with similar dimensions
@@ -665,14 +658,19 @@ originating centre, parameter names)?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
-<p>NetCDF datasets typically have a clear structure with explicit
-dimensions and variables, while GRIB datasets may have fewer explicit
-dimensions and rely on encoded metadata. GRIB files often contain
-multiple fields in one file, which can appear more fragmented, whereas
-NetCDF files are usually organised around variables and dimensions in a
-single data model.</p>
+<p>Both files expose a very similar data model when opened with xarray.
+They contain the same spatial grid (721 × 1440), 120 time steps, and a
+single variable (sst). The main difference is in the temporal and
+auxiliary coordinates: the NetCDF file uses valid_time as its dimension,
+whereas the GRIB file uses time as the dimension and retains additional
+GRIB-specific coordinates such as step, surface, and number. The GRIB
+dataset also preserves extra metadata, such as the GRIB edition, while
+the NetCDF file presents a simplified CF-compliant representation. In
+general, NetCDF stores dimensions, variables, and metadata explicitly,
+whereas GRIB is a message-based format where much of the metadata is
+encoded within each field.</p>
 </div>
 </div>
 </div>
@@ -714,21 +712,22 @@ dimensions, size, organisation, and sharing.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
-<p>Doubling the horizontal resolution roughly quadruples the number of
-grid points, increasing data volume per time step. Increasing frequency
-from monthly to hourly multiplies the number of time steps by roughly
-24×-30×, and adding more time steps to cover a 30‑year period multiplies
-data volume again.</p>
-<p>A naive strategy of storing everything in a single file, downloading
-that file locally, and always reading full arrays would quickly become
-impractical: files would be slow to move, hard to store on laptops, and
-every collaborator might end up keeping their own large copy. This
-motivates more careful file organisation (splitting archives, choosing
-good dimensions), <strong>and</strong> better access and sharing
-strategies (server‑side subsetting, remote APIs, or cloud‑native
-approaches discussed later).</p>
+<p>Doubling the horizontal resolution would increase the number of
+latitude and longitude points, giving about four times more grid cells
+at each time step. Changing the output from monthly to hourly and
+extending the dataset to 30 years would greatly increase the number of
+time steps, making the dataset much larger overall.</p>
+<p>A single file would become difficult to store, move, and analyse, so
+it would be better to split the data into smaller files. Opening and
+working with the full dataset would also become slower and could require
+more memory than is available on a typical computer.</p>
+<p>Sharing the dataset by giving everyone a local copy would be
+inefficient because of its size and could lead to different versions of
+the data. A better option would be to store the dataset on a shared
+server or in cloud storage, so everyone can access the same data without
+downloading the entire archive.</p>
 </div>
 </div>
 </div>
@@ -935,8 +934,8 @@ Data Management.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/02-ndata-challenges.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/02-ndata-challenges.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-14"
+  "dateModified": "2026-07-20",
+  "datePublished": "2026-07-20"
 }
 
   </script><script>

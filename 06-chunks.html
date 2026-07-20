@@ -258,8 +258,7 @@
 <li><a href="#thinking-in-dimensions-and-workloads">Thinking in dimensions and workloads</a></li>
 <li><a href="#inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store</a></li>
 <li><a href="#rechunking-with-xarray">Rechunking with xarray</a></li>
-<li><a href="#rechunking-with-rechunker">Rechunking with Rechunker</a></li>
-<li><a href="#choosing-between-methods">Choosing between methods</a></li>
+<li><a href="#rechunk-can-be-expensive">Rechunk can be expensive</a></li>
 <li><a href="#sharding-grouping-chunks-together">Sharding: grouping chunks together</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
@@ -415,7 +414,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>How to Choose Chunks for Analysis and Processing at Scale</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-07-20 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/06-chunks.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -535,19 +534,26 @@ most important for your users.</p>
 (UKCEH)</div>
 </figure></section><section><h2 class="section-heading" id="inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store<a class="anchor" aria-label="anchor" href="#inspecting-chunk-shapes-in-a-zarr-store"></a></h2>
 <hr class="half-width"><p>Let’s take a look on one of our example Zarr datasets to see how
-chunks are laid out. You can inspect chunk shapes using xarray:</p>
+chunks are laid out. Now we are using a subset of the GLORYS Reanalysis
+dataset, stored in a single Zarr group:</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="bu">print</span>(ds)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(<span class="st">"Dimensions:"</span>, temp.dims)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(<span class="st">"Shape:"</span>, temp.shape)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="bu">print</span>(<span class="st">"Chunks:"</span>, temp.data.chunks)</span></code></pre>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys_202605.zarr"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="bu">print</span>(ds)</span></code></pre>
+</div>
+<p>Now, let’s inspect the <code>so</code> variable (Salinity) and see
+its dimensions, shape, and chunking:</p>
+<div class="codewrapper sourceCode" id="cb2">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>so <span class="op">=</span> ds[<span class="st">"so"</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="bu">print</span>(<span class="st">"Dimensions:"</span>, so.dims)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a><span class="bu">print</span>(<span class="st">"Shape:"</span>, so.shape)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="bu">print</span>(<span class="st">"Chunks:"</span>, so.data.chunks)</span></code></pre>
 </div>
 <p>Seeing <code>shape</code> and <code>dims</code> helps you reason
 about how the current chunking might align with your workloads.</p>
@@ -560,11 +566,11 @@ about how the current chunking might align with your workloads.</p>
 <h3 class="callout-title">Exercise 1 - Relate current chunking to
 workloads</h3>
 <div class="callout-content">
-<p>Using your example Zarr dataset:</p>
-<ol style="list-style-type: decimal"><li><p>Inspect the <code>temperature</code> array’s <code>shape</code>
-and <code>chunks</code> using <code>zarr</code>.</p></li>
+<p>Using the GLORYS Reanalysis example Zarr dataset:</p>
+<ol style="list-style-type: decimal"><li><p>Inspect the <code>so</code> array’s <code>shape</code> and
+<code>chunks</code> using <code>xarray</code>.</p></li>
 <li><p>Map the dimensions to names (e.g. interpret
-<code>(time, lat, lon, level)</code> from context or attributes and
+<code>(time, lat, lon, depth)</code> from context or attributes and
 following the CF conventions).</p></li>
 <li>
 <p>For each of these workloads, decide whether the current chunking
@@ -582,13 +588,47 @@ seems “friendly” or “unfriendly”:</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
-<p>If chunks are “tall in time” but small in space, time series at a
-point may be efficient, while spatial averages may require reading many
-chunks. If chunks cover large spatial regions but few time steps,
-spatial averages may be efficient, but time series at a point may
-involve scanning many small chunks over time.</p>
+<div class="codewrapper sourceCode" id="cb3">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="co"># shape</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].shape)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a><span class="co"># chunks</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].data.chunks)</span></code></pre>
+</div>
+<p>Following the coordinate names and CF conventions
+(<code>standard_name="sea_water_salinity"</code>), the dimensions
+represent:</p>
+<pre><code><span><span class="fu">so</span><span class="op">(</span><span class="va">time</span>, <span class="va">depth</span>, <span class="va">latitude</span>, <span class="va">longitude</span><span class="op">)</span></span></code></pre>
+<p>where:</p>
+<ul><li>
+<code>time</code> = time steps</li>
+<li>
+<code>depth</code> = vertical ocean levels</li>
+<li>
+<code>latitude</code> = north-south position</li>
+<li>
+<code>longitude</code> = east-west position</li>
+</ul><p>The current chunking stores one time step and one depth level with
+the complete global horizontal grid.</p>
+<p>It is friendly for workloads that need the full spatial field at a
+given time (e.g. computing a global mean), but unfriendly for workloads
+that need many time steps or many depth levels at a single point,
+because it requires reading many large chunks to get a small amount of
+data.</p>
+<p>It is not friendly for regional subsets either, because the latitude
+and longitude dimensions are not chunked, so even a small region
+requires reading the whole global spatial chunk.</p>
+<p>It is also not friendly for time series at a point, because the data
+is split into separate time chunks, and each chunk contains the full
+spatial field. To get a time series at a single point, you would need to
+read many large chunks, which is inefficient.</p>
+<p>This example shows that chunking is a trade-off: the current layout
+is good for global spatial operations but inefficient for point-based
+time series or regional analysis.</p>
 </div>
 </div>
 </div>
@@ -638,124 +678,81 @@ storage.</p>
 change to the chunk layout.</p>
 <div class="section level3">
 <h3 id="step-1-open-the-dataset">Step 1: Open the dataset<a class="anchor" aria-label="anchor" href="#step-1-open-the-dataset"></a></h3>
-<p>Start by opening the original Zarr dataset.</p>
-<div class="codewrapper sourceCode" id="cb2">
+<p>Start by opening the original Zarr dataset. For the examples below,
+we will use the ERA5 reanalysis dataset, because it is smaller and
+easier to work with than the GLORYS dataset.</p>
+<div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a><span class="bu">print</span>(ds)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="step-2-choose-a-new-chunk-layout">Step 2: Choose a new chunk layout<a class="anchor" aria-label="anchor" href="#step-2-choose-a-new-chunk-layout"></a></h3>
 <p>Decide how you want the dataset to be chunked. For example, you might
-want chunks that are larger in time and smaller in space.</p>
-<div class="codewrapper sourceCode" id="cb3">
+want to have chunks that are larger in space but represents only one
+time step:</p>
+<div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"time"</span>: <span class="dv">10</span>, <span class="st">"lat"</span>: <span class="dv">100</span>, <span class="st">"lon"</span>: <span class="dv">100</span>})</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">1</span>, <span class="st">"latitude"</span>: <span class="dv">721</span>, <span class="st">"longitude"</span>: <span class="dv">1440</span>})</span></code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="step-3-check-the-new-chunking">Step 3: Check the new chunking<a class="anchor" aria-label="anchor" href="#step-3-check-the-new-chunking"></a></h3>
 <p>Inspect the rechunked dataset to confirm that the chunk layout looks
 right.</p>
-<div class="codewrapper sourceCode" id="cb4">
+<div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="bu">print</span>(ds_chunked)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="bu">print</span>(ds_chunked[<span class="st">"temperature"</span>].chunks)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="bu">print</span>(ds_chunked)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a><span class="bu">print</span>(ds_chunked[<span class="st">"sst"</span>].chunks)</span></code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="step-4-write-the-rechunked-data-to-a-new-zarr-store">Step 4: Write the rechunked data to a new Zarr store<a class="anchor" aria-label="anchor" href="#step-4-write-the-rechunked-data-to-a-new-zarr-store"></a></h3>
 <p>Save the dataset with the new chunk layout.</p>
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a>ds_chunked.to_zarr(<span class="st">"data/example_rechunked.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>ds_chunked.to_zarr(<span class="st">"data/ocean_temperature_rechunked.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
 </div>
 <p>This approach is convenient, but it is not always the most efficient
 for very large datasets. If the original and target chunk layouts are
 very different, rechunking can require substantial temporary storage and
 memory.</p>
-</div>
-</section><section><h2 class="section-heading" id="rechunking-with-rechunker">Rechunking with Rechunker<a class="anchor" aria-label="anchor" href="#rechunking-with-rechunker"></a></h2>
-<hr class="half-width"><p><a href="https://rechunker.readthedocs.io/" class="external-link">Rechunker</a> is a
-library designed specifically for rechunking large array datasets
-efficiently. It is useful when you want to move from one chunk layout to
-another without loading the whole dataset into memory at once.</p>
-<div class="section level3">
-<h3 id="step-1-open-the-source-dataset">Step 1: Open the source dataset<a class="anchor" aria-label="anchor" href="#step-1-open-the-source-dataset"></a></h3>
-<p>Load the original dataset and choose the variable you want to
-rechunk.</p>
-<div class="codewrapper sourceCode" id="cb6">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="im">from</span> rechunker <span class="im">import</span> rechunk</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>source <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="step-2-decide-on-the-target-chunking">Step 2: Decide on the target chunking<a class="anchor" aria-label="anchor" href="#step-2-decide-on-the-target-chunking"></a></h3>
-<p>Choose the chunk shape you want in the final dataset.</p>
-<div class="codewrapper sourceCode" id="cb7">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>target_chunks <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">100</span>)</span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="step-3-set-up-temporary-and-target-stores">Step 3: Set up temporary and target stores<a class="anchor" aria-label="anchor" href="#step-3-set-up-temporary-and-target-stores"></a></h3>
-<p>Rechunker writes through a temporary store before producing the final
-Zarr output.</p>
-<div class="codewrapper sourceCode" id="cb8">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>target_store <span class="op">=</span> <span class="st">"data/example_rechunked.zarr"</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>temp_store <span class="op">=</span> <span class="st">"data/example_rechunk_temp.zarr"</span></span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="step-4-build-the-rechunking-plan">Step 4: Build the rechunking plan<a class="anchor" aria-label="anchor" href="#step-4-build-the-rechunking-plan"></a></h3>
-<p>Create the plan that describes how the rechunking should happen.</p>
-<div class="codewrapper sourceCode" id="cb9">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>plan <span class="op">=</span> rechunk(</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>    source,</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>    target_chunks,</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a>    max_mem<span class="op">=</span><span class="st">"1GB"</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>    target_store<span class="op">=</span>target_store,</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a>    temp_store<span class="op">=</span>temp_store,</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a>)</span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="step-5-run-the-plan">Step 5: Run the plan<a class="anchor" aria-label="anchor" href="#step-5-run-the-plan"></a></h3>
-<p>Execute the rechunking operation.</p>
-<div class="codewrapper sourceCode" id="cb10">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>plan.execute()</span></code></pre>
-</div>
-<p>Rechunker is useful when you want more control over memory use and
-storage layout, especially for large datasets that are awkward to
-rewrite directly.</p>
-<div id="rechunk-can-be-expensive" class="callout">
+<div id="rechunking-with-rechunker-or-cubed" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
 </div>
 <span class="callout-header">Callout</span>
-<div id="rechunk-can-be-expensive" class="callout-inner">
-<h3 class="callout-title">Rechunk can be expensive</h3>
+<div id="rechunking-with-rechunker-or-cubed" class="callout-inner">
+<h3 class="callout-title">Rechunking with Rechunker or Cubed</h3>
 <div class="callout-content">
-<p>In some cases, rechunking can take a long time, especially if the
+<p><a href="https://rechunker.readthedocs.io/" class="external-link">Rechunker</a> is a
+library designed specifically for rechunking large array datasets
+efficiently. It is useful when you want to move from one chunk layout to
+another without loading the whole dataset into memory at once.</p>
+<p><a href="https://cubed.readthedocs.io/" class="external-link">Cubed</a> is a newer library
+that provides an array API for rechunking and other operations, designed
+to work with serverless backends or locally without needing a live Dask
+scheduler.</p>
+<p>You can also integrate Cubed with xarray to rechunk datasets in a
+more memory-efficient way.</p>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">1</span>, <span class="st">"latitude"</span>: <span class="dv">721</span>, <span class="st">"longitude"</span>: <span class="dv">1440</span>}, , chunked_array_type<span class="op">=</span><span class="st">"cubed"</span>)</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section><h2 class="section-heading" id="rechunk-can-be-expensive">Rechunk can be expensive<a class="anchor" aria-label="anchor" href="#rechunk-can-be-expensive"></a></h2>
+<hr class="half-width"><p>In some cases, rechunking can take a long time, especially if the
 original and target chunk layouts are very different. For example, a
 study on Zarr data<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> in cloud-based object stores found
 that:</p>
@@ -767,22 +764,7 @@ that:</p>
 <td align="right"><strong>~22.44 min</strong></td>
 </tr><tr><td>Very small chunks</td>
 <td align="right"><strong>~46 h</strong></td>
-</tr></tbody></table></div>
-</div>
-</div>
-</div>
-</section><section><h2 class="section-heading" id="choosing-between-methods">Choosing between methods<a class="anchor" aria-label="anchor" href="#choosing-between-methods"></a></h2>
-<hr class="half-width"><ul><li>Use <strong>xarray <code>.chunk()</code> +
-<code>.to_zarr()</code></strong> for simple, smaller rechunking
-tasks.</li>
-<li>Use <strong>Rechunker</strong> when you need a more memory-aware
-rechunking workflow for large datasets.</li>
-</ul><p>The best choice depends on the size of the dataset, the storage
-backend, and the access pattern you want to optimise.</p>
-<p>In this lesson, we will focus on the simpler xarray rechunking
-approach, but you should be aware of Rechunker for larger-scale
-workflows.</p>
-<div id="exercise-2---designing-a-new-chunk-scheme" class="callout challenge">
+</tr></tbody></table><div id="exercise-2---designing-a-new-chunk-scheme" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
@@ -790,12 +772,13 @@ workflows.</p>
 <div id="exercise-2---designing-a-new-chunk-scheme" class="callout-inner">
 <h3 class="callout-title">Exercise 2 - Designing a new chunk scheme</h3>
 <div class="callout-content">
-<p>Using the same dataset, think through the following:</p>
+<p>Using the same dataset (<code>ocean_temperature.zarr</code>), think
+through the following:</p>
 <ol style="list-style-type: decimal"><li>Identify your <strong>priority workload</strong> for this dataset
 (e.g. time series analysis, spatial means, ensemble statistics).</li>
 <li>Propose a chunk scheme
-(e.g. <code>{"time": 20, "lat": 180, "lon": 180}</code>) that you expect
-to work well for that workload.</li>
+(e.g. <code>{"valid_time": 20, "latitude": 180, "longitude": 180}</code>)
+that you expect to work well for that workload.</li>
 <li>Consider the likely chunk size in bytes (rough estimation is fine)
 and whether it seems reasonable (not too small, not too large).</li>
 </ol><p>You do not need to run the code yet; focus on design:</p>
@@ -810,15 +793,15 @@ and whether it seems reasonable (not too small, not too large).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
-<p>Learners should choose chunk sizes that reflect their dominant
-workloads and keep chunk sizes in a plausible range. For example, for
-time series analysis, they might choose relatively large time chunks and
-moderate spatial blocks; for spatial analysis, they might choose chunks
-that cover entire latitude or longitude bands. Recognising that one
-dataset may need different chunking schemes for different scenarios is a
-key insight.</p>
+<p>You should choose chunk sizes that reflect their dominant workloads
+and keep chunk sizes in a plausible range. For example, for time series
+analysis, you might choose relatively large time chunks and moderate
+spatial blocks; for spatial analysis, you might choose chunks that cover
+entire latitude or longitude bands. Recognising that one dataset may
+need different chunking schemes for different scenarios is a key
+insight.</p>
 </div>
 </div>
 </div>
@@ -836,35 +819,35 @@ key insight.</p>
 a new Zarr store.</li>
 <li>Measure the time to compute:
 <ul><li>A global mean time series
-(<code>mean(dim=("lat", "lon"))</code>).</li>
+(<code>mean(dim=("latitude", "longitude"))</code>).</li>
 <li>A regional mean time series (e.g. a subset in
-<code>lat</code>/<code>lon</code>).</li>
+<code>latitude</code>/<code>longitude</code>).</li>
 </ul></li>
 <li>Compare the timings between the original and rechunked stores and
-discuss any differences.</li>
-</ol><p>If your dataset or environment is small, focus on:</p>
-<ul><li>Comparing the <strong>number of chunks</strong> involved in each
-operation (you can inspect <code>temp.data.chunks</code> when using
-dask).</li>
-<li>Discussing how chunk layout might matter for larger datasets or
-cloud environments.</li>
-</ul><p>For example, you might run something like this:</p>
-<div class="codewrapper sourceCode" id="cb11">
+discuss any differences. To calculate the time taken for each operation,
+you can use the <code>%%time</code> magic in a Jupyter notebook, or the
+<code>time</code> module in a script:</li>
+</ol><div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="im">import</span> time</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a>t0 <span class="op">=</span> time.time()</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="co"># your operation here with the original store</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a>t1 <span class="op">=</span> time.time()</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a><span class="bu">print</span>(<span class="st">"Original store time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1" aria-label="code-block-11-7"></a></span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1" aria-label="code-block-11-8"></a>t0 <span class="op">=</span> time.time()</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1" aria-label="code-block-11-9"></a><span class="co"># your operation here with the rechunked store</span></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1" aria-label="code-block-11-10"></a>t1 <span class="op">=</span> time.time()</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1" aria-label="code-block-11-11"></a><span class="bu">print</span>(<span class="st">"Rechunked store time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> time</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a><span class="co"># your operation here with the original store</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a><span class="bu">print</span>(<span class="st">"Original store time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a><span class="co"># your operation here with the rechunked store</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1" aria-label="code-block-10-10"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1" aria-label="code-block-10-11"></a><span class="bu">print</span>(<span class="st">"Rechunked store time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span></code></pre>
 </div>
-</div>
+<ol start="4" style="list-style-type: decimal"><li>Compare the <strong>number of chunks</strong> involved in each
+operation (you can inspect <code>temp.data.chunks</code> when using
+dask).</li>
+<li>Discuss how chunk layout might matter for larger datasets or cloud
+environments.</li>
+</ol></div>
 </div>
 </div>
 <div id="accordionSolution3" class="accordion challenge-accordion accordion-flush">
@@ -872,7 +855,7 @@ cloud environments.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>You may observe modest timing differences or simply see that the
 number of chunks touched by each operation changes. The key takeaway is
@@ -936,22 +919,23 @@ instead.</p>
 <p>Zarr Python v3 supports sharded arrays directly when you create the
 array. In the example below, the array has small chunks for analysis,
 but those chunks are grouped into larger shards for storage.</p>
-<div class="codewrapper sourceCode" id="cb12">
+<p>Let’s create a sharded Zarr array with 10×10 chunks, but store them
+in 100×100 shards:</p>
+<div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a><span class="im">import</span> zarr</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>arr <span class="op">=</span> zarr.create_array(</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a>    <span class="st">"data/example_sharded.zarr"</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>    shape<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>),</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>    dtype<span class="op">=</span><span class="st">"int32"</span>,</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>    zarr_format<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>    chunks<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>),</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>    shards<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">100</span>),</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>)</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a>arr[:] <span class="op">=</span> np.random.randint(<span class="dv">0</span>, <span class="dv">100</span>, size<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a>data <span class="op">=</span> np.random.randint(<span class="dv">0</span>, <span class="dv">100</span>, size<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>)).astype(<span class="st">"int32"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a>ds <span class="op">=</span> xr.Dataset({<span class="st">"temperature"</span>: ((<span class="st">"y"</span>, <span class="st">"x"</span>), data)})</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1" aria-label="code-block-11-7"></a>ds.to_zarr(</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1" aria-label="code-block-11-8"></a>    <span class="st">"data/example_sharded.zarr"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1" aria-label="code-block-11-9"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1" aria-label="code-block-11-10"></a>    zarr_format<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1" aria-label="code-block-11-11"></a>    encoding<span class="op">=</span>{<span class="st">"temperature"</span>: {<span class="st">"chunks"</span>: (<span class="dv">10</span>, <span class="dv">10</span>), <span class="st">"shards"</span>: (<span class="dv">100</span>, <span class="dv">100</span>)}},</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1" aria-label="code-block-11-12"></a>)</span></code></pre>
 </div>
 <p>In this example:</p>
 <ul><li>
@@ -961,34 +945,39 @@ but those chunks are grouped into larger shards for storage.</p>
 <code>shards=(100, 100)</code> means many of those chunks are packed
 into a larger 100×100 shard for storage.</li>
 </ul><p>You can open the array again and inspect it in the same way:</p>
-<div class="codewrapper sourceCode" id="cb13">
+<div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> zarr</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a>arr <span class="op">=</span> zarr.<span class="bu">open</span>(<span class="st">"data/example_sharded.zarr"</span>, mode<span class="op">=</span><span class="st">"r"</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a><span class="bu">print</span>(arr.shape)</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a><span class="bu">print</span>(arr.chunks)</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a><span class="bu">print</span>(arr.dtype)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="bu">print</span>(ds)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a><span class="bu">print</span>(ds[<span class="st">"temperature"</span>].chunks)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a><span class="bu">print</span>(ds[<span class="st">"temperature"</span>].encoding)</span></code></pre>
 </div>
+</div>
+<div class="section level3">
+<h3 id="seeing-the-effect-of-sharding">Seeing the effect of sharding<a class="anchor" aria-label="anchor" href="#seeing-the-effect-of-sharding"></a></h3>
+<p>Sharding “groups small chunks into larger files”. For example, if you
+have a 1000×1000 array with 10×10 chunks, you would have 10,000 chunks.
+If you shard them into 100×100 shards, you would only have 100 shards.
+This reduces the number of files or objects in storage, which can
+improve performance and reduce overhead.</p>
 </div>
 <div class="section level3">
 <h3 id="using-xarray-with-sharded-zarr">Using xarray with sharded Zarr<a class="anchor" aria-label="anchor" href="#using-xarray-with-sharded-zarr"></a></h3>
 <p>xarray can open a sharded Zarr store the same way it opens other Zarr
 datasets, so the sharding is mostly a storage detail from the analyst’s
 point of view.</p>
-<div class="codewrapper sourceCode" id="cb14">
+<div class="codewrapper sourceCode" id="cb13">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example_sharded.zarr"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="bu">print</span>(ds)</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a><span class="bu">print</span>(temp.dims)</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a><span class="bu">print</span>(temp.shape)</span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a><span class="bu">print</span>(temp.chunks)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example_sharded_ds.zarr"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a><span class="bu">print</span>(ds)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a><span class="bu">print</span>(temp.dims)</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a><span class="bu">print</span>(temp.shape)</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a><span class="bu">print</span>(temp.chunks)</span></code></pre>
 </div>
 <p>This is useful because xarray still lets you work with labelled
 dimensions and high-level operations, while Zarr v3 handles the storage
@@ -1112,8 +1101,8 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/06-chunks.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/06-chunks.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-14"
+  "dateModified": "2026-07-20",
+  "datePublished": "2026-07-20"
 }
 
   </script><script>
