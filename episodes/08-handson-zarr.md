@@ -27,7 +27,7 @@ exercises: 20
 
 In this lesson, we work hands‑on with several open Zarr datasets:
 
-- [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS.
+- [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS (I will explain later what Icechunk is and how it relates to Zarr).
 - [**ERA5 ARCO**](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) reanalysis in Zarr on Climate Data Store - global atmospheric data ready for analysis.
 - [**Sofar Spotter drifters**](https://registry.opendata.aws/sofar-spotter-archive/) - ragged array buoy data in Zarr, accessible via `clouddrift`.
 - **Additional examples** such as CMIP6, downscaled climate, or Copernicus marine Zarr data, depending on your interests.
@@ -42,7 +42,6 @@ Each dataset illustrates different aspects:
 All these datasets are hosted in cloud object storage (Google Cloud, AWS S3, or HTTPS) and can be accessed programmatically with Python tools like `xarray`, `zarr`, and `fsspec`. I will explain later what object storage is and how it differs from traditional file systems.
 
 These datasets can be several terabytes in size. DO NOT DOWNLOAD THEM LOCALLY.
-
 
 ## Ensemble forecasts - ECMWF AIFS ENS Icechunk/Zarr
 
@@ -83,7 +82,7 @@ This subset is much smaller, but no data has been loaded yet. If we explore furt
 print(temperature_2m)
 ```
 
-To convert this into a standard Xarray DataArray we can call .compute on the temperature_2m.
+To convert this into a standard Xarray DataArray we can call .compute on the temperature_2m. Note that only now will the data be loaded into memory. This is a good example of lazy loading, where the data is not actually read until we explicitly ask for it.
 
 ```python
 temperature_2m_local = temperature_2m.compute()
@@ -97,7 +96,7 @@ temperature_2m_local.isel(init_time=0, lead_time=0).plot()
 Or access some of the data:
 
 ```python
-temperature_2m_local[0,0,0,0]
+temperature_2m_local[0,0,0,0].values
 ```
 
 If you want to slice the data by the latitude and longitude coordinates you can use sel instead of isel:
@@ -113,7 +112,42 @@ If you want to have access to more datasets, you can explore the dynamical.org c
 
 You can also find some examples of how to access and manipulate these datasets in the [dynamical.org documentation](https://dynamical.org/docs/).
 
+:::::::::::::::::::::::::::::::::::::::::: callout
 
+## Integrate cartopy for better visualisation
+
+You can see below an example of the integration of cartopy to visualise the sea zonal wind at 10 meters above the surface from the ECMWF AIFS SINGLE dataset:
+
+```python
+import xarray as xr
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+ds = xr.open_zarr("https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr")
+wind_u_10m = ds['wind_u_10m'].isel(init_time="2025-01-01",method="nearest").isel(lead_time=0)
+
+plt.figure(figsize=(12, 6))
+ax = plt.axes(projection=ccrs.PlateCarree())
+
+# Add white land background
+ax.add_feature(cfeature.LAND, facecolor='white', zorder=1)
+
+ax.coastlines()
+pcm = ax.pcolormesh(
+    wind_u_10m.longitude, wind_u_10m.latitude, wind_u_10m,
+    transform=ccrs.PlateCarree(),
+    cmap="viridis",
+    shading="auto",
+    zorder=0  # Ensure it overlays the land
+)
+
+plt.title("Sea Zonal Wind at 10 Meters Above the Surface")
+plt.colorbar(pcm, label=wind_u_10m.attrs.get("units", ""))
+plt.tight_layout()
+plt.show()
+```
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## ERA5 ARCO - global reanalysis in Zarr
 
@@ -123,21 +157,30 @@ A subset of the ERA5 single-levels dataset is available in analysis-ready, cloud
 
 1. Go to the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/) and create an account.
 
-2. After logging in, go to your [API key page](https://cds.climate.copernicus.eu/api-how-to) and copy your API key.
+2. After logging in, go to your [API key page](https://cds.climate.copernicus.eu/profile) and copy your API key.
 
 ### Access datasets
 
-```bash
-import xarray as xr
+Set the `cdsapi_key` variable in the code below to your API key. This will allow you to access the ERA5 ARCO Zarr datasets hosted on the Copernicus Climate Data Store.
 
+```python
 cdsapi_key = "<INSERT-CDS-API-KEY-HERE>"
+```
 
+For this example, we will use the wave dataset from the ERA5 ARCO dataset, which includes variables such as significant wave height (swh), mean wave period (mwp), and mean wave direction (mwd). The dataset is available in two chunking layouts: geo-chunked and time-chunked.
+
+```python
 # Geo-chunked wave data (optimised for time-series at a single location)
 geochunked_wav_url = "https://arco.datastores.ecmwf.int/cadl-arco-geo-003/arco/reanalysis_era5_single_levels/wav/geoChunked.zarr"
 
 # Time-chunked wave data (optimised for global map at a single time step)
 timechunked_wav_url = "https://arco.datastores.ecmwf.int/cadl-arco-time-003/arco/reanalysis_era5_single_levels/wav/timeChunked.zarr"
+```
 
+Let's open the time-chunked dataset using xarray. Make sure to replace `<INSERT-CDS-API-KEY-HERE>` with your actual API key.
+
+```python
+import xarray as xr
 
 # Open the zarr store with xarray, users must insert their API key where indicated.
 ds = xr.open_zarr(
@@ -149,7 +192,7 @@ ds = xr.open_zarr(
 )
 
 # Inspect the variables
-ds
+print(ds)
 ```
 
 This is the output you should see:
@@ -180,6 +223,8 @@ For a full list of available variables, see the [ERA5 ARCO documentation](https:
 
 ### Create a plot of a variable
 
+You can see below an example of how to create a plot of the significant wave height (swh) variable at a single time step using matplotlib:
+
 ```python
 import matplotlib.pyplot as plt
 
@@ -198,6 +243,26 @@ plt.ylabel("Latitude")
 plt.show()
 ```
 
+You can also use the geo-chunked dataset to get a time series of a specific location and plot it. You can see an example below for the significant wave height (swh) variable at a specific latitude and longitude (Rio de Janeiro coast):
+
+```python
+ds_geo = xr.open_zarr(
+    geochunked_wav_url,
+    consolidated=True,
+     storage_options = {
+        "headers": {"Authorization": f"Bearer {cdsapi_key}"}
+    }
+)
+swh = ds_geo["swh"]
+
+# Select a specific location (e.g. Rio de Janeiro coast)
+swh = swh.sel(latitude=-23.0, longitude=-43.0, method="nearest")
+
+# Plot the time series
+swh.plot()
+```
+
+
 ### Additional resources
 
 To see a full list of available datasets and examples, you can explore the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/) and the  [ECMWF Training datasets repository](https://github.com/ecmwf-training/dss-notebooks/tree/main/datasets).
@@ -205,39 +270,41 @@ To see a full list of available datasets and examples, you can explore the [Cope
 
 ## Sofar Spotter drifters - ragged arrays
 
-The Sofar Spotter Archive provides historical wave and inferred wind data from a global network of Spotter buoys, in both NetCDF and Zarr formats.
+The Sofar Spotter Archive provides historical wave and inferred wind data from a global network of Spotter buoys, in both NetCDF and Zarr formats. A Spotter is a small, solar-powered drifter buoy that measures wave height, period, and direction, as well as GPS location. The Sofar company has deployed thousands of Spotters worldwide, and some of the data is made available for research and analysis.
 
-![Sofar Spotter drifters deployed by Brazilian Navy and INPE](fig/mb_drifters.png){alt="Sofar Spotter drifters deployed by Brazilian Navy and INPE"}
+![Sofar Spotter drifters deployed by Brazilian Navy and INPE, in partnership with Sofar Ocean](fig/mb_drifters.png){alt="Sofar Spotter drifters deployed by Brazilian Navy and INPE, in partnership with Sofar Ocean"}
 
 ![Array of spotter buoys](fig/spotter_buoys.png){alt="Array of spotter buoys"}
 
+
+First, let's open the Zarr dataset from the Sofar Spotter Archive using xarray. The dataset is hosted on AWS S3 and can be accessed directly via its URL:
 
 ```python
 import xarray as xr
 
 s3_uri = "https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"
-ds = xr.open_zarr(s3_uri, engine="zarr")
+ds = xr.open_zarr(s3_uri)
 ds
 ```
 
 ```output
-<xarray.Dataset>
+<xarray.Dataset> Size: 511MB
 Dimensions:                (index: 6390651, trajectory: 871)
 Coordinates:
-    time                   (index) datetime64[ns] ...
-  * trajectory             (trajectory) object 'SPOT-010001' ... 'SPOT-1975'
+    time                   (index) datetime64[ns] 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+  * trajectory             (trajectory) object 7kB 'SPOT-010001' ... 'SPOT-1975'
 Dimensions without coordinates: index
 Data variables:
-    latitude               (index) float64 ...
-    longitude              (index) float64 ...
-    meanDirection          (index) float64 ...
-    meanDirectionalSpread  (index) float64 ...
-    meanPeriod             (index) float64 ...
-    peakDirection          (index) float64 ...
-    peakDirectionalSpread  (index) float64 ...
-    peakPeriod             (index) float64 ...
-    rowsize                (trajectory) int64 ...
-    significantWaveHeight  (index) float64 ...
+    latitude               (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    longitude              (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    meanDirection          (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    meanDirectionalSpread  (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    meanPeriod             (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    peakDirection          (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    peakDirectionalSpread  (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    peakPeriod             (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
+    rowsize                (trajectory) int64 7kB dask.array<chunksize=(871,), meta=np.ndarray>
+    significantWaveHeight  (index) float64 51MB dask.array<chunksize=(99854,), meta=np.ndarray>
 Attributes:
     author:         Isabel A. Houghton
     creation_date:  2023-10-18 00:43:55.333537
@@ -250,17 +317,19 @@ Attributes:
 
 ### Dataset structure
 
-This dataset was designed to follow the conventions used by NOAA for a similar dataset: Global Drifter Program (GDP) Drifter data. The explanation below was extracted and adapted from the [OHW 2024 Tutorials - collocating_noaa_gfs_sofar_spotter_during_hurricane](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane)
+This dataset was designed to follow the conventions used by NOAA for a similar dataset: Global Drifter Program (GDP) Drifter data. The explanation below was extracted and adapted from the [OHW 2024 Tutorials - collocating_noaa_gfs_sofar_spotter_during_hurricane](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane).
 
-Due to factors including, but not limited to: different reporting frequencies, deployment times, device lifetimes, and missing observations - the number of observations can, and do, vary significantly between each Spotter in the dataset. For ease of readability, one could imagine structuring the data in the following way, which is called an incomplete multidimensional array representation:
+Each Spotter buoy records a different number of observations because of factors such as deployment time, reporting frequency, instrument lifetime, and missing measurements. One way to represent these observations is as an incomplete multidimensional array, where each column corresponds to a Spotter:
 
 ![incomplete Array representation](fig/incomplete_array.png){alt="incomplete Array representation"}
 
-As you can see, while this representation appears easy to read and manipulate, there are a number of missing values for columns associated with less observations compared to the column corresponding to the greatest number of observations. When storing large amounts of data, this results in a significant amount of space dedicated to missing values. To reduce storage size, GDP, and the Sofar Spotter Archive, represent drifter data using a contiguous ragged array representation:
+Although this representation is intuitive, it requires padding shorter time series with missing values. For large datasets, these unused values can occupy a substantial amount of storage.
+
+To avoid this overhead, the GDP and Sofar Spotter Archive use a contiguous ragged array representation:
 
 ![Ragged array structure](fig/ragged_array.png){alt="Ragged array structure"}
 
-Since the data is stored in a single, contiguous array for multiple, unique, drifters/trajectories, it is necessary to identify the indices associated with the Spotter of interest, which we've done above.
+In a contiguous ragged array, observations from all Spotters are stored sequentially in a single array. Additional index variables identify which observations belong to each Spotter, eliminating the need to store missing values while preserving the original trajectories.
 
 ### Plot drift trajectory for individual drifter colored by date
 
@@ -284,45 +353,48 @@ print(f"Drifter index for {spotter_id} is {j}")
 sli = slice(traj_idx[j], traj_idx[j+1])
 ```
 
-Plot the trajectory colored by date:
+Plot the trajectory colored by significant wave height (swh):
 
 ```python
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import cartopy.crs as ccrs
+import xarray as xr
 
-# set up cartopy map
-fig, ax = plt.subplots(1,1, figsize=[9,5], subplot_kw={'projection': ccrs.PlateCarree()}, dpi=250)
+fig, ax = plt.subplots(
+    figsize=(15, 10),
+    subplot_kw={"projection": ccrs.PlateCarree()},
+)
+
 ax.coastlines()
-ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                  linewidth=.5, color='gray', alpha=0.5)
-
+ax.gridlines(draw_labels=True)
 ax.set_extent([110, 260, -10, 60], crs=ccrs.PlateCarree())
-
-
-lons = ds.longitude[sli]
+# Convert longitudes to the [0, 360] range
+lons = ds.longitude[sli].compute()
 lons[lons<0] += 360 # make sure lons span [0,360] for easier mapping
-lats = ds.latitude[sli]
-pcm1 = ax.scatter(lons, lats,
-                  c=mdates.date2num(ds.time[sli]),
-                  s=10,
-                  cmap='Spectral_r',
-                  edgecolor='face',
-                  transform=ccrs.PlateCarree())
 
-cb = fig.colorbar(pcm1,ax=ax, label='Date', shrink=0.5)
-cb.ax.yaxis.set
-cb.ax.yaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+sc = ax.scatter(
+    lons,
+    ds.latitude[sli],
+    c=ds.significantWaveHeight[sli],
+    s=12,
+    cmap="viridis",
+    transform=ccrs.PlateCarree(),
+)
 
-ax.set_ylabel('Latitude')
-ax.set_xlabel('Longitude')
-ax.set_title('Trajectory of '+str(spotter_id))
+plt.colorbar(
+    sc,
+    ax=ax,
+    label="Significant Wave Height (m)",
+    shrink=0.3,
+    pad=0.08,
+)
+
+ax.set_title(f"Trajectory of {spotter_id} colored by Significant Wave Height")
+
 plt.show()
-
 ```
 
-![Trajectory of SPOT-0164](fig/trajectory_SPOT-0164.png){alt="Trajectory of SPOT-0164"}
-
+![Trajectory of SPOT-0164](fig/trajectory_spot0164.png){alt="Trajectory of SPOT-0164"}
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
@@ -340,7 +412,7 @@ Assuming you have opened an AIFS single dataset:
 
 ```python
 import xarray as xr
-
+import numpy as np
 # Open the AIFS single dataset
 ds = xr.open_zarr("https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr")
 
@@ -352,7 +424,7 @@ print(ds.coords)
 temp = ds["temperature_2m"]  # adjust to match the dataset variable names
 
 # Subset to one week (e.g. first week of the latest init_time)
-temp_week = temp.isel(init_time=-1).sel(lead_time=slice("2024-06-01T00:00:00", "2024-06-07T00:00:00"))
+temp_week = temp.isel(init_time=-1).sel(lead_time=slice(np.timedelta64(0, "D"), np.timedelta64(7, "D")))
 
 # Global mean time series
 global_ts = temp_week.mean(dim=("latitude", "longitude"))
@@ -419,8 +491,6 @@ one_time.plot()
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-
-
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 3 - Working with ragged arrays
@@ -439,7 +509,7 @@ import xarray as xr
 
 # Open the Sofar Spotter drifter dataset
 s3_uri = "https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"
-ds_spot = xr.open_zarr(s3_uri, engine="zarr")
+ds_spot = xr.open_zarr(s3_uri)
 
 # Inspect dimensions, coordinates, and data variables
 print(ds_spot.dims)
@@ -494,7 +564,7 @@ Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, or another Zarr dataset 
 1. Define a question you want to answer (e.g. "How has near‑surface temperature changed in a region over a given period?" or "What is the distribution of wave heights across the Spotter network?").
 2. Write code to:
    - Open the dataset with xarray and/or supporting libraries.
-   - Explore dimensions, variables, and metadata.
+   - Explore dimensions, variables, chunk strategy and metadata.
    - Perform a small analysis or visualisation that addresses your question.
 3. Reflect on:
    - How easy or difficult it was to access and manipulate the Zarr dataset.
