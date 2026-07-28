@@ -265,8 +265,7 @@
       <div class="accordion-body">
         <ul><li><a href="#why-parallel-processing">Why parallel processing?</a></li>
 <li><a href="#dask-distributed-processing-for-python">Dask: distributed processing for Python</a></li>
-<li><a href="#other-parallelism-patterns">Other parallelism patterns</a></li>
-<li><a href="#parallelism-friendly-zarr-storage">Parallelism-friendly Zarr storage</a></li>
+<li><a href="#visualising-the-task-graph">Visualising the Task Graph</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
 
@@ -412,7 +411,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Parallel Processing for Zarr</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-07-28 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/07-parallel.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -484,18 +483,20 @@ ensemble members.</li>
 the data layout are aligned. Chunked storage such as Zarr lets multiple
 workers read different chunks independently, while Dask can schedule the
 work across those chunks.</p>
-</section><section><h2 class="section-heading" id="dask-distributed-processing-for-python">Dask: distributed processing for Python<a class="anchor" aria-label="anchor" href="#dask-distributed-processing-for-python"></a></h2>
-<hr class="half-width"><p>Dask is a Python library for parallel and distributed computing. It
-offers two main sets of features:</p>
-<ul><li>
-<strong>High-level collections</strong> - Dask arrays, Dask
-dataframes, Dask bags, and Xarray integration, which behave like NumPy,
-pandas, etc. but execute lazily and in parallel.</li>
-<li>
-<strong>Low-level task scheduling</strong> - delayed functions and
-futures to run arbitrary Python functions in parallel, coordinated by a
-scheduler.</li>
-</ul><p>Key ideas:</p>
+<figure><img src="../fig/parallel_processing.png" alt="Diagram showing parallel vs serial processing." class="figure mx-auto d-block"><div class="figcaption">Parallel vs Serial processing. Source: <a href="https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html" class="external-link uri">https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html</a>
+</div>
+</figure></section><section><h2 class="section-heading" id="dask-distributed-processing-for-python">Dask: distributed processing for Python<a class="anchor" aria-label="anchor" href="#dask-distributed-processing-for-python"></a></h2>
+<hr class="half-width"><p>Dask is a Distributed processing library for Python. It enables
+parallel processing of Python code across multiple cores on the same
+computer or across multiple computers. It can be used behind the scenes
+by Xarray with minimal modification to code. JASMIN users can make use
+of a Dask gateway that allows their Dask code submitted from the Jupyter
+notebook interface to run on the LOTUS HPC cluster. Dask has two broad
+categories of features, high level data structures which behave in a
+similar way to common Python data structures but with the ability to
+perform operations in parallel and low level task scheduling to run any
+Python code in parallel.</p>
+<p>Key ideas:</p>
 <ul><li>
 <strong>Task graph</strong>: Dask builds a graph of tasks and
 dependencies when you write code, but does not execute immediately.</li>
@@ -516,6 +517,9 @@ etc.).</li>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a>                n_workers<span class="op">=</span><span class="dv">1</span>, memory_limit<span class="op">=</span><span class="st">"2GB"</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>client  <span class="co"># Show cluster information</span></span></code></pre>
 </div>
+<p>The code above will create a local Dask cluster with one worker and 4
+threads for each worker and a limit of 2GB of memory. Displaying the
+<code>client</code> object will tell us all about the cluster.</p>
 <figure><img src="../fig/dask_setup.png" alt="Dask setup showing a local cluster with one worker and four threads." class="figure mx-auto d-block"><div class="figcaption">Dask Setup</div>
 </figure><div class="section level3">
 <h3 id="using-the-dask-dashboard">Using the Dask dashboard<a class="anchor" aria-label="anchor" href="#using-the-dask-dashboard"></a></h3>
@@ -528,30 +532,115 @@ our code is making use of Dask’s parallelism. Note that it is not
 possible (or at least not without significant additional complexity) to
 access the Dask dashboard when running on the JASMIN notebook
 service.</p>
-<figure><img src="../fig/dask_dashboard.png" alt="Dask dashboard showing task progress and worker status." class="figure mx-auto d-block"><div class="figcaption">Dask dashboard</div>
+<figure><img src="../fig/dask_dashboard.png" alt="Dask dashboard showing task progress and worker status." class="figure mx-auto d-block"><div class="figcaption">Dask dashboard graph view</div>
+</figure><figure><img src="../fig/dask_status.png" alt="Dask dashboard task view" class="figure mx-auto d-block"><div class="figcaption">Dask dashboard task view</div>
 </figure></div>
 <div class="section level3">
-<h3 id="dask-arrays-and-lazy-computation">Dask arrays and lazy computation<a class="anchor" aria-label="anchor" href="#dask-arrays-and-lazy-computation"></a></h3>
-<p>Dask arrays are chunked arrays that mimic NumPy’s API but execute
-lazily and in parallel.</p>
-<p>Example:</p>
+<h3 id="using-the-jasmin-dask-gateway">Using the JASMIN Dask gateway<a class="anchor" aria-label="anchor" href="#using-the-jasmin-dask-gateway"></a></h3>
+<p>JASMIN offers a Dask Gateway service which can submit Dask jobs to a
+special queue on the HPC cluster. To use this we need to do a bit of
+extra setup. We will need to import the <code>dask_gateway</code>
+library and configure the gateway.</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="co"># Create a 10000x10000 array of random numbers, chunked 1000x1000</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>x <span class="op">=</span> da.random.random((<span class="dv">10000</span>, <span class="dv">10000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="bu">print</span>(x)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a><span class="co"># Simple operation: add ones</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a>y <span class="op">=</span> da.ones((<span class="dv">10000</span>, <span class="dv">10000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>))</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a>z <span class="op">=</span> x <span class="op">+</span> y</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a><span class="bu">print</span>(z)  <span class="co"># Still a Dask array, not yet computed</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a><span class="co"># Trigger computation</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a>result <span class="op">=</span> z.mean().compute()</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a><span class="bu">print</span>(<span class="st">"Mean value:"</span>, result)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span></code></pre>
+</div>
+<p>The gateway can be given a set of options including how many worker
+cores to use, initially we can set this to one and scale it up later. We
+also need to allocate at least one core as to the scheduler which will
+manage our Dask cluster. JASMIN requires us to specify a project to
+associate the Dask jobs with. Users of training accounts should use
+“workshop”. Finally we need to tell Dask which Conda/Mamba environment
+to use and this needs to match the one we’re running in our
+notebook.</p>
+<div class="codewrapper sourceCode" id="cb3">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>options <span class="op">=</span> gw.cluster_options()</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>options.worker_cores <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience'</span></span></code></pre>
+</div>
+<p>Finally we can check if we already had a cluster running and reuse
+that if we do and then get a <code>client</code> object from the cluster
+that will behave the same way as the local Dask client did.</p>
+<div class="codewrapper sourceCode" id="cb4">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a><span class="cf">else</span>:</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>    cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1" aria-label="code-block-4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1" aria-label="code-block-4-7"></a>client <span class="op">=</span> cluster.get_client()</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1" aria-label="code-block-4-8"></a>client</span></code></pre>
+</div>
+<p>Now that we have a running cluster we can allow it to adapt and scale
+up and down as we demand it. This will translate to jobs being launched
+on the JASMIN cluster itself. JASMIN allows users to spawn up to 16 jobs
+in the Dask queue, but one of these will be taken by the scheduler so
+the we can only launch a maximum of 15 workers.</p>
+<div class="codewrapper sourceCode" id="cb5">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">15</span>)</span></code></pre>
+</div>
+<p>Once we are done with Dask we can shutdown the cluster by calling its
+shutdown function. This should cause the jobs in the SLURM queue to
+finish.</p>
+<div class="codewrapper sourceCode" id="cb6">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>cluster.shutdown()</span></code></pre>
+</div>
+</div>
+<div class="section level3">
+<h3 id="dask-arrays-and-lazy-computation">Dask arrays and lazy computation<a class="anchor" aria-label="anchor" href="#dask-arrays-and-lazy-computation"></a></h3>
+<p>Dask arrays are chunked arrays that mimic NumPy’s API but execute
+lazily and in parallel. Any processing operations can work in parallel
+across these chunks. Data can also be loaded “lazily” into Dask Arrays,
+this means it is only loaded from disk when it is accessed. This can
+give us the illusion of loading a dataset that is larger than our
+memory.</p>
+<p>Example:</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a><span class="co"># Create a 10000x10000 array of random numbers, chunked 1000x1000</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>x <span class="op">=</span> da.random.random((<span class="dv">10000</span>, <span class="dv">10000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>))</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a><span class="bu">print</span>(x)</span></code></pre>
+</div>
+<p>Simple operation: add ones</p>
+<div class="codewrapper sourceCode" id="cb8">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>y <span class="op">=</span> da.ones((<span class="dv">10000</span>, <span class="dv">10000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>, <span class="dv">1000</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>z <span class="op">=</span> x <span class="op">+</span> y</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a><span class="bu">print</span>(z)  <span class="co"># Still a Dask array, not yet computed</span></span></code></pre>
+</div>
+<p>As you can see, the addition operation does not compute the result
+immediately. Instead, it builds a task graph that describes how to
+compute <code>z</code> from <code>x</code> and <code>y</code>. The
+actual computation happens when you call <code>.compute()</code>:</p>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="co"># Trigger computation</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>result <span class="op">=</span> z.mean().compute()</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a><span class="bu">print</span>(<span class="st">"Mean value:"</span>, result)</span></code></pre>
+</div>
+<p>The new variable result will now contain the result of the
+computation and will be of the type numpy.ndarray.</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="bu">type</span>(result)</span></code></pre>
 </div>
 <p>Important points:</p>
 <ul><li>Creating <code>x</code> and <code>y</code> defines a Dask array with
@@ -575,22 +664,22 @@ time. Ensure you only time the core computation and not the Dask cluster
 setup or library imports, this means you’ll have to write this code into
 multiple cells. Dask version (note you’ll need to do the Dask client
 setup first):</p>
-<div class="codewrapper sourceCode" id="cb3">
+<div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="co"># Dask version</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>x <span class="op">=</span> da.random.random((<span class="dv">20000</span>,<span class="dv">20000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>,<span class="dv">1000</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>x_mean <span class="op">=</span> x.mean()</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>x_mean.compute()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="co"># Dask version</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a>x <span class="op">=</span> da.random.random((<span class="dv">20000</span>,<span class="dv">20000</span>), chunks<span class="op">=</span>(<span class="dv">1000</span>,<span class="dv">1000</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a>x_mean <span class="op">=</span> x.mean()</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a>x_mean.compute()</span></code></pre>
 </div>
 <p>Numpy version:</p>
-<div class="codewrapper sourceCode" id="cb4">
+<div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a>npx <span class="op">=</span> np.random.random((<span class="dv">20000</span>,<span class="dv">20000</span>))</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>npx_mean <span class="op">=</span> npx.mean()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a>npx <span class="op">=</span> np.random.random((<span class="dv">20000</span>,<span class="dv">20000</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a>npx_mean <span class="op">=</span> npx.mean()</span></code></pre>
 </div>
 <p>Which went faster overall? Why do you think you got the result you
 did? Try making the dataset a little larger, going much beyond
@@ -629,7 +718,10 @@ difficult to know when the data are actually being read from disk or
 downloaded from a remote source. This can lead to unexpected memory
 usage or performance issues.</p>
 <p>So, when do the download and processing actually happen? Things that
-are usually obvious but catch us all off guard</p>
+are usually obvious but catch us all off guard!</p>
+<p>When you open a Zarr dataset with xarray, the data are not read into
+memory. The data are only read when you access them (e.g., by slicing or
+computing a statistic).</p>
 </div>
 </div>
 </div>
@@ -640,39 +732,46 @@ are usually obvious but catch us all off guard</p>
 xarray and ask xarray to use Dask-backed chunks. Xarray then keeps the
 data lazy until you compute something.</p>
 <p>First, create the client:</p>
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb13">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>, memory_limit<span class="op">=</span><span class="st">"1GB"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a>client</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>, memory_limit<span class="op">=</span><span class="st">"1GB"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>client</span></code></pre>
 </div>
 <p>Then open the Zarr dataset with chunking:</p>
-<div class="codewrapper sourceCode" id="cb6">
+<div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>, chunks<span class="op">=</span>{})</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="bu">print</span>(ds)</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a><span class="bu">print</span>(temp)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>, chunks<span class="op">=</span>{})</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="bu">print</span>(ds)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a>sst <span class="op">=</span> ds[<span class="st">"sst"</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a><span class="bu">print</span>(sst)</span></code></pre>
 </div>
-<p>The <code>chunks</code> argument tells xarray to load the data into
-Dask arrays with a chosen chunk structure. If the chunking matches your
-workload, the resulting operations can run efficiently across multiple
-workers.</p>
+<p>Because this dataset is already chunked, xarray can use the existing
+chunking from the Zarr store. In this case, you can set the
+<code>chunks</code> argument to <code>{}</code> or don’t specify it at
+all. Xarray will use the chunking from the Zarr store.</p>
+<p>If you are using a netCDF dataset, to integrate Dask you would need
+to specify the chunk sizes when opening the dataset. For example:</p>
+<div class="codewrapper sourceCode" id="cb15">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>ds <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>, chunks<span class="op">=</span>{<span class="st">"time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span></code></pre>
+</div>
 </div>
 <div class="section level3">
 <h3 id="a-simple-parallel-computation">A simple parallel computation<a class="anchor" aria-label="anchor" href="#a-simple-parallel-computation"></a></h3>
-<div class="codewrapper sourceCode" id="cb7">
+<div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>corrected <span class="op">=</span> temp <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"lat"</span>, <span class="st">"lon"</span>))</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a>result <span class="op">=</span> global_mean.compute()</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a><span class="bu">print</span>(result)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a>corrected <span class="op">=</span> sst <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a>result <span class="op">=</span> global_mean.compute()</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a><span class="bu">print</span>(result)</span></code></pre>
 </div>
 <p>This workflow is important because the data stay lazy until
 <code>.compute()</code> is called. At that point Dask schedules the work
@@ -685,18 +784,22 @@ across the chunks.</p>
 <div id="exercise-1---dask-and-xarray-together" class="callout-inner">
 <h3 class="callout-title">Exercise 1 - Dask and xarray together</h3>
 <div class="callout-content">
-<p>Using your Zarr dataset:</p>
-<ol style="list-style-type: decimal"><li>Open the dataset with <code>xr.open_zarr</code>, specifying chunk
-sizes.</li>
+<p>Using the zarr (<code>data/ocean_temperature.zarr</code>) dataset and
+the netCDF (<code>data/ocean_temperature.nc</code>) dataset, try the
+following:</p>
+<ol style="list-style-type: decimal"><li>Open each one with xarray, using <code>xr.open_zarr</code> for the
+Zarr dataset and <code>xr.open_dataset</code> for the netCDF
+dataset.</li>
 <li>Compute a spatial mean over latitude and longitude.</li>
-<li>Select a regional subset and compute its mean.</li>
-<li>Call <code>.compute()</code> and compare the result with and without
-Dask-backed chunks.</li>
+<li>Call <code>.compute()</code> in the zarr case and compare the result
+with and without Dask-backed chunks. Try to calculate the time taken for
+each computation and compare the results. You can use the
+<code>%%time</code> magic command in a Jupyter notebook to time the
+execution of a cell.</li>
 </ol><p>Questions:</p>
-<ul><li>Which chunk sizes seem most suitable for your workload?</li>
-<li>How many chunks do you think the operation touches?</li>
-<li>Does the computation feel faster or easier to reason about with
-Dask?</li>
+<ul><li>How does the chunking affect the computation?</li>
+<li>How does the performance differ between the Zarr and netCDF
+datasets?</li>
 </ul></div>
 </div>
 </div>
@@ -705,51 +808,37 @@ Dask?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<p>xarray plus Dask gives them a lazy, chunk-aware workflow. The
+<p>For the Zarr dataset:</p>
+<div class="codewrapper sourceCode" id="cb17">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="op">%%</span>time</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>sst_zarr <span class="op">=</span> ds_zarr[<span class="st">"sst"</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>global_mean_zarr <span class="op">=</span> sst_zarr.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>result_zarr <span class="op">=</span> global_mean_zarr.compute()</span></code></pre>
+</div>
+<p>For the netCDF dataset:</p>
+<div class="codewrapper sourceCode" id="cb18">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a><span class="op">%%</span>time</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a>sst_nc <span class="op">=</span> ds_nc[<span class="st">"sst"</span>]</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a>result_nc <span class="op">=</span> sst_nc.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span></code></pre>
+</div>
+<p>When you compute the spatial mean over latitude and longitude for the
+Zarr dataset with Dask, you should see a reduction in computation time
+compared to the netCDF dataset. The exact performance gain will depend
+on the size of the dataset and the chunking strategy used.</p>
+<p>Xarray plus Dask gives them a lazy, chunk-aware workflow. The
 important link is that chunking from the storage lesson now becomes the
 basis for parallel computation.</p>
 </div>
 </div>
 </div>
-</div>
-</div>
-</section><section><h2 class="section-heading" id="other-parallelism-patterns">Other parallelism patterns<a class="anchor" aria-label="anchor" href="#other-parallelism-patterns"></a></h2>
-<hr class="half-width"><p>Dask is the main tool in this workshop, but Python users also use a
-few other parallelism patterns with Zarr workflows.</p>
-<div class="section level3">
-<h3 id="dask-delayed"><code>dask.delayed</code><a class="anchor" aria-label="anchor" href="#dask-delayed"></a></h3>
-<p><code>dask.delayed</code> is useful when you want to parallelise a
-custom Python function instead of an array operation. It lets you build
-a task graph from normal Python code.</p>
-<div class="codewrapper sourceCode" id="cb8">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">import</span> dask</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a><span class="at">@dask.delayed</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a><span class="kw">def</span> apply_correction(x):</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>    <span class="cf">return</span> x <span class="op">*</span> <span class="fl">1.01</span> <span class="op">+</span> <span class="fl">0.1</span></span></code></pre>
-</div>
-<p>This is helpful when a workflow is not naturally expressed as a NumPy
-or xarray operation.</p>
-</div>
-<div class="section level3">
-<h3 id="futures">Futures<a class="anchor" aria-label="anchor" href="#futures"></a></h3>
-<p>Dask futures are useful when you want tasks to start immediately and
-manage results asynchronously. They are a good fit for workflows that
-submit many independent jobs, such as processing many Zarr groups or
-many files.</p>
-<div class="codewrapper sourceCode" id="cb9">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>client <span class="op">=</span> Client()</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>future <span class="op">=</span> client.submit(<span class="bu">sum</span>, )</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a><span class="bu">print</span>(future.result())</span></code></pre>
 </div>
 <div id="other-ways-to-parallelise-zarr-workflows" class="callout">
 <div class="callout-square">
@@ -788,14 +877,25 @@ cloud-oriented workflows.</p>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="parallelism-friendly-zarr-storage">Parallelism-friendly Zarr storage<a class="anchor" aria-label="anchor" href="#parallelism-friendly-zarr-storage"></a></h2>
-<hr class="half-width"><p>Zarr is a good fit for parallel processing because it stores data in
-chunks, and each chunk can be read independently. That means multiple
-workers can read different chunks at the same time without needing a
-single giant file.</p>
-<p>This is especially useful when the data live in object storage or
-another backend that can serve chunk-sized requests efficiently. In
-other words, Zarr gives Dask something it can parallelise cleanly.</p>
+</section><section><h2 class="section-heading" id="visualising-the-task-graph">Visualising the Task Graph<a class="anchor" aria-label="anchor" href="#visualising-the-task-graph"></a></h2>
+<hr class="half-width"><p>To see how Dask is scheduling work, you can visualise the task graph.
+This can help you understand how many tasks are being created and how
+they depend on each other.</p>
+<div class="codewrapper sourceCode" id="cb19">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> dask</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a>sst <span class="op">=</span> ds[<span class="st">"sst"</span>]</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>corrected <span class="op">=</span> sst <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a>dask.visualize(global_mean, filename<span class="op">=</span><span class="st">'task_graph.png'</span>)</span></code></pre>
+</div>
+<p>This will create a PNG file showing the task graph for the
+computation. You can also use <code>global_mean.visualize()</code> to
+see the graph directly in a Jupyter notebook.</p>
 <div id="exercise-2---a-small-parallel-workflow" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -804,11 +904,27 @@ other words, Zarr gives Dask something it can parallelise cleanly.</p>
 <div id="exercise-2---a-small-parallel-workflow" class="callout-inner">
 <h3 class="callout-title">Exercise 2 - A small parallel workflow</h3>
 <div class="callout-content">
-<p>Using the same dataset:</p>
-<ol style="list-style-type: decimal"><li>Open the dataset with chunk sizes chosen for your workload.</li>
+<p>Now, we are going to compare the results with different chunk sizes.
+Using the original zarr (<code>data/ocean_temperature.zarr</code>) and
+the rechunked zarr (<code>data/ocean_temperature_rechunked.zarr</code> -
+you created this in the previous episode) datasets, try the
+following:</p>
+<ol style="list-style-type: decimal"><li>Open the dataset</li>
 <li>Run one spatial statistic and one time-based statistic.</li>
-<li>Repeat the same operation with a different chunk size.</li>
-<li>Compare which version creates a more efficient task structure.</li>
+</ol><p>For example (but you can choose any statistic you like):</p>
+<div class="codewrapper sourceCode" id="cb20">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a>spatial_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a>time_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span></code></pre>
+</div>
+<ol start="3" style="list-style-type: decimal"><li>Repeat the same operation for the other dataset (the one you didn’t
+use in step 1).</li>
+<li>Compare which version creates a more efficient task structure and
+which one runs faster. You can use the <code>%%time</code> magic command
+in a Jupyter notebook to time the execution of a cell.</li>
 </ol><p>Questions:</p>
 <ul><li>Which dimensions matter most for your workflow?</li>
 <li>Did the chunk layout help or hurt parallel execution?</li>
@@ -821,42 +937,128 @@ other words, Zarr gives Dask something it can parallelise cleanly.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<p>The main lesson is that parallelism works best when the data are
-already organised in a way that matches the common workload. Zarr
-provides the storage layout, and Dask provides the parallel
-execution.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="visualising-the-task-graph" class="callout">
-<div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
-</div>
-<span class="callout-header">Callout</span>
-<div id="visualising-the-task-graph" class="callout-inner">
-<h3 class="callout-title">Visualising the Task Graph</h3>
-<div class="callout-content">
-<p>To see how Dask is scheduling work, you can visualise the task graph.
-This can help you understand how many tasks are being created and how
-they depend on each other.</p>
-<div class="codewrapper sourceCode" id="cb10">
+<p>For the original zarr dataset:</p>
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> dask</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>, chunks<span class="op">=</span>{})</span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>corrected <span class="op">=</span> temp <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"lat"</span>, <span class="st">"lon"</span>))</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a>dask.visualize(global_mean, filename<span class="op">=</span><span class="st">'task_graph.png'</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Open the original zarr dataset</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a>sst_original <span class="op">=</span> ds_original[<span class="st">"sst"</span>]</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>spatial_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>time_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a><span class="op">%</span>time spatial_mean_original.compute()</span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a><span class="op">%</span>time time_mean_original.compute()</span></code></pre>
 </div>
-<p>This will create a PNG file showing the task graph for the
-computation. You can also use <code>global_mean.visualize()</code> to
-see the graph directly in a Jupyter notebook.</p>
+<p>For the rechunked zarr dataset:</p>
+<div class="codewrapper sourceCode" id="cb22">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="co"># Open the rechunked zarr dataset</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature_rechunked.zarr"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a>sst_rechunked <span class="op">=</span> ds_rechunked[<span class="st">"sst"</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>spatial_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>time_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="op">%</span>time spatial_mean_rechunked.compute()</span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a><span class="op">%</span>time time_mean_rechunked.compute()</span></code></pre>
+</div>
+<p>When you compute the spatial and time-based statistics for both the
+original and rechunked datasets, you should observe differences in
+execution time. The chunk layout can significantly affect parallel
+execution, especially for larger datasets.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="exercise-3-optional---parallel-workflow-using-a-dask-cluster-on-hpc" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<span class="callout-header">Challenge</span>
+<div id="exercise-3-optional---parallel-workflow-using-a-dask-cluster-on-hpc" class="callout-inner">
+<h3 class="callout-title">Exercise 3 (Optional) - Parallel workflow
+using a Dask cluster on HPC</h3>
+<div class="callout-content">
+<p>Now we are going to explore how to run a parallel workflow using a
+Dask cluster on an HPC system like JASMIN. For this example, we are
+going to use a bigger dataset, the subset of the GLORYS Reanalysis
+dataset, stored in a single Zarr group
+(<code>data/glorys_202605.zarr</code>). This dataset is too large to
+process efficiently on a single core, so we will use Dask to parallelise
+the computation.</p>
+<p>Please follow the steps below:</p>
+<ol style="list-style-type: decimal"><li>Set up a Dask cluster on JASMIN using the Dask Gateway service.</li>
+<li>Open the GLORYS u-component of the ocean current velocity
+(<code>uo</code>) with Xarray.</li>
+<li>Run a correction algorithm on the <code>uo</code> data (for example,
+multiply by a factor and subtract an offset). For example
+<code>corrected_uo = uo * 1.1 - 1.0</code>.</li>
+<li>Experiment with:</li>
+</ol><ul><li>Changing the number of worker cores</li>
+<li>Changing the number of workers (set in cluster.adapt)</li>
+</ul></div>
+</div>
+</div>
+<div id="accordionSolution3" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
+  <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
+</button>
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div class="accordion-body">
+<p>Create a Dask cluster on JASMIN using the Dask Gateway service. You
+can use the following code snippet to set up the cluster and connect to
+it:</p>
+<div class="codewrapper sourceCode" id="cb23">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a><span class="co"># Create a connection to dask-gateway.</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a>options <span class="op">=</span> gw.cluster_options()</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a>options.worker_cores <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1" aria-label="code-block-23-9"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1" aria-label="code-block-23-10"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1" aria-label="code-block-23-11"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/colinsau/esces-env'</span></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1" aria-label="code-block-23-12"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1" aria-label="code-block-23-13"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1" aria-label="code-block-23-14"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1" aria-label="code-block-23-15"></a><span class="cf">else</span>:</span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1" aria-label="code-block-23-16"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span></code></pre>
+</div>
+<p>Now that we have a running cluster, we can get a client object from
+the cluster that will behave the same way as the local Dask client
+did.</p>
+<div class="codewrapper sourceCode" id="cb24">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a>client <span class="op">=</span> cluster.get_client()</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys_202605.zarr"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a>uo <span class="op">=</span> ds[<span class="st">'uo'</span>]</span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>corrected_uo <span class="op">=</span> uo <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a>corrected_uo.compute()</span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1" aria-label="code-block-24-7"></a><span class="bu">print</span>(corrected_uo)</span></code></pre>
+</div>
+<p>Remember to shutdown the cluster when you are done to free up
+resources:</p>
+<div class="codewrapper sourceCode" id="cb25">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" tabindex="-1" aria-label="code-block-25-1"></a>cluster.shutdown()</span></code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -941,7 +1143,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
+  "dateModified": "2026-07-28",
   "datePublished": "2026-07-28"
 }
 
