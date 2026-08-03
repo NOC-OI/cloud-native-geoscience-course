@@ -24,13 +24,13 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-danger">
-          <abbr title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.">
+        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-info">
+          <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
-              <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="border-radius: 5px"></i>
-              Pre-Alpha
+              <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
+              Beta
             </a>
-            <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
+            <span class="visually-hidden">This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.</span>
           </abbr>
         </span>
 
@@ -652,11 +652,12 @@ over time while keeping the repository in object storage.</p>
 <div class="section level3">
 <h3 id="step-2---opening-the-local-zarr-store">Step 2 - Opening the local Zarr store<a class="anchor" aria-label="anchor" href="#step-2---opening-the-local-zarr-store"></a></h3>
 <p>Open the local Zarr dataset with xarray. We are going to use the
-<code>data/ocean_temperature.zarr</code> dataset as an example.</p>
+<code>data/era5_sst/ocean_temperature.zarr</code> dataset as an
+example.</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>local_zarr <span class="op">=</span> <span class="st">"data/ocean_temperature.zarr"</span></span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>local_zarr <span class="op">=</span> <span class="st">"data/era5_sst/ocean_temperature.zarr"</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds <span class="op">=</span> xr.open_zarr(local_zarr)</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a></span>
@@ -769,7 +770,8 @@ well-defined version of the data.</p>
 <h3 class="callout-title">Exercise 2 - Your turn: open the
 ocean_temperature zarr dataset and and add Icechunk</h3>
 <div class="callout-content">
-<p>Using the <code>data/ocean_temperature.zarr</code> dataset:</p>
+<p>Using the <code>data/era5_sst/ocean_temperature.zarr</code>
+dataset:</p>
 <ol style="list-style-type: decimal"><li>Open the store with xarray.</li>
 <li>Create an Icechunk repository in the object store.</li>
 <li>Add the Zarr store to Icechunk.</li>
@@ -814,7 +816,7 @@ path?</li>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="co"># Open the local Zarr store</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span></code></pre>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature.zarr"</span>)</span></code></pre>
 </div>
 <p>Create an Icechunk repository in the object store:</p>
 <div class="codewrapper sourceCode" id="cb14">
@@ -1266,7 +1268,7 @@ any links that you are not going to use.
 		</div>
 		<div class="col-md-6">
 
-        <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
+        <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
         <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>

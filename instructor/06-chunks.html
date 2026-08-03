@@ -24,13 +24,13 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="dc-logo" alt="Data Carpentry" src="../assets/images/data-logo.svg"><span class="badge text-bg-danger">
-          <abbr title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.">
+        <img id="dc-logo" alt="Data Carpentry" src="../assets/images/data-logo.svg"><span class="badge text-bg-info">
+          <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
-              <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="border-radius: 5px"></i>
-              Pre-Alpha
+              <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
+              Beta
             </a>
-            <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
+            <span class="visually-hidden">This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.</span>
           </abbr>
         </span>
 
@@ -549,8 +549,10 @@ stored in a single Zarr group:</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys_202605.zarr"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="bu">print</span>(ds)</span></code></pre>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/glorys/glorys_202605.zarr"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 <p>Now, let’s inspect the <code>zos</code> variable (Sea surface height)
 and see its dimensions, shape, and chunking:</p>
@@ -575,7 +577,7 @@ about how the current chunking might align with your workloads.</p>
 workloads</h3>
 <div class="callout-content">
 <p>Using the GLORYS Reanalysis example Zarr dataset
-(<code>data/glorys_202605.zarr</code>), answer the following:</p>
+(<code>data/glorys/glorys_202605.zarr</code>), answer the following:</p>
 <ol style="list-style-type: decimal"><li><p>Inspect the <code>so</code> (Salinity) array’s <code>shape</code>
 and <code>chunks</code> using <code>xarray</code>.</p></li>
 <li><p>Map the dimensions to names (e.g. interpret
@@ -606,7 +608,10 @@ seems “friendly” or “unfriendly”:</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].shape)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a><span class="co"># chunks</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].data.chunks)</span></code></pre>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].data.chunks)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a><span class="co"># dimensions</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a><span class="bu">print</span>(ds[<span class="st">"so"</span>].dims)</span></code></pre>
 </div>
 <p>Following the coordinate names and CF conventions
 (<code>standard_name="sea_water_salinity"</code>), the dimensions
@@ -692,7 +697,7 @@ later if you want).</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 <p>You can see that this dataset has dimensions
@@ -720,7 +725,7 @@ time step:</p>
 <div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">1</span>, <span class="st">"latitude"</span>: <span class="dv">721</span>, <span class="st">"longitude"</span>: <span class="dv">1440</span>})</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">20</span>, <span class="st">"latitude"</span>: <span class="dv">180</span>, <span class="st">"longitude"</span>: <span class="dv">180</span>})</span></code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -736,11 +741,19 @@ right.</p>
 </div>
 <div class="section level3">
 <h3 id="step-4-write-the-rechunked-data-to-a-new-zarr-store">Step 4: Write the rechunked data to a new Zarr store<a class="anchor" aria-label="anchor" href="#step-4-write-the-rechunked-data-to-a-new-zarr-store"></a></h3>
-<p>Save the dataset with the new chunk layout.</p>
+<p>Save the dataset with the new chunk layout. However, because this
+dataset also has an encoding for the <code>sst</code> variable, you also
+need to update the encoding to reflect the new chunking.</p>
+<p>Note that we are going to save the data in your local data directory
+(not in the <code>base_path</code>):</p>
 <div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>ds_chunked.to_zarr(<span class="st">"data/ocean_temperature_rechunked.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>ds_chunked.to_zarr(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a>  <span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a>  mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a>  encoding<span class="op">=</span>{<span class="st">"sst"</span>: {<span class="st">"chunks"</span>: (<span class="dv">20</span>, <span class="dv">180</span>, <span class="dv">180</span>)}},</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>)</span></code></pre>
 </div>
 <p>This approach is convenient, but it is not always the most efficient
 for very large datasets. If the original and target chunk layouts are
@@ -778,8 +791,9 @@ more memory-efficient way.</p>
 </section><section><h2 class="section-heading" id="rechunk-can-be-expensive">Rechunk can be expensive<a class="anchor" aria-label="anchor" href="#rechunk-can-be-expensive"></a></h2>
 <hr class="half-width"><p>In some cases, rechunking can take a long time, especially if the
 original and target chunk layouts are very different. For example, a
-study on Zarr data<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> in cloud-based object stores found
-that:</p>
+study on Zarr data<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> in cloud-based object stores calculated the
+time to rechunk a 9–10 GB dataset with different chunking
+strategies:</p>
 <table class="table"><colgroup><col width="64%"><col width="35%"></colgroup><thead><tr><th>Chunking strategy</th>
 <th align="right">Rechunk time</th>
 </tr></thead><tbody><tr><td>Large chunks</td>
@@ -895,23 +909,27 @@ environments.</li>
 </button>
 <div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
-<pre><code>import time
-import xarray as xr
-
-# Open the original and rechunked datasets
-ds_original = xr.open_zarr("data/ocean_temperature.zarr")
-ds_rechunked = xr.open_zarr("data/ocean_temperature_rechunked.zarr")
-
-# Measure time for global mean time series
-t0 = time.time()
-global_mean_original = ds_original["sst"].mean(dim=("latitude", "longitude")).compute()
-t1 = time.time()
-print("Original store global mean time:", t1 - t0, "seconds")
-
-t0 = time.time()
-global_mean_rechunked = ds_rechunked["sst"].mean(dim=("latitude", "longitude")).compute()
-t1 = time.time()
-print("Rechunked store global mean time:", t1 - t0, "seconds")</code></pre>
+<div class="codewrapper sourceCode" id="cb14">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="im">import</span> time</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="co"># Open the original and rechunked datasets</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a><span class="co"># Measure time for global mean time series</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1" aria-label="code-block-14-10"></a>global_mean_original <span class="op">=</span> ds_original[<span class="st">"sst"</span>].mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1" aria-label="code-block-14-11"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1" aria-label="code-block-14-12"></a><span class="bu">print</span>(<span class="st">"Original store global mean time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1" aria-label="code-block-14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1" aria-label="code-block-14-14"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1" aria-label="code-block-14-15"></a>global_mean_rechunked <span class="op">=</span> ds_rechunked[<span class="st">"sst"</span>].mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1" aria-label="code-block-14-16"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1" aria-label="code-block-14-17"></a><span class="bu">print</span>(<span class="st">"Rechunked store global mean time:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span></code></pre>
+</div>
 <p>You may observe modest timing differences. This is because the
 dataset is small enough that the overhead of reading chunks is not
 significant. However, for larger datasets or when working in cloud
@@ -1015,7 +1033,8 @@ the Zarr metadata directly:</p>
 <div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="fu">cat</span> data/example_sharded.zarr/temperature/zarr.json</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="co"># Run this command in your terminal to see the Zarr metadata for the sharded array</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a><span class="fu">cat</span> data/example_sharded.zarr/temperature/zarr.json</span></code></pre>
 </div>
 <div class="codewrapper">
 <h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -1091,14 +1110,27 @@ layout underneath.</p>
 <ol style="list-style-type: decimal"><li>In the rechunked dataset you created in Exercise 3, implement a
 sharding scheme that groups multiple chunks into larger shards. For
 example, if your chunks are <code>(20, 180, 180)</code>, you might
-choose to shard them into <code>(100, 360, 360)</code>.</li>
-<li>Inspect the Zarr metadata to confirm that the shards are being used,
+choose to shard them into <code>(100, 360, 360)</code>. Because you are
+changing the chunks (by setting the <code>shards</code> parameter in the
+encoding), you need to use <code>align_chunks=True</code> when saving
+the dataset to Zarr:</li>
+</ol><div class="codewrapper sourceCode" id="cb20">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a>ds_rechunked.to_zarr(..., align_chunks<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+</div>
+<ol start="2" style="list-style-type: decimal"><li>Inspect the Zarr metadata to confirm that the shards are being used,
 and that the chunking is still as you expect.</li>
 <li>Compare the number of files/objects in the original, rechunked, and
-sharded datasets. You can use <code>os.listdir()</code> or
-<code>zarr.open()</code> to inspect the contents of the Zarr
-stores.</li>
-</ol></div>
+sharded datasets. You can use the example below to perform this
+calculation:</li>
+</ol><div class="codewrapper sourceCode" id="cb21">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a>zarr_store_path <span class="op">=</span> Path(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr/sst/c"</span>) <span class="co"># use the "c" directory as it contains the actual chunk data</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a><span class="bu">print</span>(<span class="st">"Total Files:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> zarr_store_path.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span></code></pre>
+</div>
+</div>
 </div>
 </div>
 <div id="accordionSolution4" class="accordion challenge-accordion accordion-flush">
@@ -1108,31 +1140,36 @@ stores.</li>
 </button>
 <div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb20">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> os</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a><span class="co"># Open the rechunked dataset</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature_rechunked.zarr"</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a></span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a><span class="co"># Save the dataset with sharding</span></span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1" aria-label="code-block-20-8"></a>ds_rechunked.to_zarr(<span class="st">"data/ocean_temperature_sharded.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>, zarr_format<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1" aria-label="code-block-20-9"></a>                     encoding<span class="op">=</span>{<span class="st">"sst"</span>: {<span class="st">"chunks"</span>: (<span class="dv">20</span>, <span class="dv">180</span>, <span class="dv">180</span>), <span class="st">"shards"</span>: (<span class="dv">100</span>, <span class="dv">360</span>, <span class="dv">360</span>)}})</span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1" aria-label="code-block-20-10"></a></span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1" aria-label="code-block-20-11"></a><span class="co"># Inspect the Zarr metadata</span></span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1" aria-label="code-block-20-12"></a>ds_sharded <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature_sharded.zarr"</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1" aria-label="code-block-20-13"></a><span class="bu">print</span>(ds_sharded)</span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1" aria-label="code-block-20-14"></a><span class="bu">print</span>(ds_sharded[<span class="st">"sst"</span>].chunks)</span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1" aria-label="code-block-20-15"></a></span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1" aria-label="code-block-20-16"></a><span class="co"># Compare the number of files/objects</span></span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1" aria-label="code-block-20-17"></a>original_files <span class="op">=</span> <span class="bu">len</span>(os.listdir(<span class="st">"data/ocean_temperature.zarr/sst"</span>))</span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1" aria-label="code-block-20-18"></a>rechunked_files <span class="op">=</span> <span class="bu">len</span>(os.listdir(<span class="st">"data/ocean_temperature_rechunked.zarr/sst"</span>))</span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1" aria-label="code-block-20-19"></a>sharded_files <span class="op">=</span> <span class="bu">len</span>(os.listdir(<span class="st">"data/ocean_temperature_sharded.zarr/sst"</span>))</span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1" aria-label="code-block-20-20"></a><span class="bu">print</span>(<span class="ss">f"Original store files: </span><span class="sc">{</span>original_files<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1" aria-label="code-block-20-21"></a><span class="bu">print</span>(<span class="ss">f"Rechunked store files: </span><span class="sc">{</span>rechunked_files<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1" aria-label="code-block-20-22"></a><span class="bu">print</span>(<span class="ss">f"Sharded store files: </span><span class="sc">{</span>sharded_files<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="im">import</span> os</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="co"># Open the rechunked dataset</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>ds_rechunked <span class="op">=</span> ds_rechunked.chunk({<span class="st">"valid_time"</span>: <span class="dv">20</span>, <span class="st">"latitude"</span>: <span class="dv">180</span>, <span class="st">"longitude"</span>: <span class="dv">180</span>})</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="co"># Save the dataset with sharding</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a>ds_rechunked.to_zarr(<span class="st">"data/era5_sst/ocean_temperature_sharded.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>, zarr_format<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1" aria-label="code-block-22-10"></a>                     encoding<span class="op">=</span>{<span class="st">"sst"</span>: {<span class="st">"chunks"</span>: (<span class="dv">20</span>, <span class="dv">180</span>, <span class="dv">180</span>), <span class="st">"shards"</span>: (<span class="dv">100</span>, <span class="dv">360</span>, <span class="dv">360</span>)}}, align_chunks<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1" aria-label="code-block-22-11"></a></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1" aria-label="code-block-22-12"></a><span class="co"># Inspect the Zarr metadata</span></span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1" aria-label="code-block-22-13"></a>ds_sharded <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_sharded.zarr"</span>)</span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1" aria-label="code-block-22-14"></a><span class="bu">print</span>(ds_sharded)</span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1" aria-label="code-block-22-15"></a><span class="bu">print</span>(ds_sharded[<span class="st">"sst"</span>].chunks)</span></code></pre>
+</div>
+<p>To calculate the number of files/objects in each dataset, you can use
+the following code:</p>
+<div class="codewrapper sourceCode" id="cb23">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a>original <span class="op">=</span> Path(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr/sst/c"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a>rechunked <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_rechunked.zarr/sst/c"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>sharded <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_sharded.zarr/sst/c"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a><span class="bu">print</span>(<span class="st">"Original:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> original.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a><span class="bu">print</span>(<span class="st">"Rechunked:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> rechunked.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a><span class="bu">print</span>(<span class="st">"Sharded:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> sharded.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span></code></pre>
 </div>
 <p>Using this approach, you should see that the sharded dataset has
 fewer files/objects than the original and rechunked datasets, while
@@ -1229,7 +1266,7 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
 		</div>
 		<div class="col-md-6">
 
-        <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
+        <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
         <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>

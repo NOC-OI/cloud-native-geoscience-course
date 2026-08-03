@@ -24,13 +24,13 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-danger">
-          <abbr title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.">
+        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-info">
+          <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
-              <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="border-radius: 5px"></i>
-              Pre-Alpha
+              <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
+              Beta
             </a>
-            <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
+            <span class="visually-hidden">This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.</span>
           </abbr>
         </span>
 
@@ -557,7 +557,7 @@ notebook.</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>options.worker_cores <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'</span></span></code></pre>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env'</span></span></code></pre>
 </div>
 <p>Finally we can check if we already had a cluster running and reuse
 that if we do and then get a <code>client</code> object from the cluster
@@ -743,11 +743,13 @@ data lazy until you compute something.</p>
 <div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>, chunks<span class="op">=</span>{})</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="bu">print</span>(ds)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a>sst <span class="op">=</span> ds[<span class="st">"sst"</span>]</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a><span class="bu">print</span>(sst)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>, chunks<span class="op">=</span>{})</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="bu">print</span>(ds)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>sst <span class="op">=</span> ds[<span class="st">"sst"</span>]</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a><span class="bu">print</span>(sst)</span></code></pre>
 </div>
 <p>Because this dataset is already chunked, xarray can use the existing
 chunking from the Zarr store. In this case, you can set the
@@ -758,7 +760,7 @@ to specify the chunk sizes when opening the dataset. For example:</p>
 <div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>ds <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>, chunks<span class="op">=</span>{<span class="st">"time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>, chunks<span class="op">=</span>{<span class="st">"valid_time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="a-simple-parallel-computation">A simple parallel computation<a class="anchor" aria-label="anchor" href="#a-simple-parallel-computation"></a></h3>
@@ -781,9 +783,9 @@ across the chunks.</p>
 <div id="exercise-1---dask-and-xarray-together" class="callout-inner">
 <h3 class="callout-title">Exercise 1 - Dask and xarray together</h3>
 <div class="callout-content">
-<p>Using the zarr (<code>data/ocean_temperature.zarr</code>) dataset and
-the netCDF (<code>data/ocean_temperature.nc</code>) dataset, try the
-following:</p>
+<p>Using the zarr (<code>data/era5_sst/ocean_temperature.zarr</code>)
+dataset and the netCDF (<code>data/era5_sst/ocean_temperature.nc</code>)
+dataset, try the following:</p>
 <ol style="list-style-type: decimal"><li>Open each one with xarray, using <code>xr.open_zarr</code> for the
 Zarr dataset and <code>xr.open_dataset</code> for the netCDF
 dataset.</li>
@@ -812,17 +814,18 @@ datasets?</li>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="op">%%</span>time</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>sst_zarr <span class="op">=</span> ds_zarr[<span class="st">"sst"</span>]</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>global_mean_zarr <span class="op">=</span> sst_zarr.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>result_zarr <span class="op">=</span> global_mean_zarr.compute()</span></code></pre>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>sst_zarr <span class="op">=</span> ds_zarr[<span class="st">"sst"</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>global_mean_zarr <span class="op">=</span> sst_zarr.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1" aria-label="code-block-17-6"></a>result_zarr <span class="op">=</span> global_mean_zarr.compute()</span></code></pre>
 </div>
 <p>For the netCDF dataset:</p>
 <div class="codewrapper sourceCode" id="cb18">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a><span class="op">%%</span>time</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a>sst_nc <span class="op">=</span> ds_nc[<span class="st">"sst"</span>]</span>
 <span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a>result_nc <span class="op">=</span> sst_nc.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span></code></pre>
 </div>
@@ -884,7 +887,7 @@ they depend on each other.</p>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> dask</span>
 <span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
 <span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a>sst <span class="op">=</span> ds[<span class="st">"sst"</span>]</span>
 <span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>corrected <span class="op">=</span> sst <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
 <span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
@@ -903,10 +906,10 @@ see the graph directly in a Jupyter notebook.</p>
 <h3 class="callout-title">Exercise 2 - A small parallel workflow</h3>
 <div class="callout-content">
 <p>Now, we are going to compare the results with different chunk sizes.
-Using the original zarr (<code>data/ocean_temperature.zarr</code>) and
-the rechunked zarr (<code>data/ocean_temperature_rechunked.zarr</code> -
-you created this in the previous episode) datasets, try the
-following:</p>
+Using the original zarr
+(<code>data/era5_sst/ocean_temperature.zarr</code>) and the rechunked
+zarr (<code>data/era5_sst/ocean_temperature_rechunked.zarr</code> - you
+created this in the previous episode) datasets, try the following:</p>
 <ol style="list-style-type: decimal"><li>Open the dataset</li>
 <li>Run one spatial statistic and one time-based statistic.</li>
 </ol><p>For example (but you can choose any statistic you like):</p>
@@ -944,12 +947,12 @@ in a Jupyter notebook to time the execution of a cell.</li>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a></span>
 <span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Open the original zarr dataset</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
 <span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a>sst_original <span class="op">=</span> ds_original[<span class="st">"sst"</span>]</span>
 <span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
 <span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>spatial_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a><span class="co"># Time-based statistic: mean over time</span></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>time_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>time_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
 <span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a></span>
 <span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a><span class="op">%</span>time spatial_mean_original.compute()</span>
 <span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a><span class="op">%</span>time time_mean_original.compute()</span></code></pre>
@@ -959,12 +962,12 @@ in a Jupyter notebook to time the execution of a cell.</li>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="co"># Open the rechunked zarr dataset</span></span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature_rechunked.zarr"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a>sst_rechunked <span class="op">=</span> ds_rechunked[<span class="st">"sst"</span>]</span>
 <span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
 <span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>spatial_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
 <span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a><span class="co"># Time-based statistic: mean over time</span></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>time_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>time_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
 <span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="op">%</span>time spatial_mean_rechunked.compute()</span>
 <span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a><span class="op">%</span>time time_mean_rechunked.compute()</span></code></pre>
 </div>
@@ -989,9 +992,9 @@ using a Dask cluster on HPC</h3>
 Dask cluster on an HPC system like JASMIN. For this example, we are
 going to use a bigger dataset, the subset of the GLORYS Reanalysis
 dataset, stored in a single Zarr group
-(<code>data/glorys_202605.zarr</code>). This dataset is too large to
-process efficiently on a single core, so we will use Dask to parallelise
-the computation.</p>
+(<code>data/glorys/glorys_202605.zarr</code>). This dataset is too large
+to process efficiently on a single core, so we will use Dask to
+parallelise the computation.</p>
 <p>Please follow the steps below:</p>
 <ol style="list-style-type: decimal"><li>Set up a Dask cluster on JASMIN using the Dask Gateway service.</li>
 <li>Open the GLORYS u-component of the ocean current velocity
@@ -1043,7 +1046,7 @@ did.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a>client <span class="op">=</span> cluster.get_client()</span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys_202605.zarr"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys/glorys_202605.zarr"</span>)</span>
 <span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a>uo <span class="op">=</span> ds[<span class="st">'uo'</span>]</span>
 <span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>corrected_uo <span class="op">=</span> uo <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
 <span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a>corrected_uo.compute()</span>
@@ -1116,7 +1119,7 @@ any links that you are not going to use.
 		</div>
 		<div class="col-md-6">
 
-        <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
+        <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
         <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>

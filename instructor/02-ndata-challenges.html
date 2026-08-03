@@ -24,13 +24,13 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="dc-logo" alt="Data Carpentry" src="../assets/images/data-logo.svg"><span class="badge text-bg-danger">
-          <abbr title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.">
+        <img id="dc-logo" alt="Data Carpentry" src="../assets/images/data-logo.svg"><span class="badge text-bg-info">
+          <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
-              <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="border-radius: 5px"></i>
-              Pre-Alpha
+              <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
+              Beta
             </a>
-            <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
+            <span class="visually-hidden">This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.</span>
           </abbr>
         </span>
 
@@ -572,10 +572,11 @@ structures we are working with.</p>
 <h3 class="callout-title">Exercise 1: Inspecting the structure of a
 NetCDF file</h3>
 <div class="callout-content">
-<p>The example NetCDF file <code>data/ocean_temperature.nc</code>
-contains a subset of the ERA5 Reanalysis, consisting of 2D sea surface
-temperature fields (latitude and longitude) recorded every 2 hours
-during the first five days of 2025.</p>
+<p>The example NetCDF file
+<code>data/era5_sst/ocean_temperature.nc</code> contains a subset of the
+ERA5 Reanalysis, consisting of 2D sea surface temperature fields
+(latitude and longitude) recorded every 2 hours during the first five
+days of 2025.</p>
 <ol style="list-style-type: decimal"><li>Use xarray to open the dataset.</li>
 <li>Inspect dimensions, coordinates, and attributes.</li>
 <li>Discuss how the organisation (variables, dimensions, attributes)
@@ -585,11 +586,13 @@ reflects the n-dimensional nature of the data.</li>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="bu">print</span>(ds)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="bu">print</span>(ds.dims)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds.coords)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds.attrs)</span></code></pre>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>ds <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds.dims)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(ds.coords)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="bu">print</span>(ds.attrs)</span></code></pre>
 </div>
 <p>Think about:</p>
 <ul><li>Which dimensions does this dataset use (e.g. <code>time</code>,
@@ -631,10 +634,11 @@ files</h3>
 <p>Many forecast products are distributed in GRIB, while climate or
 reanalysis products may be available as NetCDF. To get a feeling for
 differences:</p>
-<ol style="list-style-type: decimal"><li>Open a NetCDF example (e.g. <code>data/ocean_temperature.nc</code>)
-with xarray.</li>
-<li>Open a GRIB example (e.g. <code>data/ocean_temperature.grib</code>)
-with xarray using the <code>cfgrib</code> engine.</li>
+<ol style="list-style-type: decimal"><li>Open a NetCDF example
+(e.g. <code>data/era5_sst/ocean_temperature.nc</code>) with xarray.</li>
+<li>Open a GRIB example
+(e.g. <code>data/era5_sst/ocean_temperature.grib</code>) with xarray
+using the <code>cfgrib</code> engine.</li>
 <li>Compare what <code>print(ds)</code> shows for each: dimensions, data
 variables, coordinates, and attributes.</li>
 </ol><p>To open a GRIB file, you may need to use <code>engine="cfgrib"</code>
@@ -643,7 +647,7 @@ in <code>xr.open_dataset()</code>:</p>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>ds_grib <span class="op">=</span> xr.open_dataset(</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>    <span class="st">"data/ocean_temperature.grib"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>    <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.grib"</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>    engine<span class="op">=</span><span class="st">"cfgrib"</span>,</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>)</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="bu">print</span>(ds_grib)</span>
@@ -691,8 +695,8 @@ encoded within each field.</p>
 <h3 class="callout-title">Exercise 3 - Thinking about growth and
 organisation</h3>
 <div class="callout-content">
-<p>Using the <code>data/ocean_temperature.nc</code> NetCDF file, imagine
-that:</p>
+<p>Using the <code>data/era5_sst/ocean_temperature.nc</code> NetCDF
+file, imagine that:</p>
 <ul><li>Spatial resolution doubles in each horizontal direction.</li>
 <li>Output frequency increases from monthly to hourly.</li>
 <li>We add more time steps to cover a 30‑year period.</li>
@@ -806,9 +810,9 @@ or cloud pricing, but it is useful to recognise that:</p>
 on local disks or HPC filesystems.</li>
 <li>Centralised archives and object storage are attractive for
 long‑term, shared access.</li>
-<li>Formats and access patterns that support <strong>subsetting and
-streaming</strong> (rather than whole‑file downloads) will become more
-important as archives grow.</li>
+<li>Formats and access patterns that support subsetting and streaming
+(rather than whole‑file downloads) will become more important as
+archives grow.</li>
 </ul><p>Later lessons on Zarr and cloud‑native workflows will show how
 chunking, object storage, and tools like xarray/dask are combined to
 address these challenges more directly.</p>
@@ -935,7 +939,7 @@ Data Management.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 		</div>
 		<div class="col-md-6">
 
-        <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
+        <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
         <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>

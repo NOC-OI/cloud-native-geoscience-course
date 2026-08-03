@@ -24,13 +24,13 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-danger">
-          <abbr title="This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.">
+        <img id="dc-logo" alt="Data Carpentry" src="assets/images/data-logo.svg"><span class="badge text-bg-info">
+          <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
-              <i aria-hidden="true" class="icon" data-feather="alert-octagon" style="border-radius: 5px"></i>
-              Pre-Alpha
+              <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
+              Beta
             </a>
-            <span class="visually-hidden">This lesson is in the pre-alpha phase, which means that it is in early development, but has not yet been taught.</span>
+            <span class="visually-hidden">This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.</span>
           </abbr>
         </span>
 
@@ -613,7 +613,7 @@ environment on your own computer.</li>
   In-person setup (JASMIN)
   </h3>
 </button>
-<div id="collapseSpoiler1" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler1" aria-labelledby="headingSpoiler1">
+<div id="collapseSpoiler1" class="accordion-collapse collapse" aria-labelledby="headingSpoiler1" data-bs-parent="#accordionSpoiler1">
 <div class="accordion-body">
 <p>We will be using the Notebooks service on the JASMIN system for this
 workshop. This will open a Jupyter notebook in your web browser, from
@@ -683,8 +683,8 @@ service to check that you can access the data:</p>
 </h3>
 <pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="fu">ls</span> /gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/</span></code></pre>
 </div>
-<p>If you see a list of files, you have access to the data. If you see
-an error, please ask for help.</p>
+<p>If you see a folder called <code>data</code>, you have access to the
+example data. If you see an error, please ask for help.</p>
 <p>During the course, remember to use the full path
 <code>/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/</code>
 when accessing the data.</p>
@@ -701,7 +701,7 @@ when accessing the data.</p>
   Remote setup (your own computer)
   </h3>
 </button>
-<div id="collapseSpoiler6" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler6" aria-labelledby="headingSpoiler6">
+<div id="collapseSpoiler6" class="accordion-collapse collapse" aria-labelledby="headingSpoiler6" data-bs-parent="#accordionSpoiler6">
 <div class="accordion-body">
 <p>If you are joining remotely, you will install the environment on your
 own computer.</p>
@@ -712,7 +712,8 @@ own computer.</p>
 <li>Conda or mamba installed.</li>
 <li>At least 8 GB of RAM, with 16 GB preferred.</li>
 <li>At least 10 GB of free disk space for the environment.</li>
-<li>At least 20 GB of free disk space for the example data.</li>
+<li>At least 30 GB of free disk space for the example data and for data
+that will be generated during the workshop.</li>
 <li>A stable internet connection for downloading packages and data.</li>
 <li>A terminal application (e.g., Terminal on macOS, Console or Terminal
 in Linux, or <a href="https://git-scm.com/downloads" class="external-link">Git Bash</a> or <a href="https://learn.microsoft.com/en-us/windows/wsl/install" class="external-link">WSL</a> on
@@ -749,7 +750,7 @@ OSX - Apple M1/2/3 CPU</a></li>
   Windows installation
   </h3>
 </button>
-<div id="collapseSpoiler2" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler2" aria-labelledby="headingSpoiler2">
+<div id="collapseSpoiler2" class="accordion-collapse collapse" aria-labelledby="headingSpoiler2" data-bs-parent="#accordionSpoiler2">
 <div class="accordion-body">
 <p>If you are using miniforge on Windows, after you download the <a href="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe" class="external-link">Windows
 installer</a>, double-click it and follow the instructions, including
@@ -768,7 +769,7 @@ variable”</strong> option.</p>
   Mac OSX or Linux installation
   </h3>
 </button>
-<div id="collapseSpoiler3" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler3" aria-labelledby="headingSpoiler3">
+<div id="collapseSpoiler3" class="accordion-collapse collapse" aria-labelledby="headingSpoiler3" data-bs-parent="#accordionSpoiler3">
 <div class="accordion-body">
 <p>If you are using miniforge on Mac OSX or Linux, you can install it
 from the command line. First, download the 64-bit Python 3 install
@@ -854,7 +855,7 @@ following:</p>
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="ex">$</span> conda <span class="at">--version</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a><span class="ex">conda</span> 4.8.2</span></code></pre>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a><span class="ex">conda</span> 24.11.3 <span class="co"># or similar, depending on the version you installed</span></span></code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -875,8 +876,8 @@ and <code>data/</code> subfolders.</p>
 <div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/Documents/cloud-native-geoscience-course/environment</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/Documents/cloud-native-geoscience-course/data</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/cloud-native-geoscience-course/environment</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/cloud-native-geoscience-course/data</span></code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -886,7 +887,7 @@ repository:</p>
 <div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="bu">cd</span> ~/Documents/cloud-native-geoscience-course/environment</span>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="bu">cd</span> ~/cloud-native-geoscience-course/environment</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a></span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a><span class="ex">curl</span> <span class="at">-L</span> https://raw.githubusercontent.com/NOC-OI/cloud-native-geoscience-course/refs/heads/main/episodes/files/environment.yml <span class="at">-o</span> environment.yaml</span></code></pre>
 </div>
@@ -926,14 +927,14 @@ your <code>cloud-native-geoscience-course/data/</code> folder:</p>
 <div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="ex">curl</span> <span class="at">-L</span> https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/data.zip <span class="at">-o</span> data.zip</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a><span class="fu">unzip</span> data.zip <span class="at">-d</span> ~/Documents/cloud-native-geoscience-course/data/</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="ex">curl</span> <span class="at">-L</span> https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/cloud-native-geoscience-course-data.tar.gz <span class="at">-o</span> data.tar.gz</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a><span class="fu">tar</span> <span class="at">-xzf</span> data.tar.gz <span class="at">-C</span> ~/cloud-native-geoscience-course/data/</span></code></pre>
 </div>
-<p><strong>Note:</strong> The unzip process can take some time, because
-we are extracting a large number of files. You can check the progress by
-running
-<code>ls -lh ~/Documents/cloud-native-geoscience-course/data/</code> in
-another terminal window.</p>
+<p><strong>Note:</strong> The extraction process can take some time,
+because we are extracting a large number of files. You can check the
+progress by running
+<code>ls -lh ~/cloud-native-geoscience-course/data/</code> in another
+terminal window.</p>
 </div>
 <div class="section level3">
 <h3 id="launch-python-interface">Launch Python interface<a class="anchor" aria-label="anchor" href="#launch-python-interface"></a></h3>
@@ -950,7 +951,7 @@ with Python. You can launch a notebook from the terminal:</p>
   Unix shell
   </h3>
 </button>
-<div id="collapseSpoiler4" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler4" aria-labelledby="headingSpoiler4">
+<div id="collapseSpoiler4" class="accordion-collapse collapse" aria-labelledby="headingSpoiler4" data-bs-parent="#accordionSpoiler4">
 <div class="accordion-body">
 <p>Navigate to the <code>cloud-native-geoscience-course/</code>
 directory. If you’re using a Unix shell application, such as Terminal on
@@ -959,7 +960,7 @@ execute the following command:</p>
 <div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="bu">cd</span> ~/Documents/cloud-native-geoscience-course/</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="bu">cd</span> ~/cloud-native-geoscience-course/</span></code></pre>
 </div>
 <p>To launch the Jupyter server, run:</p>
 <div class="codewrapper sourceCode" id="cb17">
@@ -979,14 +980,14 @@ execute the following command:</p>
   Command Prompt (Windows)
   </h3>
 </button>
-<div id="collapseSpoiler5" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler5" aria-labelledby="headingSpoiler5">
+<div id="collapseSpoiler5" class="accordion-collapse collapse" aria-labelledby="headingSpoiler5" data-bs-parent="#accordionSpoiler5">
 <div class="accordion-body">
 <p>On Windows, you can use its native Command Prompt program. The
 easiest way to start it up is by pressing <kbd>Windows Logo
 Key</kbd>+<kbd>R</kbd>, entering <code>cmd</code>, and hitting
 <kbd>Return</kbd>. In the Command Prompt, use the following command to
 navigate to the <code>cloud-native-geoscience-course/</code> folder:</p>
-<pre class="source"><code>cd /D %userprofile%\Documents\cloud-native-geoscience-course/</code></pre>
+<pre class="source"><code>cd /D %userprofile%\cloud-native-geoscience-course/</code></pre>
 <p>To launch the Jupyter server, run:</p>
 <pre class="source"><code>python -m jupyter lab</code></pre>
 </div>
@@ -1013,50 +1014,69 @@ available:</p>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> numpy</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">import</span> xarray</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="im">import</span> dask</span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a><span class="im">import</span> zarr</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a><span class="im">import</span> netCDF4</span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a><span class="im">import</span> matplotlib</span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a><span class="im">import</span> cartopy</span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1" aria-label="code-block-20-8"></a><span class="im">import</span> numba</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1" aria-label="code-block-20-9"></a><span class="im">import</span> fsspec</span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1" aria-label="code-block-20-10"></a><span class="im">import</span> icechunk</span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1" aria-label="code-block-20-11"></a><span class="im">import</span> virtualizarr</span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1" aria-label="code-block-20-12"></a><span class="im">import</span> pystac</span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1" aria-label="code-block-20-13"></a><span class="im">import</span> topozarr</span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1" aria-label="code-block-20-14"></a></span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1" aria-label="code-block-20-15"></a><span class="bu">print</span>(<span class="st">"numpy:"</span>, numpy.__version__)</span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1" aria-label="code-block-20-16"></a><span class="bu">print</span>(<span class="st">"xarray:"</span>, xarray.__version__)</span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1" aria-label="code-block-20-17"></a><span class="bu">print</span>(<span class="st">"dask:"</span>, dask.__version__)</span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1" aria-label="code-block-20-18"></a><span class="bu">print</span>(<span class="st">"zarr:"</span>, zarr.__version__)</span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1" aria-label="code-block-20-19"></a><span class="bu">print</span>(<span class="st">"netCDF4:"</span>, netCDF4.__version__)</span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1" aria-label="code-block-20-20"></a><span class="bu">print</span>(<span class="st">"matplotlib:"</span>, matplotlib.__version__)</span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1" aria-label="code-block-20-21"></a><span class="bu">print</span>(<span class="st">"cartopy:"</span>, cartopy.__version__)</span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1" aria-label="code-block-20-22"></a><span class="bu">print</span>(<span class="st">"numba:"</span>, numba.__version__)</span>
-<span id="cb20-23"><a href="#cb20-23" tabindex="-1" aria-label="code-block-20-23"></a><span class="bu">print</span>(<span class="st">"fsspec:"</span>, fsspec.__version__)</span>
-<span id="cb20-24"><a href="#cb20-24" tabindex="-1" aria-label="code-block-20-24"></a><span class="bu">print</span>(<span class="st">"icechunk:"</span>, icechunk.__version__)</span>
-<span id="cb20-25"><a href="#cb20-25" tabindex="-1" aria-label="code-block-20-25"></a><span class="bu">print</span>(<span class="st">"virtualizarr:"</span>, virtualizarr.__version__)</span>
-<span id="cb20-26"><a href="#cb20-26" tabindex="-1" aria-label="code-block-20-26"></a><span class="bu">print</span>(<span class="st">"pystac:"</span>, pystac.__version__)</span>
-<span id="cb20-27"><a href="#cb20-27" tabindex="-1" aria-label="code-block-20-27"></a><span class="bu">print</span>(<span class="st">"topozarr:"</span>, topozarr.__version__)</span></code></pre>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">import</span> pandas</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="im">import</span> xarray</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a><span class="im">import</span> s3fs</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a><span class="im">import</span> dask</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a><span class="im">import</span> zarr</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1" aria-label="code-block-20-8"></a><span class="im">import</span> netCDF4</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1" aria-label="code-block-20-9"></a><span class="im">import</span> matplotlib</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1" aria-label="code-block-20-10"></a><span class="im">import</span> cartopy</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1" aria-label="code-block-20-11"></a><span class="im">import</span> fsspec</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1" aria-label="code-block-20-12"></a><span class="im">import</span> icechunk</span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1" aria-label="code-block-20-13"></a><span class="im">import</span> virtualizarr</span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1" aria-label="code-block-20-14"></a><span class="im">import</span> pystac</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1" aria-label="code-block-20-15"></a><span class="im">import</span> topozarr</span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1" aria-label="code-block-20-16"></a><span class="im">import</span> boto3</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1" aria-label="code-block-20-17"></a><span class="im">import</span> shapely</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1" aria-label="code-block-20-18"></a><span class="im">import</span> obstore</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1" aria-label="code-block-20-19"></a></span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1" aria-label="code-block-20-20"></a><span class="bu">print</span>(<span class="st">"numpy:"</span>, numpy.__version__)</span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1" aria-label="code-block-20-21"></a><span class="bu">print</span>(<span class="st">"pandas:"</span>, pandas.__version__)</span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1" aria-label="code-block-20-22"></a><span class="bu">print</span>(<span class="st">"xarray:"</span>, xarray.__version__)</span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1" aria-label="code-block-20-23"></a><span class="bu">print</span>(<span class="st">"s3fs:"</span>, s3fs.__version__)</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1" aria-label="code-block-20-24"></a><span class="bu">print</span>(<span class="st">"dask:"</span>, dask.__version__)</span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1" aria-label="code-block-20-25"></a><span class="bu">print</span>(<span class="st">"dask_gateway:"</span>, dask_gateway.__version__)</span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1" aria-label="code-block-20-26"></a><span class="bu">print</span>(<span class="st">"zarr:"</span>, zarr.__version__)</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1" aria-label="code-block-20-27"></a><span class="bu">print</span>(<span class="st">"netCDF4:"</span>, netCDF4.__version__)</span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1" aria-label="code-block-20-28"></a><span class="bu">print</span>(<span class="st">"matplotlib:"</span>, matplotlib.__version__)</span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1" aria-label="code-block-20-29"></a><span class="bu">print</span>(<span class="st">"cartopy:"</span>, cartopy.__version__)</span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1" aria-label="code-block-20-30"></a><span class="bu">print</span>(<span class="st">"fsspec:"</span>, fsspec.__version__)</span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1" aria-label="code-block-20-31"></a><span class="bu">print</span>(<span class="st">"icechunk:"</span>, icechunk.__version__)</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1" aria-label="code-block-20-32"></a><span class="bu">print</span>(<span class="st">"virtualizarr:"</span>, virtualizarr.__version__)</span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1" aria-label="code-block-20-33"></a><span class="bu">print</span>(<span class="st">"pystac:"</span>, pystac.__version__)</span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1" aria-label="code-block-20-34"></a><span class="bu">print</span>(<span class="st">"topozarr:"</span>, topozarr.__version__)</span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1" aria-label="code-block-20-35"></a><span class="bu">print</span>(<span class="st">"boto3:"</span>, boto3.__version__)</span>
+<span id="cb20-36"><a href="#cb20-36" tabindex="-1" aria-label="code-block-20-36"></a><span class="bu">print</span>(<span class="st">"shapely:"</span>, shapely.__version__)</span>
+<span id="cb20-37"><a href="#cb20-37" tabindex="-1" aria-label="code-block-20-37"></a><span class="bu">print</span>(<span class="st">"obstore:"</span>, obstore.__version__)</span>
+<span id="cb20-38"><a href="#cb20-38" tabindex="-1" aria-label="code-block-20-38"></a><span class="bu">print</span>(<span class="st">"eccodes:"</span>, eccodes.__version__)</span>
+<span id="cb20-39"><a href="#cb20-39" tabindex="-1" aria-label="code-block-20-39"></a><span class="bu">print</span>(<span class="st">"cfgrib:"</span>, cfgrib.__version__)</span></code></pre>
 </div>
-<p>You should see this output:</p>
+<p>You should see something like:</p>
 <div class="codewrapper">
 <h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="output" tabindex="0"><code>numpy: 1.26.2
-xarray: 2024.12.0
-dask: 2024.12.0
-zarr: 2.24.0
-netCDF4: 1.6.4
-matplotlib: 3.9.2
-cartopy: 0.24.1
-numba: 0.59.0
-fsspec: 2024.12.0
-icechunk: 0.1.0
-virtualizarr: 0.1.0
-pystac: 1.6.0
-topozarr: 0.1.0</code></pre>
+<pre class="output" tabindex="0"><code>numpy: 2.4.3
+pandas: 3.0.2
+xarray: 2026.7.0
+s3fs: 2026.4.0
+dask: 2026.3.0
+dask_gateway: 2026.3.0
+zarr: 3.2.1
+netCDF4: 1.7.4
+matplotlib: 3.11.1
+cartopy: 0.25.0
+fsspec: 2026.4.0
+icechunk: 2.1.1
+virtualizarr: 2.7.1
+pystac: 1.15.2
+topozarr: 0.1.2
+boto3: 1.43.46
+shapely: 2.1.2
+obstore: 0.11.0
+eccodes: 2.48.0
+cfgrib: 0.9.15.1</code></pre>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="about-the-example-data">About the example data<a class="anchor" aria-label="anchor" href="#about-the-example-data"></a></h2>
@@ -1111,7 +1131,7 @@ any links that you are not going to use.
 		</div>
 		<div class="col-md-6">
 
-        <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
+        <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
         <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
