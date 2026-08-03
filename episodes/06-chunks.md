@@ -81,7 +81,9 @@ Let's take a look on one of our example Zarr datasets to see how chunks are laid
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/glorys_202605.zarr")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds = xr.open_zarr(f"{base_path}data/glorys/glorys_202605.zarr")
 print(ds)
 ```
 
@@ -102,7 +104,7 @@ Seeing `shape` and `dims` helps you reason about how the current chunking might 
 
 ## Exercise 1 - Relate current chunking to workloads
 
-Using the GLORYS Reanalysis example Zarr dataset (`data/glorys_202605.zarr`), answer the following:
+Using the GLORYS Reanalysis example Zarr dataset (`data/glorys/glorys_202605.zarr`), answer the following:
 
 1. Inspect the `so` (Salinity) array's `shape` and `chunks` using `xarray`.
 2. Map the dimensions to names (e.g. interpret `(time, lat, lon, depth)` from context or attributes and following the CF conventions).
@@ -121,6 +123,9 @@ print(ds["so"].shape)
 
 # chunks
 print(ds["so"].data.chunks)
+
+# dimensions
+print(ds["so"].dims)
 ```
 
 Following the coordinate names and CF conventions (`standard_name="sea_water_salinity"`), the dimensions represent:
@@ -181,7 +186,7 @@ Start by opening the original Zarr dataset. For the examples below, we will use 
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 print(ds)
 ```
 
@@ -202,7 +207,7 @@ print(ds["sst"].chunks)
 Decide how you want the dataset to be chunked. For example, you might want to have chunks that are larger in space but represents only one time step:
 
 ```python
-ds_chunked = ds.chunk({"valid_time": 1, "latitude": 721, "longitude": 1440})
+ds_chunked = ds.chunk({"valid_time": 20, "latitude": 180, "longitude": 180})
 ```
 
 ### Step 3: Check the new chunking
@@ -213,13 +218,18 @@ Inspect the rechunked dataset to confirm that the chunk layout looks right.
 print(ds_chunked)
 print(ds_chunked["sst"].chunks)
 ```
-
 ### Step 4: Write the rechunked data to a new Zarr store
 
-Save the dataset with the new chunk layout.
+Save the dataset with the new chunk layout. However, because this dataset also has an encoding for the `sst` variable, you also need to update the encoding to reflect the new chunking.
+
+Note that we are going to save the data in your local data directory (not in the `base_path`):
 
 ```python
-ds_chunked.to_zarr("data/ocean_temperature_rechunked.zarr", mode="w")
+ds_chunked.to_zarr(
+  "data/era5_sst/ocean_temperature_rechunked.zarr",
+  mode="w",
+  encoding={"sst": {"chunks": (20, 180, 180)}},
+)
 ```
 
 This approach is convenient, but it is not always the most efficient for very large datasets. If the original and target chunk layouts are very different, rechunking can require substantial temporary storage and memory. And we will also create a new Zarr store, which may be expensive in terms of storage.
@@ -242,7 +252,7 @@ ds_chunked = ds.chunk({"valid_time": 1, "latitude": 721, "longitude": 1440}, chu
 
 ## Rechunk can be expensive
 
-In some cases, rechunking can take a long time, especially if the original and target chunk layouts are very different. For example, a study on Zarr data[^nguyean_etal2023] in cloud-based object stores found that:
+In some cases, rechunking can take a long time, especially if the original and target chunk layouts are very different. For example, a study on Zarr data[^nguyean_etal2023] in cloud-based object stores calculated the time to rechunk a 9–10 GB dataset with different chunking strategies:
 
 
 | Chunking strategy                                    |                  Rechunk time |
@@ -320,13 +330,13 @@ print("Rechunked store time:", t1 - t0, "seconds")
 
 ::::::::::::::: solution
 
-```
+```python
 import time
 import xarray as xr
 
 # Open the original and rechunked datasets
-ds_original = xr.open_zarr("data/ocean_temperature.zarr")
-ds_rechunked = xr.open_zarr("data/ocean_temperature_rechunked.zarr")
+ds_original = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
+ds_rechunked = xr.open_zarr("data/era5_sst/ocean_temperature_rechunked.zarr")
 
 # Measure time for global mean time series
 t0 = time.time()
@@ -417,6 +427,7 @@ print(ds["temperature"].encoding)
 You can see that the chunking is still `(10, 10)`, but the underlying storage is grouped into larger shards. You can also inspect the Zarr metadata directly:
 
 ```bash
+# Run this command in your terminal to see the Zarr metadata for the sharded array
 cat data/example_sharded.zarr/temperature/zarr.json
 ```
 
@@ -482,9 +493,19 @@ This is useful because xarray still lets you work with labelled dimensions and h
 
 ## Exercise 4 - Shard the dataset
 
-1. In the rechunked dataset you created in Exercise 3, implement a sharding scheme that groups multiple chunks into larger shards. For example, if your chunks are `(20, 180, 180)`, you might choose to shard them into `(100, 360, 360)`.
+1. In the rechunked dataset you created in Exercise 3, implement a sharding scheme that groups multiple chunks into larger shards. For example, if your chunks are `(20, 180, 180)`, you might choose to shard them into `(100, 360, 360)`. Because you are changing the chunks (by setting the `shards` parameter in the encoding), you need to use `align_chunks=True` when saving the dataset to Zarr:
+
+```python
+ds_rechunked.to_zarr(..., align_chunks=True)
+```
+
 2. Inspect the Zarr metadata to confirm that the shards are being used, and that the chunking is still as you expect.
-3. Compare the number of files/objects in the original, rechunked, and sharded datasets. You can use `os.listdir()` or `zarr.open()` to inspect the contents of the Zarr stores.
+3. Compare the number of files/objects in the original, rechunked, and sharded datasets. You can use the example below to perform this calculation:
+
+```python
+zarr_store_path = Path(f"{base_path}data/era5_sst/ocean_temperature.zarr/sst/c") # use the "c" directory as it contains the actual chunk data
+print("Total Files:", sum(1 for p in zarr_store_path.rglob("*") if p.is_file()))
+```
 
 ::::::::::::::: solution
 
@@ -493,24 +514,28 @@ import os
 import xarray as xr
 
 # Open the rechunked dataset
-ds_rechunked = xr.open_zarr("data/ocean_temperature_rechunked.zarr")
+ds_rechunked = xr.open_zarr("data/era5_sst/ocean_temperature_rechunked.zarr")
 
+ds_rechunked = ds_rechunked.chunk({"valid_time": 20, "latitude": 180, "longitude": 180})
 # Save the dataset with sharding
-ds_rechunked.to_zarr("data/ocean_temperature_sharded.zarr", mode="w", zarr_format=3,
-                     encoding={"sst": {"chunks": (20, 180, 180), "shards": (100, 360, 360)}})
+ds_rechunked.to_zarr("data/era5_sst/ocean_temperature_sharded.zarr", mode="w", zarr_format=3,
+                     encoding={"sst": {"chunks": (20, 180, 180), "shards": (100, 360, 360)}}, align_chunks=True)
 
 # Inspect the Zarr metadata
-ds_sharded = xr.open_zarr("data/ocean_temperature_sharded.zarr")
+ds_sharded = xr.open_zarr("data/era5_sst/ocean_temperature_sharded.zarr")
 print(ds_sharded)
 print(ds_sharded["sst"].chunks)
+```
 
-# Compare the number of files/objects
-original_files = len(os.listdir("data/ocean_temperature.zarr/sst"))
-rechunked_files = len(os.listdir("data/ocean_temperature_rechunked.zarr/sst"))
-sharded_files = len(os.listdir("data/ocean_temperature_sharded.zarr/sst"))
-print(f"Original store files: {original_files}")
-print(f"Rechunked store files: {rechunked_files}")
-print(f"Sharded store files: {sharded_files}")
+To calculate the number of files/objects in each dataset, you can use the following code:
+
+```python
+original = Path(f"{base_path}data/era5_sst/ocean_temperature.zarr/sst/c")
+rechunked = Path(f"data/era5_sst/ocean_temperature_rechunked.zarr/sst/c")
+sharded = Path(f"data/era5_sst/ocean_temperature_sharded.zarr/sst/c")
+print("Original:", sum(1 for p in original.rglob("*") if p.is_file()))
+print("Rechunked:", sum(1 for p in rechunked.rglob("*") if p.is_file()))
+print("Sharded:", sum(1 for p in sharded.rglob("*") if p.is_file()))
 ```
 
 Using this approach, you should see that the sharded dataset has fewer files/objects than the original and rechunked datasets, while still maintaining the benefits of chunked access for analysis.

@@ -97,7 +97,7 @@ options = gw.cluster_options()
 options.worker_cores = 1
 options.scheduler_cores = 1
 options.account = "workshop"
-options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'
+options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env'
 ```
 
 Finally we can check if we already had a cluster running and reuse that if we do and then get a `client` object from the cluster that will behave the same way as the local Dask client did.
@@ -237,7 +237,9 @@ client
 Then open the Zarr dataset with chunking:
 
 ```python
-ds = xr.open_zarr("data/ocean_temperature.zarr", chunks={})
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr", chunks={})
 print(ds)
 
 sst = ds["sst"]
@@ -249,7 +251,7 @@ Because this dataset is already chunked, xarray can use the existing chunking fr
 If you are using a netCDF dataset, to integrate Dask you would need to specify the chunk sizes when opening the dataset. For example:
 
 ```python
-ds = xr.open_dataset("data/ocean_temperature.nc", chunks={"time": 10, "latitude": 100, "longitude": 100})
+ds_nc = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc", chunks={"valid_time": 10, "latitude": 100, "longitude": 100})
 ```
 
 ### A simple parallel computation
@@ -267,7 +269,7 @@ This workflow is important because the data stay lazy until `.compute()` is call
 
 ## Exercise 1 - Dask and xarray together
 
-Using the zarr (`data/ocean_temperature.zarr`) dataset and the netCDF (`data/ocean_temperature.nc`) dataset, try the following:
+Using the zarr (`data/era5_sst/ocean_temperature.zarr`) dataset and the netCDF (`data/era5_sst/ocean_temperature.nc`) dataset, try the following:
 
 1. Open each one with xarray, using `xr.open_zarr` for the Zarr dataset and `xr.open_dataset` for the netCDF dataset.
 2. Compute a spatial mean over latitude and longitude.
@@ -284,7 +286,8 @@ For the Zarr dataset:
 
 ```python
 %%time
-ds_zarr = xr.open_zarr("data/ocean_temperature.zarr")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+ds_zarr = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 sst_zarr = ds_zarr["sst"]
 global_mean_zarr = sst_zarr.mean(dim=("latitude", "longitude"))
 result_zarr = global_mean_zarr.compute()
@@ -294,7 +297,7 @@ For the netCDF dataset:
 
 ```python
 %%time
-ds_nc = xr.open_dataset("data/ocean_temperature.nc")
+ds_nc = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 sst_nc = ds_nc["sst"]
 result_nc = sst_nc.mean(dim=("latitude", "longitude"))
 ```
@@ -335,7 +338,7 @@ To see how Dask is scheduling work, you can visualise the task graph. This can h
 import dask
 import xarray as xr
 
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 sst = ds["sst"]
 corrected = sst * 1.1 - 1.0
 global_mean = corrected.mean(dim=("latitude", "longitude"))
@@ -350,7 +353,7 @@ This will create a PNG file showing the task graph for the computation. You can 
 
 ## Exercise 2 - A small parallel workflow
 
-Now, we are going to compare the results with different chunk sizes. Using the original zarr (`data/ocean_temperature.zarr`) and the rechunked zarr (`data/ocean_temperature_rechunked.zarr` - you created this in the previous episode) datasets, try the following:
+Now, we are going to compare the results with different chunk sizes. Using the original zarr (`data/era5_sst/ocean_temperature.zarr`) and the rechunked zarr (`data/era5_sst/ocean_temperature_rechunked.zarr` - you created this in the previous episode) datasets, try the following:
 
 1. Open the dataset
 2. Run one spatial statistic and one time-based statistic.
@@ -381,12 +384,12 @@ For the original zarr dataset:
 import xarray as xr
 
 # Open the original zarr dataset
-ds_original = xr.open_zarr("data/ocean_temperature.zarr")
+ds_original = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 sst_original = ds_original["sst"]
 # Spatial statistic: mean over latitude and longitude
 spatial_mean_original = sst_original.mean(dim=("latitude", "longitude"))
 # Time-based statistic: mean over time
-time_mean_original = sst_original.mean(dim="time")
+time_mean_original = sst_original.mean(dim="valid_time")
 
 %time spatial_mean_original.compute()
 %time time_mean_original.compute()
@@ -396,12 +399,12 @@ For the rechunked zarr dataset:
 
 ```python
 # Open the rechunked zarr dataset
-ds_rechunked = xr.open_zarr("data/ocean_temperature_rechunked.zarr")
+ds_rechunked = xr.open_zarr("data/era5_sst/ocean_temperature_rechunked.zarr")
 sst_rechunked = ds_rechunked["sst"]
 # Spatial statistic: mean over latitude and longitude
 spatial_mean_rechunked = sst_rechunked.mean(dim=("latitude", "longitude"))
 # Time-based statistic: mean over time
-time_mean_rechunked = sst_rechunked.mean(dim="time")
+time_mean_rechunked = sst_rechunked.mean(dim="valid_time")
 %time spatial_mean_rechunked.compute()
 %time time_mean_rechunked.compute()
 ```
@@ -417,7 +420,7 @@ When you compute the spatial and time-based statistics for both the original and
 
 ## Exercise 3 (Optional) - Parallel workflow using a Dask cluster on HPC
 
-Now we are going to explore how to run a parallel workflow using a Dask cluster on an HPC system like JASMIN. For this example, we are going to use a bigger dataset, the subset of the GLORYS Reanalysis dataset, stored in a single Zarr group (`data/glorys_202605.zarr`). This dataset is too large to process efficiently on a single core, so we will use Dask to parallelise the computation.
+Now we are going to explore how to run a parallel workflow using a Dask cluster on an HPC system like JASMIN. For this example, we are going to use a bigger dataset, the subset of the GLORYS Reanalysis dataset, stored in a single Zarr group (`data/glorys/glorys_202605.zarr`). This dataset is too large to process efficiently on a single core, so we will use Dask to parallelise the computation.
 
 Please follow the steps below:
 
@@ -456,7 +459,7 @@ Now that we have a running cluster, we can get a client object from the cluster 
 ```python
 client = cluster.get_client()
 cluster.adapt(minimum=1, maximum=4)
-ds = xr.open_zarr("data/glorys_202605.zarr")
+ds = xr.open_zarr("data/glorys/glorys_202605.zarr")
 uo = ds['uo']
 corrected_uo = uo * 1.1 - 1.0
 corrected_uo.compute()

@@ -59,11 +59,14 @@ Inside the group, each array usually appears as its own directory, and that arra
 - `.zattrs` for array-specific attributes.
 - Chunk files, named by their chunk coordinates, such as `0.0.0`, `0.0.1`, `1.0.0`, and so on.
 
-A simple Zarr v2 layout might look like this:
+A simple Zarr v2 layout might look like this (please run the following commands in a terminal to see the structure of the Zarr store):
 
 ```bash
+# Set the base path to your data directory. If you have the data in your current working directory, you can set it to an empty string.
+export BASE_DATA_PATH="/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
 # This command shows the directory structure of a Zarr v2 store for an ocean temperature dataset that we have in the example data folder. You can run this command in a terminal to see the structure of the Zarr store.
-tree -L 2 data/ocean_temperature_v2.zarr
+tree -L 2 "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr"
 ```
 
 ```output
@@ -79,17 +82,11 @@ ocean_temperature_v2.zarr/
 │   ├── 0.1.0
 │   └── ...
 ├── valid_time/
-│   ├── .zarray
-│   ├── .zattrs
-│   └── ...
+│   └── 0
 ├── longitude/
-│   ├── .zarray
-│   ├── .zattrs
-│   └── ...
+│   └── 0
 └── latitude/
-    ├── .zarray
-    ├── .zattrs
-    └── ...
+    └── 0
 ```
 
 In this example, `sst` is one data variable, while `valid_time`, `longitude`, and `latitude` are coordinate arrays. Each array has its own `.zarray` file describing the array shape, data type, chunk layout, fill value, and other storage settings.
@@ -97,15 +94,17 @@ In this example, `sst` is one data variable, while `valid_time`, `longitude`, an
 To see the `.zgroup`, `.zattrs`, and `.zmetadata` of this zarr dataset, you can run the following command in a terminal:
 
 ```bash
-cat data/ocean_temperature_v2.zarr/.zgroup
-cat data/ocean_temperature_v2.zarr/.zattrs
-cat data/ocean_temperature_v2.zarr/.zmetadata
+# run the following commands in a terminal
+
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zgroup"
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zattrs"
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zmetadata"
 ```
 
 To see the `.zarray` metadata for the `sst` array, you can run:
 
 ```bash
-cat data/ocean_temperature_v2.zarr/sst/.zarray
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/sst/.zarray"
 ```
 
 This tells us that the `sst` array is three-dimensional, stored in chunks of size `10 × 100 × 100`, and encoded as 32-bit floating-point values. The actual chunk data is stored separately in files such as `0.0.0`, `0.0.1`, `0.1.0`, and so on.
@@ -130,14 +129,13 @@ A simplified Zarr v3 structure might look like this:
 
 
 ```bash
-# This command shows the directory structure of a Zarr v3 store for an ocean temperature dataset that we have in the example data folder.
-tree -L 2 data/ocean_temperature.zarr
+tree -L 2 "${BASE_DATA_PATH}data/era5_sst/ocean_temperature.zarr"
 ```
 
 ```output
 ocean_temperature.zarr/
 ├── zarr.json
-├── sos_abs/
+├── sst/
 │   ├── zarr.json
 │   └── c
 │       ├── 0/0/1
@@ -146,15 +144,15 @@ ocean_temperature.zarr/
 ├── valid_time/
 │   ├── zarr.json
 │   └── c
-│       └── ...
+│       └── 0
 ├── longitude/
 │   ├── zarr.json
 │   └── c
-│       └── ...
+│       └── 0
 └── latitude/
 │   ├── zarr.json
 │   └── c
-│       └── ...
+│       └── 0
 ```
 
 In this example, the root `zarr.json` describes the top-level group, and each array has its own `zarr.json` file describing its shape, chunk grid, data type, codecs, and other metadata. The chunk data are stored separately under chunk key paths such as `c/0/0/0`.
@@ -183,8 +181,8 @@ An example of a Zarr v3 metadata file for an array might look like this:
 To see the `zarr.json` metadata for the root group and for the `sst` array, you can run:
 
 ```bash
-cat data/ocean_temperature.zarr/zarr.json
-cat data/ocean_temperature.zarr/sst/zarr.json
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature.zarr/zarr.json"
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature.zarr/sst/zarr.json"
 ```
 
 Zarr v3 also adds more explicit support for features such as sharding, where several chunks can be grouped together inside a larger storage object. This helps reduce the overhead of managing very large numbers of tiny files or keys, especially in cloud object storage. We will talk more about sharding in later lessons.
@@ -250,14 +248,16 @@ In short, Zarr doesn't replace scientific semantics like CF or the Common Data M
 
 ## Inspect a Zarr store with Python
 
-To inspect a Zarr store, we can use the `zarr` library in Python. For example, in the example datasets, we have a Zarr store called `data/ocean_temperature_with_groups.zarr`. This zarr store represents a subset of the ERA5 reanalysis dataset, with sea surface temperature data organised into pyramid groups and arrays. We will talk later about pyramids and how they are used for multiscale visualisation, but for now we will focus on the Zarr structure itself.
+To inspect a Zarr store, we can use the `zarr` library in Python. For example, in the example datasets, we have a Zarr store called `data/era5_sst/ocean_temperature_with_groups.zarr`. This zarr store represents a subset of the ERA5 reanalysis dataset, with sea surface temperature data organised into pyramid groups and arrays. We will talk later about pyramids and how they are used for multiscale visualisation, but for now we will focus on the Zarr structure itself.
 
 To open this Zarr store, we can run:
 
 ```python
 import zarr
 
-store = zarr.open_group("data/ocean_temperature_with_groups.zarr", mode="r")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
+
+store = zarr.open_group(f"{base_path}data/era5_sst/ocean_temperature_with_groups.zarr", mode="r")
 print(store)
 ```
 
@@ -268,7 +268,7 @@ print(list(store.arrays()))  # List arrays
 print(list(store.groups()))  # List groups
 ```
 
-To see the arrays inside a specific group, we can access that group and list its arrays:
+Because this Zarr store uses groups, the arrays are not directly in the root group. Instead, they are inside child groups. To see the arrays inside a specific group, we can access that group and list its arrays:
 
 ```python
 # Show arrays inside group "1"
@@ -291,7 +291,7 @@ print(dict(sst.attrs))
 
 ## Exercise 1 - Inspecting a Zarr store with Python
 
-Using the Zarr store called `data/ocean_temperature_with_groups.zarr`, please complete the following tasks:
+Using the Zarr store called `data/era5_sst/ocean_temperature_with_groups.zarr`, please complete the following tasks:
 
 1. Use the Python `zarr` library to open the store.
 2. Inspect the group hierarchy and list available arrays, groups, and their attributes.
@@ -313,7 +313,9 @@ Code to inspect the Zarr store:
 ```python
 import zarr
 
-store = zarr.open_group("data/ocean_temperature_with_groups.zarr", mode="r")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
+
+store = zarr.open_group(f"{base_path}data/era5_sst/ocean_temperature_with_groups.zarr", mode="r")
 
 print(store)
 print(list(store.groups()))
@@ -330,9 +332,12 @@ print(dict(sst.attrs))
 Code to list the files and to see the content of the metadata files (as this is a Zarr v3 store, the metadata files are `zarr.json`):
 
 ```bash
-ls -R data/ocean_temperature_with_groups.zarr
-cat data/ocean_temperature_with_groups.zarr/zarr.json
-cat data/ocean_temperature_with_groups.zarr/1/sst/zarr.json
+# These commands are meant to be run in a terminal, not in Python.
+export BASE_DATA_PATH="/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
+
+tree -L 2 "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_with_groups.zarr"
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_with_groups.zarr/zarr.json"
+cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_with_groups.zarr/1/sst/zarr.json"
 ```
 
 The Zarr store is organised as a hierarchical container. In this example, the root group does not contain any arrays directly:

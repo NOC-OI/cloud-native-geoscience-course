@@ -358,6 +358,7 @@ To visualise your catalog:
 
 ```python
 import boto3
+from botocore.config import Config
 import os
 
 s3 = boto3.client(
@@ -365,6 +366,11 @@ s3 = boto3.client(
     endpoint_url="https://atlantis-vis-o.s3-ext.jc.rl.ac.uk",
     aws_access_key_id="your-access-key",
     aws_secret_access_key="your-secret-key",
+    # This is necessary for JASMIN object store, but may not be needed for other S3-compatible stores.
+    config=Config(
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required",
+    ),
 )
 
 bucket_name = "my-bucket" # Replace with your bucket name

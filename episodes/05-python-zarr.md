@@ -39,14 +39,16 @@ In this lesson we focus on the essentials: how to use `zarr` directly for low-le
 
 As you saw in the previous lesson, Zarr stores are organised into groups and arrays. The `zarr` library provides low-level access to these stores, allowing you to open groups and arrays, inspect their shapes, chunk shapes, data types, read and write data, and view or edit attributes (metadata).
 
-On the data directory, we have a Zarr store called `data/ocean_temperature.zarr`. This store contains a single group with one array, representing sea surface temperature data from the ERA5 reanalysis dataset. The array is chunked in time and space, and has metadata attributes such as units and long names.
+On the data directory, we have a Zarr store called `data/era5_sst/ocean_temperature.zarr`. This store contains a single group with one array, representing sea surface temperature data from the ERA5 reanalysis dataset. The array is chunked in time and space, and has metadata attributes such as units and long names.
 
-We can open the Zarr store `data/ocean_temperature.zarr` using the `zarr` library:
+We can open the Zarr store `data/era5_sst/ocean_temperature.zarr` using the `zarr` library:
 
 ```python
 import zarr
 
-root = zarr.open_group("data/ocean_temperature.zarr", mode="r")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
+
+root = zarr.open_group(f"{base_path}data/era5_sst/ocean_temperature.zarr", mode="r")
 print(root)
 print(list(root.arrays()))
 print(list(root.groups()))
@@ -56,7 +58,7 @@ print("Group attributes:", root.attrs)
 You can then inspect one array directly:
 
 ```python
-temp = root["temperature"]
+temp = root["sst"]
 print(temp)
 print("Shape:", temp.shape)
 print("Chunks:", temp.chunks)
@@ -70,7 +72,7 @@ A Zarr array tells you how the data are organised on disk or in object storage. 
 
 ## Exercise 1 - Explore the store
 
-Using the example Zarr store (`data/ocean_temperature.zarr`):
+Using the example Zarr store (`data/era5_sst/ocean_temperature.zarr`):
 
 1. List all arrays in the root group.
 2. Choose one data variable and print its `shape`, `chunks`, and `dtype`.
@@ -89,7 +91,7 @@ Each array has a fixed shape and chunk layout, and that metadata provides contex
 ```python
 import zarr
 
-root = zarr.open_group("data/ocean_temperature.zarr", mode="r")
+root = zarr.open_group(f"{base_path}data/era5_sst/ocean_temperature.zarr", mode="r")
 print(list(root.arrays()))
 sst = root["sst"]
 print(sst)
@@ -121,8 +123,6 @@ The same idea applies with xarray: opening the dataset is cheap, and data are lo
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-
 ## Opening with xarray
 
 While `zarr` is ideal for low-level inspection and manipulation, xarray is usually the main tool for analysing multidimensional environmental data. It provides:
@@ -141,7 +141,7 @@ For Zarr it uses `xr.open_zarr`, which understands the Zarr metadata and convent
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 print(ds)           # Overview of variables and coordinates
 print(ds.dims)      # Dimensions
 print(ds.data_vars) # Data variables
@@ -151,7 +151,7 @@ print(ds.coords)    # Coordinate variables
 Important points:
 
 - `ds` is an xarray `Dataset`.
-- `ds.data_vars` lists data variables (e.g. `temperature`, `salinity`).
+- `ds.data_vars` lists data variables (e.g. `sst`, `salinity`).
 - `ds.coords` typically includes `time`, `lat`, `lon`, and any other coordinate variables.
 - Metadata from Zarr arrays and attributes is mapped into xarray's structure so that CF conventions and other patterns can be used.
 
@@ -187,7 +187,7 @@ Questions:
 
 ```python
 import xarray as xr
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 print(ds.dims)
 print(ds.data_vars)
 print(ds.coords)
@@ -206,7 +206,7 @@ Xarray organises the dataset into named dimensions and separates data variables 
 If we open the same dataset in NetCDF format, we can use `xr.open_dataset`:
 
 ```python
-ds_netcdf = xr.open_dataset("data/ocean_temperature.nc")
+ds_netcdf = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 print(ds_netcdf)
 ```
 
@@ -227,7 +227,7 @@ In oceanography, climate, and meteorology, we often want to select data by coord
 time_slice = ds["sst"].sel(valid_time=slice("2025-01-01T00:00:00", "2025-01-02T00:00:00"))
 global_mean = ds["sst"].mean(dim=("latitude", "longitude"))
 point_ts = ds["sst"].sel(latitude=0.0, longitude=0.0, method="nearest")
-isel_slice = ds["sst"].isel(valid_time=0, latitude=100, longitude=200)
+isel_slice = ds["sst"].isel(valid_time=0, latitude=200, longitude=200)
 ```
 
 In the operations above, the data is not loaded into memory until you request values or plot the results. For example, the following code will trigger data loading and plotting:
@@ -268,7 +268,7 @@ print(ds["sst"].attrs)
 But this requests actual data values:
 
 ```python
-ds["sst"].isel(time=0).values
+ds["sst"].isel(valid_time=0).values
 ```
 
 This distinction is one of the main reasons Zarr works well for large environmental datasets: you can explore the dataset structure first, and only load the parts you need for analysis.
@@ -277,11 +277,12 @@ This distinction is one of the main reasons Zarr works well for large environmen
 
 ## Exercise 3 - First analysis on a Zarr dataset
 
-Using the `data/ocean_temperature.zarr` dataset and xarray:
+Using the `data/era5_sst/ocean_temperature.zarr` dataset and xarray:
 
 1. Inspect the available variables and pick the sea surface temperature.
 2. Compute a spatial mean over latitude and longitude and inspect the resulting time series.
-3. Select a small spatial region (e.g. a box around a particular ocean basin) and compute a mean for that region.
+3. Select a small spatial region (e.g. a box around a particular ocean basin) and compute a mean for that region. Remember that you have to use `max_lat` before `min_lat` in `slice()` because latitude decreases from north to south. And remember that longitude is usually 0-360 in ERA5.
+
 
 Questions:
 
@@ -294,7 +295,7 @@ Questions:
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 
 sst = ds["sst"]
 
@@ -303,7 +304,7 @@ global_ts = sst.mean(dim=("latitude", "longitude"))
 print(global_ts)
 
 # Regional mean (example box)
-regional_ts = sst.sel(latitude=slice(-30, 30), longitude=slice(-60, 0)).mean(dim=("latitude", "longitude"))
+regional_ts = sst.sel(latitude=slice(0, -30), longitude=slice(300, 360)).mean(dim=("latitude", "longitude"))
 print(regional_ts)
 
 # Additional plotting if desired
@@ -335,12 +336,12 @@ Questions:
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 sst = ds["sst"]
 
-subset = sst.sel(time="2025-01-01T00:00:00", latitude=slice(-30, -20), longitude=slice(-50, -40))
+subset = sst.sel(valid_time="2025-01-01T00:00:00", latitude=slice(-20, -30), longitude=slice(310, 320))  # Note: longitude is 0-360 in ERA5, so -50 to -40 becomes 310 to 320
 print(subset)
-print(subset.mean())
+print(subset.mean().values)
 ```
 
 We can open a huge dataset and still process only a small portion of it. This is one of the main advantages of Zarr and xarray for large environmental data.
