@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 68%" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">68%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 69%" aria-valuenow="69" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">69%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -309,7 +309,7 @@
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
         <ul><li><a href="#why-data-versioning-matters">Why data versioning matters</a></li>
-<li><a href="#core-concepts">Core concepts</a></li>
+<li><a href="#icechunk-concepts">Icechunk concepts</a></li>
 <li><a href="#basic-icechunk-workflow">Basic Icechunk workflow</a></li>
 <li><a href="#making-an-atomic-update">Making an atomic update</a></li>
 <li><a href="#recovering-from-mistakes">Recovering from mistakes</a></li>
@@ -414,13 +414,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Data Versioning with Icechunk</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/12-icechunk.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 40 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 70 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -435,14 +435,14 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>What problems arise when we use plain Zarr for shared, evolving
-datasets?</li>
-<li>How does Icechunk add safety, consistency, and reproducibility on
-top of Zarr?</li>
-<li>How can we use transactions to update data atomically and avoid
-partial writes?</li>
-<li>How can we reference and replay specific versions of data for
-reproducible analysis?</li>
+<ul><li>“What problems arise when we use plain Zarr for shared, evolving
+datasets?”</li>
+<li>“How does Icechunk add safety, consistency, and reproducibility on
+top of Zarr?”</li>
+<li>“How can we use transactions to update data atomically and avoid
+partial writes?”</li>
+<li>“How can we reference and replay specific versions of data for
+reproducible analysis?”</li>
 </ul></div>
 </div>
 </div>
@@ -450,13 +450,14 @@ reproducible analysis?</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>Explain why versioning is important for Zarr-based scientific
-datasets.</li>
-<li>Describe Icechunk’s core concepts: repositories, transactions,
-snapshots, branches, and tags.</li>
-<li>Use Icechunk with Zarr to perform atomic updates and create
-reproducible versions.</li>
-<li>Recover from mistakes and open specific versions of a dataset.</li>
+<ul><li>“Explain why versioning is important for Zarr-based scientific
+datasets.”</li>
+<li>“Describe Icechunk’s core concepts: repositories, transactions,
+snapshots, branches, and tags.”</li>
+<li>“Use Icechunk with Zarr to perform atomic updates and create
+reproducible versions.”</li>
+<li>“Recover from mistakes and open specific versions of a
+dataset.”</li>
 </ul></div>
 </div>
 </div>
@@ -465,21 +466,21 @@ reproducible versions.</li>
 <section><h2 class="section-heading" id="why-data-versioning-matters">Why data versioning matters<a class="anchor" aria-label="anchor" href="#why-data-versioning-matters"></a></h2>
 <hr class="half-width"><p>Zarr is a strong format for cloud and parallel data access, but by
 itself it does not provide transactions, version history, or a built-in
-way to recover from mistakes.</p>
-<p>That can be a problem for shared scientific datasets. If several
-people are updating data, readers may see incomplete changes, accidental
-overwrites can be hard to recover from, and analyses can become
-difficult to reproduce later.</p>
-<p>Icechunk adds version control on top of Zarr. It lets you manage data
-in a repository with transactions, snapshots, branches, and tags, so you
-can update data atomically, recover from mistakes, and refer to exact
-versions in future analysis.</p>
+way to recover from mistakes. That can be a problem for shared
+scientific datasets. If several people are updating data, readers may
+see incomplete changes, accidental overwrites can be hard to recover
+from, and analyses can become difficult to reproduce later.</p>
+<p><a href="https://icechunk.io/en/stable/" class="external-link">Icechunk</a> adds version
+control on top of Zarr. It lets you manage data in a repository with
+transactions, snapshots, branches, and tags, so you can update data
+atomically, recover from mistakes, and refer to exact versions in future
+analysis.</p>
 <figure><img src="../fig/zarr_without_icechunk.png" alt="Zarr without Icechunk." class="figure mx-auto d-block"><div class="figcaption">Zarr without Icechunk. Source: <a href="https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/" class="external-link uri">https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/</a>
 </div>
-</figure><figure><img src="../fig/icechunk.png" alt="Icechunk" class="figure mx-auto d-block"><div class="figcaption">Icechunk</div>
-</figure></section><section><h2 class="section-heading" id="core-concepts">Core concepts<a class="anchor" aria-label="anchor" href="#core-concepts"></a></h2>
-<hr class="half-width"><p>Icechunk wraps Zarr stores inside <strong>repositories</strong> that
-track changes over time.</p>
+</figure></section><section><h2 class="section-heading" id="icechunk-concepts">Icechunk concepts<a class="anchor" aria-label="anchor" href="#icechunk-concepts"></a></h2>
+<hr class="half-width"><p>Icechunk wraps Zarr stores inside repositories that track changes
+over time, in a similar way to how Git tracks changes to code. The main
+concepts are:</p>
 <ul><li>
 <strong>Repository</strong>: the top-level object managing a Zarr
 hierarchy plus version history.</li>
@@ -506,10 +507,10 @@ complete version of the dataset.</p>
 <div id="comparison-of-plain-zarr-vs-icechunk" class="callout-inner">
 <h3 class="callout-title">Comparison of plain Zarr vs Icechunk</h3>
 <div class="callout-content">
-<p>The example was adapted from the <a href="https://github.com/earth-mover/zarr-summit-2025" class="external-link">Earth Mover
+<p>This example was adapted from the <a href="https://github.com/earth-mover/zarr-summit-2025" class="external-link">Earth Mover
 Github repository</a> and shows how Icechunk adds versioning and
 transactional semantics to Zarr.</p>
-<p>In the backend, I have a Zarr and a Icechunk repository that are
+<p>In the backend, we have a Zarr and an Icechunk repository that are
 being updated in a loop, following the same pattern.</p>
 <p>If you try to read the plain zarr store while it is being updated,
 you will see a mix of old and new data:</p>
@@ -519,16 +520,15 @@ you will see a mix of old and new data:</p>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="im">import</span> zarr</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="co"># Get all the zarr array values</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>store <span class="op">=</span> zarr.storage.FsspecStore.from_url(<span class="st">"s3://zarr-summit-italy-public/zarr3"</span>, storage_options<span class="op">=</span>{<span class="st">'anon'</span>: <span class="va">True</span>})</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>root <span class="op">=</span> zarr.open_group(store<span class="op">=</span>store, mode<span class="op">=</span><span class="st">'r'</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>arr <span class="op">=</span> root[<span class="st">'image'</span>]</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a>img_data <span class="op">=</span> arr[:]</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a><span class="co"># Plot the data</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1" aria-label="code-block-1-11"></a>plt.imshow(img_data)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1" aria-label="code-block-1-12"></a>plt.axis(<span class="st">'off'</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1" aria-label="code-block-1-13"></a>plt.show()</span></code></pre>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a>store <span class="op">=</span> zarr.storage.FsspecStore.from_url(<span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/icechunk-demo/zarr"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>root <span class="op">=</span> zarr.open_group(store<span class="op">=</span>store, mode<span class="op">=</span><span class="st">'r'</span>, zarr_format<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>arr <span class="op">=</span> root[<span class="st">'image'</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>img_data <span class="op">=</span> arr[:]</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="co"># Plot the data</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a>plt.imshow(img_data)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1" aria-label="code-block-1-11"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1" aria-label="code-block-1-12"></a>plt.show()</span></code></pre>
 </div>
 <p>If you try to read the Icechunk store while it is being updated, you
 will see either the old snapshot or the new snapshot, but never a
@@ -538,34 +538,38 @@ mix.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a><span class="im">import</span> zarr</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="im">import</span> arraylake <span class="im">as</span> al</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="co"># Log in to arraylake</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>client <span class="op">=</span> al.Client()</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a><span class="co"># Open the Icechunk repo from the arraylake catalog</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a>ic_repo <span class="op">=</span> client.get_repo(<span class="st">"earthmover-demos/zarr-summit-2025"</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a><span class="co"># Start a read-only icechunk session</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a>session <span class="op">=</span> ic_repo.readonly_session(<span class="st">"main"</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a><span class="co"># Get the zarr store</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1" aria-label="code-block-2-15"></a>store <span class="op">=</span> session.store</span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1" aria-label="code-block-2-16"></a></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1" aria-label="code-block-2-17"></a><span class="co"># Get all the zarr array values</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1" aria-label="code-block-2-18"></a>root <span class="op">=</span> zarr.open_group(store<span class="op">=</span>store, mode<span class="op">=</span><span class="st">'r'</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1" aria-label="code-block-2-19"></a>arr <span class="op">=</span> root[<span class="st">'image'</span>]</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1" aria-label="code-block-2-20"></a>img_data <span class="op">=</span> arr[:]</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1" aria-label="code-block-2-21"></a></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1" aria-label="code-block-2-22"></a><span class="co"># Plot the data</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1" aria-label="code-block-2-23"></a>plt.imshow(img_data)</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1" aria-label="code-block-2-24"></a>plt.axis(<span class="st">'off'</span>)</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1" aria-label="code-block-2-25"></a>plt.show()</span></code></pre>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>storage <span class="op">=</span> ic.s3_storage(</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>	bucket<span class="op">=</span><span class="st">"icechunk-demo"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a>	prefix<span class="op">=</span><span class="st">"icechunk"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a>	endpoint_url<span class="op">=</span><span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a>	anonymous<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a>	force_path_style<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a>ic_repo <span class="op">=</span> ic.Repository.<span class="bu">open</span>(storage)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1" aria-label="code-block-2-15"></a><span class="co"># Start a read-only icechunk session</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1" aria-label="code-block-2-16"></a>session <span class="op">=</span> ic_repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1" aria-label="code-block-2-17"></a></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1" aria-label="code-block-2-18"></a><span class="co"># Get the zarr store</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1" aria-label="code-block-2-19"></a>store <span class="op">=</span> session.store</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1" aria-label="code-block-2-20"></a></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1" aria-label="code-block-2-21"></a><span class="co"># Get all the zarr array values</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1" aria-label="code-block-2-22"></a>root <span class="op">=</span> zarr.open_group(store<span class="op">=</span>store, mode<span class="op">=</span><span class="st">'r'</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1" aria-label="code-block-2-23"></a>arr <span class="op">=</span> root[<span class="st">'image'</span>]</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1" aria-label="code-block-2-24"></a>img_data <span class="op">=</span> arr[:]</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1" aria-label="code-block-2-25"></a></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1" aria-label="code-block-2-26"></a><span class="co"># Plot the data</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1" aria-label="code-block-2-27"></a>plt.imshow(img_data)</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1" aria-label="code-block-2-28"></a>plt.axis(<span class="st">'off'</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1" aria-label="code-block-2-29"></a>plt.show()</span></code></pre>
 </div>
 <p>This shows that Icechunk provides a safe, consistent, and
 reproducible way to manage evolving Zarr datasets, making it suitable
 for collaborative scientific workflows.</p>
-<figure><img src="../fig/icechunk.png" alt="XXXXXXXXXXXXXXXXXX CAT IMAGE" class="figure mx-auto d-block"><div class="figcaption">XXXXXXXXXXXXXXXXXX CAT IMAGE</div>
+<figure><img src="../fig/shark.jpg" alt="Happy and sad shark!" class="figure mx-auto d-block"><div class="figcaption">Happy and sad shark!</div>
 </figure></div>
 </div>
 </div>
@@ -578,7 +582,7 @@ for collaborative scientific workflows.</p>
 <h3 class="callout-title">Exercise 1 - Map Git concepts to Icechunk</h3>
 <div class="callout-content">
 <p>Before writing any code:</p>
-<ol style="list-style-type: decimal"><li>In small groups, map familiar Git concepts to Icechunk:
+<ol style="list-style-type: decimal"><li>Map familiar Git concepts to Icechunk:
 <ul><li>Git repository → Icechunk repository.</li>
 <li>Git commit → Icechunk snapshot.</li>
 <li>Git branch → Icechunk branch.</li>
@@ -587,9 +591,7 @@ for collaborative scientific workflows.</p>
 <li>Discuss how these concepts help you reason about data changes over
 time.</li>
 <li>Discuss how “time travel” supports reproducibility.</li>
-</ol><p>Write a short summary of your mapping and keep it handy for later
-exercises.</p>
-</div>
+</ol></div>
 </div>
 </div>
 <div id="accordionSolution1" class="accordion challenge-accordion accordion-flush">
@@ -599,8 +601,14 @@ exercises.</p>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<p>Icechunk brings familiar version control ideas into the realm of
-multidimensional scientific data.</p>
+<p>Git concepts map naturally to Icechunk. An Icechunk repository stores
+the history of a dataset, similar to a Git repository for code.
+Snapshots are like Git commits, branches allow independent development,
+and tags mark important dataset versions.</p>
+<p>These concepts make it easy to track changes, experiment safely, and
+understand how data evolves. Icechunk’s time travel feature allows you
+to access previous snapshots, making analyses reproducible by ensuring
+the exact dataset version can always be revisited.</p>
 </div>
 </div>
 </div>
@@ -614,17 +622,12 @@ multidimensional scientific data.</p>
 by creating a virtual layer over an existing Zarr store.</li>
 <li>Commit the session to create a snapshot.</li>
 <li>Open the repository again in read-only mode for analysis.</li>
-</ol><div class="section level3">
-<h3 id="add-an-icechunk-layer-on-top-of-an-existing-zarr-store">Add an Icechunk layer on top of an existing Zarr store<a class="anchor" aria-label="anchor" href="#add-an-icechunk-layer-on-top-of-an-existing-zarr-store"></a></h3>
-<p>For this lesson, we will start with one example Zarr dataset already
-stored in the object store. That dataset will be the basis for the
-exercises, so learners can see how Icechunk is used to version an
-existing scientific store rather than starting from scratch.</p>
-<p>In this example, the source Zarr store already exists at
-<code>s3://my-bucket/existing/example.zarr</code>, and we create an
-Icechunk repository that points to it.</p>
-<div class="section level4">
-<h4 id="step-1---connecting-to-the-object-store">Step 1 - Connecting to the object store<a class="anchor" aria-label="anchor" href="#step-1---connecting-to-the-object-store"></a></h4>
+</ol><p>In this lesson, we start with a Zarr dataset stored on your local
+machine and create an Icechunk repository in an object store. Once
+imported, the dataset can be versioned, allowing you to track changes
+over time while keeping the repository in object storage.</p>
+<div class="section level3">
+<h3 id="step-1---connecting-to-the-object-store">Step 1 - Connecting to the object store<a class="anchor" aria-label="anchor" href="#step-1---connecting-to-the-object-store"></a></h3>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -634,121 +637,146 @@ Icechunk repository that points to it.</p>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>] <span class="op">=</span> <span class="st">"your-access-key"</span></span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a>os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>] <span class="op">=</span> <span class="st">"your-secret-key"</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a>os.environ[<span class="st">"AWS_DEFAULT_REGION"</span>] <span class="op">=</span> <span class="st">"us-east-1"</span></span></code></pre>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1" aria-label="code-block-3-9"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1" aria-label="code-block-3-10"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1" aria-label="code-block-3-11"></a>    <span class="st">"client_kwargs"</span>: {</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1" aria-label="code-block-3-12"></a>        <span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1" aria-label="code-block-3-13"></a>    },</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1" aria-label="code-block-3-14"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1" aria-label="code-block-3-15"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1" aria-label="code-block-3-16"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1" aria-label="code-block-3-17"></a>    },</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1" aria-label="code-block-3-18"></a>}</span></code></pre>
 </div>
 </div>
-<div class="section level4">
-<h4 id="step-2---opening-the-example-zarr-store">Step 2 - Opening the example Zarr store<a class="anchor" aria-label="anchor" href="#step-2---opening-the-example-zarr-store"></a></h4>
-<p>If the example store is already in the object store, open it with
-xarray as usual:</p>
+<div class="section level3">
+<h3 id="step-2---opening-the-local-zarr-store">Step 2 - Opening the local Zarr store<a class="anchor" aria-label="anchor" href="#step-2---opening-the-local-zarr-store"></a></h3>
+<p>Open the local Zarr dataset with xarray. We are going to use the
+<code>data/ocean_temperature.zarr</code> dataset as an example.</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>example_zarr <span class="op">=</span> <span class="st">"s3://my-bucket/example-data.zarr"</span></span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>local_zarr <span class="op">=</span> <span class="st">"data/ocean_temperature.zarr"</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a>    example_zarr,</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>    storage_options<span class="op">=</span>{</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1" aria-label="code-block-4-6"></a>        <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1" aria-label="code-block-4-7"></a>        <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1" aria-label="code-block-4-8"></a>        <span class="st">"client_kwargs"</span>: {<span class="st">"region_name"</span>: <span class="st">"us-east-1"</span>},</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1" aria-label="code-block-4-9"></a>    },</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1" aria-label="code-block-4-10"></a>)</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1" aria-label="code-block-4-11"></a><span class="bu">print</span>(ds)</span></code></pre>
-</div>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds <span class="op">=</span> xr.open_zarr(local_zarr)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-3---adding-icechunk-to-the-store">Step 3 - Adding Icechunk to the store<a class="anchor" aria-label="anchor" href="#step-3---adding-icechunk-to-the-store"></a></h3>
-<p>Once the example dataset is open, create or open an Icechunk
-repository in the object store and add the Zarr data to it. Icechunk
-also supports existing Zarr stores through its virtual dataset workflow,
-which is the right pattern when you want to layer versioning onto data
-that already exists.</p>
+<h3 id="step-3---creating-the-icechunk-repository">Step 3 - Creating the Icechunk repository<a class="anchor" aria-label="anchor" href="#step-3---creating-the-icechunk-repository"></a></h3>
+<p>Create (or open) an Icechunk repository in the object store and write
+the dataset into it.</p>
+<p>First, configure the Icechunk storage to point to the object
+store:</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a><span class="im">from</span> virtualizarr <span class="im">import</span> open_virtual_dataset</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a><span class="im">from</span> virtualizarr.parsers <span class="im">import</span> ZarrParser</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="im">from</span> obstore.store <span class="im">import</span> from_url</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="im">from</span> obspec_utils.registry <span class="im">import</span> ObjectStoreRegistry</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>source_bucket <span class="op">=</span> <span class="st">"s3://my-bucket/"</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a>source_zarr <span class="op">=</span> <span class="st">"s3://my-bucket/example-data.zarr"</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a>repo_bucket <span class="op">=</span> <span class="st">"my-bucket"</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1" aria-label="code-block-5-11"></a>repo_prefix <span class="op">=</span> <span class="st">"icechunk-repo"</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1" aria-label="code-block-5-12"></a></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1" aria-label="code-block-5-13"></a>source_store <span class="op">=</span> from_url(source_bucket, region<span class="op">=</span><span class="st">"us-east-1"</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1" aria-label="code-block-5-14"></a>registry <span class="op">=</span> ObjectStoreRegistry({source_bucket: source_store})</span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1" aria-label="code-block-5-15"></a></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1" aria-label="code-block-5-16"></a>virtual_ds <span class="op">=</span> open_virtual_dataset(</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1" aria-label="code-block-5-17"></a>    url<span class="op">=</span>source_zarr,</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1" aria-label="code-block-5-18"></a>    parser<span class="op">=</span>ZarrParser(),</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1" aria-label="code-block-5-19"></a>    registry<span class="op">=</span>registry,</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1" aria-label="code-block-5-20"></a>)</span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1" aria-label="code-block-5-21"></a></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1" aria-label="code-block-5-22"></a>storage <span class="op">=</span> ic.s3_storage(</span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1" aria-label="code-block-5-23"></a>    bucket<span class="op">=</span>repo_bucket,</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1" aria-label="code-block-5-24"></a>    prefix<span class="op">=</span>repo_prefix,</span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1" aria-label="code-block-5-25"></a>    from_env<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1" aria-label="code-block-5-26"></a>)</span>
-<span id="cb5-27"><a href="#cb5-27" tabindex="-1" aria-label="code-block-5-27"></a></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1" aria-label="code-block-5-28"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1" aria-label="code-block-5-29"></a>config.set_virtual_chunk_container(</span>
-<span id="cb5-30"><a href="#cb5-30" tabindex="-1" aria-label="code-block-5-30"></a>    ic.virtual.VirtualChunkContainer(</span>
-<span id="cb5-31"><a href="#cb5-31" tabindex="-1" aria-label="code-block-5-31"></a>        source_bucket,</span>
-<span id="cb5-32"><a href="#cb5-32" tabindex="-1" aria-label="code-block-5-32"></a>        ic.storage.s3_store(region<span class="op">=</span><span class="st">"us-east-1"</span>),</span>
-<span id="cb5-33"><a href="#cb5-33" tabindex="-1" aria-label="code-block-5-33"></a>    )</span>
-<span id="cb5-34"><a href="#cb5-34" tabindex="-1" aria-label="code-block-5-34"></a>)</span>
-<span id="cb5-35"><a href="#cb5-35" tabindex="-1" aria-label="code-block-5-35"></a></span>
-<span id="cb5-36"><a href="#cb5-36" tabindex="-1" aria-label="code-block-5-36"></a>credentials <span class="op">=</span> ic.credentials.containers_credentials(</span>
-<span id="cb5-37"><a href="#cb5-37" tabindex="-1" aria-label="code-block-5-37"></a>    {</span>
-<span id="cb5-38"><a href="#cb5-38" tabindex="-1" aria-label="code-block-5-38"></a>        source_bucket: ic.credentials.s3_credentials(</span>
-<span id="cb5-39"><a href="#cb5-39" tabindex="-1" aria-label="code-block-5-39"></a>            access_key_id<span class="op">=</span>os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb5-40"><a href="#cb5-40" tabindex="-1" aria-label="code-block-5-40"></a>            secret_access_key<span class="op">=</span>os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb5-41"><a href="#cb5-41" tabindex="-1" aria-label="code-block-5-41"></a>            region<span class="op">=</span><span class="st">"us-east-1"</span>,</span>
-<span id="cb5-42"><a href="#cb5-42" tabindex="-1" aria-label="code-block-5-42"></a>        )</span>
-<span id="cb5-43"><a href="#cb5-43" tabindex="-1" aria-label="code-block-5-43"></a>    }</span>
-<span id="cb5-44"><a href="#cb5-44" tabindex="-1" aria-label="code-block-5-44"></a>)</span>
-<span id="cb5-45"><a href="#cb5-45" tabindex="-1" aria-label="code-block-5-45"></a></span>
-<span id="cb5-46"><a href="#cb5-46" tabindex="-1" aria-label="code-block-5-46"></a>repo <span class="op">=</span> ic.Repository.create(storage, config, credentials)</span>
-<span id="cb5-47"><a href="#cb5-47" tabindex="-1" aria-label="code-block-5-47"></a></span>
-<span id="cb5-48"><a href="#cb5-48" tabindex="-1" aria-label="code-block-5-48"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
-<span id="cb5-49"><a href="#cb5-49" tabindex="-1" aria-label="code-block-5-49"></a>virtual_ds.vz.to_icechunk(session.store)</span>
-<span id="cb5-50"><a href="#cb5-50" tabindex="-1" aria-label="code-block-5-50"></a>snapshot_id <span class="op">=</span> session.commit(<span class="st">"Add example Zarr store to Icechunk"</span>)</span>
-<span id="cb5-51"><a href="#cb5-51" tabindex="-1" aria-label="code-block-5-51"></a><span class="bu">print</span>(<span class="st">"Committed snapshot:"</span>, snapshot_id)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a>storage <span class="op">=</span> ic.s3_storage(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a>    bucket<span class="op">=</span><span class="st">"cloud-native-geoscience-course"</span>, <span class="co"># the name of the bucket where the Icechunk repository will be stored</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>    prefix<span class="op">=</span><span class="st">"icechunk-repo"</span>, <span class="co"># the prefix in the bucket where the Icechunk repository will be stored</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>    endpoint_url<span class="op">=</span>storage_options[<span class="st">"client_kwargs"</span>][<span class="st">"endpoint_url"</span>],</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a>    access_key_id<span class="op">=</span>storage_options[<span class="st">"key"</span>],</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>    secret_access_key<span class="op">=</span>storage_options[<span class="st">"secret"</span>],</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>    region<span class="op">=</span><span class="st">"us-east-1"</span>, <span class="co"># the region of the bucket</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a>    force_path_style<span class="op">=</span><span class="va">True</span>, <span class="co"># the endpoint uses path-style access</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>    checksum_algorithm<span class="op">=</span><span class="va">None</span>, <span class="co"># the endpoint does not support checksums</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a>)</span></code></pre>
 </div>
-<p>After this, the Zarr store is managed through Icechunk, and the
-repository now has a version history.</p>
-</div>
-<div class="section level3">
-<h3 id="step-4---reading-from-the-main-branch">Step 4 - Reading from the <code>main</code> branch<a class="anchor" aria-label="anchor" href="#step-4---reading-from-the-main-branch"></a></h3>
+<p>Because we are using an object store that does not support
+conditional updates (JASMIN), we need to disable Icechunk’s safety
+checks for conditional updates and creates. This is done by setting
+<code>unsafe_use_conditional_update</code> and
+<code>unsafe_use_conditional_create</code> to <code>False</code>. This
+step is optional if you are using an object store that supports
+conditional updates, such as AWS S3.</p>
 <div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a>ds_main <span class="op">=</span> xr.open_zarr(ro_session.store)</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a><span class="bu">print</span>(ds_main)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>storage_settings <span class="op">=</span> ic.StorageSettings(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a>    unsafe_use_conditional_update<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>    unsafe_use_conditional_create<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>)</span></code></pre>
 </div>
-<p>This is the normal read path for analysis. Readers get a complete
-snapshot rather than a dataset that might be mid-update.</p>
-<div id="exercise-2---open-the-example-store-and-add-icechunk" class="callout challenge">
+<p>Now we can create the Icechunk repository in the object store. If the
+repository already exists, it will be opened instead.</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>repo_config <span class="op">=</span> ic.RepositoryConfig(storage<span class="op">=</span>storage_settings)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a>repo <span class="op">=</span> ic.Repository.open_or_create(storage, config<span class="op">=</span>repo_config)</span></code></pre>
+</div>
+<p>When I do the above, I can see that the repository is created in the
+object store. Now I can start a writable session on the
+<code>main</code> branch and add the dataset to it.</p>
+<div class="codewrapper sourceCode" id="cb8">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="co"># Create a writable session on the main branch</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a><span class="co"># Save the dataset to the Icechunk repository</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>ds.to_zarr(</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a>    session.store,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>)</span></code></pre>
+</div>
+<p>Now that the dataset is added to the Icechunk repository, I can
+commit the session to create a snapshot.</p>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>snapshot <span class="op">=</span> session.commit(<span class="st">"Initial import of local Zarr dataset"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a><span class="bu">print</span>(snapshot)</span></code></pre>
+</div>
+<p>After committing the session, the dataset is stored as an Icechunk
+repository in the object store. Future changes can be committed as new
+snapshots without modifying previous versions.</p>
+</div>
+<div class="section level3">
+<h3 id="step-4---reading-from-the-main-branch">Step 4 - Reading from the <code>main</code> branch<a class="anchor" aria-label="anchor" href="#step-4---reading-from-the-main-branch"></a></h3>
+<p>To read the dataset from the Icechunk repository, I can open a
+read-only session on the <code>main</code> branch:</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span></code></pre>
+</div>
+<p>And them use xarray to open the dataset from the Icechunk
+repository:</p>
+<div class="codewrapper sourceCode" id="cb11">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a>    ro_session.store,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a><span class="bu">print</span>(ds_main)</span></code></pre>
+</div>
+<p>This is the standard way to read data from an Icechunk repository.
+Opening a read-only session on the <code>main</code> branch gives you a
+consistent snapshot of the dataset, ensuring that analyses always use a
+well-defined version of the data.</p>
+<div id="exercise-2---your-turn-open-the-ocean_temperature-zarr-dataset-and-and-add-icechunk" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-2---open-the-example-store-and-add-icechunk" class="callout-inner">
-<h3 class="callout-title">Exercise 2 - Open the example store and add
-Icechunk</h3>
+<div id="exercise-2---your-turn-open-the-ocean_temperature-zarr-dataset-and-and-add-icechunk" class="callout-inner">
+<h3 class="callout-title">Exercise 2 - Your turn: open the
+ocean_temperature zarr dataset and and add Icechunk</h3>
 <div class="callout-content">
-<p>Using the example Zarr store:</p>
+<p>Using the <code>data/ocean_temperature.zarr</code> dataset:</p>
 <ol style="list-style-type: decimal"><li>Open the store with xarray.</li>
 <li>Create an Icechunk repository in the object store.</li>
 <li>Add the Zarr store to Icechunk.</li>
 <li>Reopen the dataset from <code>main</code>.</li>
-<li>Compare the result with the original store.</li>
+<li>Compare the result with the local Zarr store.</li>
 </ol><p>Questions:</p>
 <ul><li>What changes when the store is managed by Icechunk?</li>
 <li>What do you gain by reading from a branch instead of a raw Zarr
@@ -763,43 +791,187 @@ path?</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<p>Learners should see that the scientific data do not change, but the
-repository now has version history, branches, and snapshots.</p>
+<p>Set the object store credentials:</p>
+<div class="codewrapper sourceCode" id="cb12">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> os</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>    <span class="st">"client_kwargs"</span>: {</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>        <span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>    },</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1" aria-label="code-block-12-14"></a>    },</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1" aria-label="code-block-12-15"></a>}</span></code></pre>
+</div>
+<p>Open the local zarr store:</p>
+<div class="codewrapper sourceCode" id="cb13">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="co"># Open the local Zarr store</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>)</span></code></pre>
+</div>
+<p>Create an Icechunk repository in the object store:</p>
+<div class="codewrapper sourceCode" id="cb14">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a>storage <span class="op">=</span> ic.s3_storage(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a>    bucket<span class="op">=</span><span class="st">"my-bucket"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a>    prefix<span class="op">=</span><span class="st">"icechunk-repo"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a>    endpoint_url<span class="op">=</span>storage_options[<span class="st">"client_kwargs"</span>][<span class="st">"endpoint_url"</span>],</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a>    access_key_id<span class="op">=</span>storage_options[<span class="st">"key"</span>],</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>    secret_access_key<span class="op">=</span>storage_options[<span class="st">"secret"</span>],</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a>    region<span class="op">=</span><span class="st">"us-east-1"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a>    force_path_style<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a>    checksum_algorithm<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1" aria-label="code-block-14-10"></a>)</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1" aria-label="code-block-14-11"></a></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1" aria-label="code-block-14-12"></a>storage_settings <span class="op">=</span> ic.StorageSettings(</span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1" aria-label="code-block-14-13"></a>    unsafe_use_conditional_update<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1" aria-label="code-block-14-14"></a>    unsafe_use_conditional_create<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1" aria-label="code-block-14-15"></a>)</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1" aria-label="code-block-14-16"></a>repo_config <span class="op">=</span> ic.RepositoryConfig(storage<span class="op">=</span>storage_settings)</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1" aria-label="code-block-14-17"></a>repo <span class="op">=</span> ic.Repository.open_or_create(storage, config<span class="op">=</span>repo_config)</span></code></pre>
+</div>
+<p>Import the dataset into Icechunk and commit it:</p>
+<div class="codewrapper sourceCode" id="cb15">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>ds.to_zarr(</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>    session.store,</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>)</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a>snapshot <span class="op">=</span> session.commit(<span class="st">"Initial import of ocean_temperature.zarr"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a><span class="bu">print</span>(<span class="ss">f"Snapshot: </span><span class="sc">{</span>snapshot<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
+</div>
+<p>Reopen the dataset from the main branch and compare it with the local
+Zarr store:</p>
+<div class="codewrapper sourceCode" id="cb16">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a>ds_icechunk <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a>    ro_session.store,</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1" aria-label="code-block-16-5"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1" aria-label="code-block-16-6"></a>)</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1" aria-label="code-block-16-7"></a></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1" aria-label="code-block-16-8"></a><span class="bu">print</span>(<span class="st">"Icechunk dataset:"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1" aria-label="code-block-16-9"></a><span class="bu">print</span>(ds_icechunk)</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1" aria-label="code-block-16-10"></a><span class="bu">print</span>(<span class="st">"Local Zarr dataset:"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1" aria-label="code-block-16-11"></a><span class="bu">print</span>(ds)</span></code></pre>
+</div>
+<p>The dataset contents are the same before and after importing into
+Icechunk. The main difference is that the Icechunk version is now
+version-controlled, allowing changes to be committed as new snapshots
+without overwriting previous versions.</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="making-an-atomic-update">Making an atomic update<a class="anchor" aria-label="anchor" href="#making-an-atomic-update"></a></h2>
-<hr class="half-width"><p>Icechunk transactions let you update several variables together and
-commit them as one version.</p>
-<div class="codewrapper sourceCode" id="cb7">
+<hr class="half-width"><p>Icechunk transactions let you make multiple updates to a dataset
+atomically. This means that either all changes are applied together, or
+none are applied at all. This is important for maintaining consistency
+in the dataset, especially when multiple variables/time steps are being
+updated simultaneously or when multiple users are accessing the
+data.</p>
+<div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> zarr</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Update temperature and pressure"</span>) <span class="im">as</span> store:</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a>    root[<span class="st">"temperature"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> np.random.rand(<span class="op">*</span>root[<span class="st">"temperature"</span>].shape)</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a>    root[<span class="st">"pressure"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> np.random.rand(<span class="op">*</span>root[<span class="st">"pressure"</span>].shape)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="im">import</span> zarr</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Update temperature values"</span>) <span class="im">as</span> store:</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1" aria-label="code-block-17-6"></a>    ny, nx <span class="op">=</span> root[<span class="st">"sst"</span>].shape[<span class="dv">1</span>:]</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1" aria-label="code-block-17-7"></a></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1" aria-label="code-block-17-8"></a>    root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> np.random.rand(ny, nx).astype(np.float32)</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1" aria-label="code-block-17-9"></a>    root[<span class="st">"sst"</span>][<span class="dv">1</span>, :, :] <span class="op">=</span> np.random.rand(ny, nx).astype(np.float32)</span></code></pre>
 </div>
-<p>With plain Zarr, a reader might see one variable updated and another
-still old if they read while writes are in progress. With Icechunk,
-readers see either the old snapshot or the new snapshot, never a mixed
-state.</p>
-<div id="exercise-3---atomic-update-of-multiple-variables" class="callout challenge">
+<p>In the code above, we start a transaction on the <code>main</code>
+branch and update two time steps of the <code>sst</code> variable with
+random values. The transaction ensures that both updates are applied
+together. If any part of the transaction fails, none of the changes will
+be applied, preserving the integrity of the dataset.</p>
+<p>With plain Zarr, a reader might see a mix of old and new values if
+they access the dataset while the update is in progress. With Icechunk,
+readers will see either the old snapshot or the new snapshot, but never
+a mix.</p>
+<p>If you try to plot the data after the update, you will see either the
+old or new values, but not a mix (like the example with the shark image
+above). This ensures that analyses are based on consistent data.</p>
+<div class="codewrapper sourceCode" id="cb18">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a>    ro_session.store,</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1" aria-label="code-block-18-5"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1" aria-label="code-block-18-6"></a>)</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1" aria-label="code-block-18-7"></a>ds_main.sst.isel(valid_time<span class="op">=</span><span class="dv">0</span>).plot() <span class="co"># you may see a random pattern or the original data, but not a mix</span></span></code></pre>
+</div>
+</section><section><h2 class="section-heading" id="recovering-from-mistakes">Recovering from mistakes<a class="anchor" aria-label="anchor" href="#recovering-from-mistakes"></a></h2>
+<hr class="half-width"><p>A major advantage of Icechunk is that mistakes are reversible. If a
+bad update is committed, you can go back to a previous snapshot and
+restore the branch.</p>
+<p>For example, you can list the history of snapshots on a branch:</p>
+<div class="codewrapper sourceCode" id="cb19">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a>history <span class="op">=</span> <span class="bu">list</span>(repo.ancestry(branch<span class="op">=</span><span class="st">"main"</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a><span class="cf">for</span> i, snap <span class="kw">in</span> <span class="bu">enumerate</span>(history):</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>    <span class="bu">print</span>(i, snap.<span class="bu">id</span>, snap.message)</span></code></pre>
+</div>
+<p>In the last commit, you can see the message related to the bad update
+(adding random values). You can then reset the branch to the previous
+snapshot, effectively undoing the bad update.</p>
+<div class="codewrapper sourceCode" id="cb20">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a>history <span class="op">=</span> <span class="bu">list</span>(repo.ancestry(branch<span class="op">=</span><span class="st">"main"</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a>prev_snapshot <span class="op">=</span> history[<span class="op">-</span><span class="dv">2</span>].<span class="bu">id</span> <span class="co"># get the previous snapshot id</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a>repo.reset_branch(<span class="st">"main"</span>, prev_snapshot) <span class="co"># reset the branch to the previous snapshot</span></span></code></pre>
+</div>
+<p>Then reopen the dataset and confirm that the original data have
+returned:</p>
+<div class="codewrapper sourceCode" id="cb21">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a>session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a>ds_main <span class="op">=</span> xr.open_zarr(session.store)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a>ds_main.sst.isel(valid_time<span class="op">=</span><span class="dv">0</span>).plot() <span class="co"># now you should see the original data again</span></span></code></pre>
+</div>
+<p>This is much safer than overwriting a plain Zarr store, where
+recovery usually depends on external backups or manual copies.</p>
+<div id="exercise-3---atomic-update-of-a-variable-in-two-different-time-steps" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-3---atomic-update-of-multiple-variables" class="callout-inner">
-<h3 class="callout-title">Exercise 3 - Atomic update of multiple
-variables</h3>
+<div id="exercise-3---atomic-update-of-a-variable-in-two-different-time-steps" class="callout-inner">
+<h3 class="callout-title">Exercise 3 - Atomic update of a variable in
+two different time steps</h3>
 <div class="callout-content">
-<p>Using the example dataset:</p>
+<p>Using the ocean_temperature dataset in Icechunk:</p>
 <ol style="list-style-type: decimal"><li>Open the dataset from the <code>main</code> branch.</li>
-<li>Start a transaction and update at least two variables together.</li>
+<li>Start a transaction and update at least two time steps together. Try
+to make the update clearly visible, such as adding a constant value or
+multiplying by a factor.</li>
 <li>Open the dataset again in a read-only session.</li>
 <li>Confirm that you see either the old version or the new version, but
 not a mix.</li>
@@ -817,61 +989,54 @@ Icechunk?</li>
 </button>
 <div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
-<p>Learners should see that Icechunk ensures consistent snapshots under
-updates.</p>
-</div>
-</div>
-</div>
-</div>
-</section><section><h2 class="section-heading" id="recovering-from-mistakes">Recovering from mistakes<a class="anchor" aria-label="anchor" href="#recovering-from-mistakes"></a></h2>
-<hr class="half-width"><p>A major advantage of Icechunk is that mistakes are reversible. If a
-bad update is committed, you can go back to a previous snapshot and
-restore the branch.</p>
-<div class="codewrapper sourceCode" id="cb8">
+<p>Update the dataset:</p>
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Bad update"</span>) <span class="im">as</span> store:</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a>    root[<span class="st">"temperature"</span>][:] <span class="op">=</span> <span class="fl">0.0</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="im">import</span> zarr</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Update temperature values"</span>) <span class="im">as</span> store:</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a>    ny, nx <span class="op">=</span> root[<span class="st">"sst"</span>].shape[<span class="dv">1</span>:]</span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a>    root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">*</span> <span class="fl">10.0</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a>    root[<span class="st">"sst"</span>][<span class="dv">1</span>, :, :] <span class="op">=</span> root[<span class="st">"sst"</span>][<span class="dv">1</span>, :, :] <span class="op">*</span> <span class="fl">10.0</span></span></code></pre>
 </div>
-<p>After the bad update, inspect the snapshot history and reset the
-branch to the previous version:</p>
-<div class="codewrapper sourceCode" id="cb9">
+<p>Open the dataset again in a read-only session:</p>
+<div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>history <span class="op">=</span> <span class="bu">list</span>(repo.ancestry(<span class="st">"main"</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>prev_snapshot <span class="op">=</span> history.snapshot_id</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>repo.reset_branch(<span class="st">"main"</span>, prev_snapshot)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>    ro_session.store,</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a>ds_main.sst.isel(valid_time<span class="op">=</span><span class="dv">0</span>).plot()</span></code></pre>
 </div>
-<p>Then reopen the dataset and confirm that the original data have
-returned:</p>
-<div class="codewrapper sourceCode" id="cb10">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a>ds <span class="op">=</span> xr.open_zarr(session.store)</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
-<p>This is much safer than overwriting a plain Zarr store, where
-recovery usually depends on external backups or manual copies.</p>
-<div id="exercise-4---simulate-and-recover-from-a-bad-update" class="callout challenge">
+</div>
+</div>
+</div>
+<div id="exercise-4---recover-from-a-bad-update" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-4---simulate-and-recover-from-a-bad-update" class="callout-inner">
-<h3 class="callout-title">Exercise 4 - Simulate and recover from a bad
-update</h3>
+<div id="exercise-4---recover-from-a-bad-update" class="callout-inner">
+<h3 class="callout-title">Exercise 4 - Recover from a bad update</h3>
 <div class="callout-content">
 <p>Using the example dataset:</p>
-<ol style="list-style-type: decimal"><li>Make a good update and commit it to <code>main</code>.</li>
-<li>Make a bad update that clearly corrupts one variable.</li>
+<ol style="list-style-type: decimal"><li>Make a good update and commit it to <code>main</code>. It can be a
+simple update, such as adding a constant value to one time step.</li>
+<li>Make a bad update that clearly corrupts one time step and commit it
+to <code>main</code>. You can use random values or a constant that is
+clearly wrong.</li>
 <li>Inspect the dataset and confirm the bad values are present.</li>
 <li>Find the previous snapshot and reset the branch.</li>
 <li>Reopen the dataset and confirm recovery.</li>
 </ol><p>Questions:</p>
-<ul><li>How many lines of code were needed to recover?</li>
-<li>What would you need to do to recover the same mistake in plain
+<ul><li>What would you need to do to recover the same mistake in plain
 Zarr?</li>
 </ul></div>
 </div>
@@ -883,30 +1048,89 @@ Zarr?</li>
 </button>
 <div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
-<p>Learners should see that Icechunk’s version history makes recovery
-explicit and simple.</p>
+<p>Make a good update:</p>
+<div class="codewrapper sourceCode" id="cb24">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Good update"</span>) <span class="im">as</span> store:</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a>    root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">+</span> <span class="fl">1.0</span></span></code></pre>
+</div>
+<p>Make a bad update:</p>
+<div class="codewrapper sourceCode" id="cb25">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" tabindex="-1" aria-label="code-block-25-1"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"Bad update"</span>) <span class="im">as</span> store:</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1" aria-label="code-block-25-2"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1" aria-label="code-block-25-3"></a>    root[<span class="st">"sst"</span>][<span class="dv">10</span>, :, :] <span class="op">=</span> np.random.rand(<span class="op">*</span>root[<span class="st">"sst"</span>][<span class="dv">1</span>, :, :].shape).astype(np.float32)</span></code></pre>
+</div>
+<p>Inspect the dataset and confirm the bad values are present:</p>
+<div class="codewrapper sourceCode" id="cb26">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" tabindex="-1" aria-label="code-block-26-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1" aria-label="code-block-26-2"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1" aria-label="code-block-26-3"></a>    ro_session.store,</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1" aria-label="code-block-26-4"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1" aria-label="code-block-26-5"></a>)</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1" aria-label="code-block-26-6"></a>ds_main.sst.isel(valid_time<span class="op">=</span><span class="dv">10</span>).plot()</span></code></pre>
+</div>
+<p>Find the previous snapshot and reset the branch:</p>
+<div class="codewrapper sourceCode" id="cb27">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" tabindex="-1" aria-label="code-block-27-1"></a>history <span class="op">=</span> <span class="bu">list</span>(repo.ancestry(branch<span class="op">=</span><span class="st">"main"</span>))</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1" aria-label="code-block-27-2"></a>prev_snapshot <span class="op">=</span> history[<span class="op">-</span><span class="dv">2</span>].<span class="bu">id</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1" aria-label="code-block-27-3"></a>repo.reset_branch(<span class="st">"main"</span>, prev_snapshot)</span></code></pre>
+</div>
+<p>Reopen the dataset and confirm recovery:</p>
+<div class="codewrapper sourceCode" id="cb28">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" tabindex="-1" aria-label="code-block-28-1"></a>ro_session <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1" aria-label="code-block-28-2"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1" aria-label="code-block-28-3"></a>    ro_session.store,</span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1" aria-label="code-block-28-4"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1" aria-label="code-block-28-5"></a>)</span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1" aria-label="code-block-28-6"></a>ds_main.sst.isel(valid_time<span class="op">=</span><span class="dv">10</span>).plot()</span></code></pre>
+</div>
+<p>With a plain Zarr store, you would need to rely on external backups
+or manual copies to recover from a bad update, which is less convenient
+and more error-prone.</p>
 </div>
 </div>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="branches-and-reproducibility">Branches and reproducibility<a class="anchor" aria-label="anchor" href="#branches-and-reproducibility"></a></h2>
-<hr class="half-width"><p>Branches and tags are useful when the dataset evolves but you need to
-preserve a stable version for analysis. A branch such as
+<hr class="half-width"><p>Branches and tags are useful when a dataset evolves but you need to
+preserve a stable version for analysis or reproduction. A branch such as
 <code>main</code> can continue changing, while a tag gives you a fixed
 reference point for a publication, report, or operational run.</p>
-<div class="codewrapper sourceCode" id="cb11">
+<div class="codewrapper sourceCode" id="cb29">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>session_main <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a>ds_main <span class="op">=</span> xr.open_zarr(session_main.store)</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="co"># Example tag access</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a><span class="co"># session_release = repo.readonly_session(tag="v1.0")</span></span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a><span class="co"># ds_release = xr.open_zarr(session_release.store)</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" tabindex="-1" aria-label="code-block-29-1"></a><span class="co"># Get the current snapshot of the main branch</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1" aria-label="code-block-29-2"></a>snapshot <span class="op">=</span> repo.lookup_branch(<span class="st">"main"</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1" aria-label="code-block-29-3"></a></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1" aria-label="code-block-29-4"></a><span class="co"># Create a tag pointing to this snapshot</span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1" aria-label="code-block-29-5"></a>repo.create_tag(<span class="st">"v1.0.0"</span>, snapshot)</span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1" aria-label="code-block-29-6"></a></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1" aria-label="code-block-29-7"></a><span class="co"># Open the dataset using the tag</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1" aria-label="code-block-29-8"></a>session <span class="op">=</span> repo.readonly_session(tag<span class="op">=</span><span class="st">"v1.0.0"</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1" aria-label="code-block-29-9"></a>ds <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1" aria-label="code-block-29-10"></a>    session.store,</span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1" aria-label="code-block-29-11"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1" aria-label="code-block-29-12"></a>)</span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1" aria-label="code-block-29-13"></a></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1" aria-label="code-block-29-14"></a><span class="co"># Example analysis</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1" aria-label="code-block-29-15"></a>mean_sst <span class="op">=</span> ds.sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1" aria-label="code-block-29-16"></a><span class="bu">print</span>(mean_sst)</span></code></pre>
 </div>
 <p>This makes it easy to say exactly which version of the data was used,
 and to reopen that same version later for verification or reruns.</p>
-<figure><img src="../fig/icechunk_branches.png" alt="XXXXXXXXXXXXXXXXXXIcechunk Workflow" class="figure mx-auto d-block"><div class="figcaption">XXXXXXXXXXXXXXXXXXIcechunk Workflow</div>
+<figure><img src="../fig/git_workflow.png" alt="Git Workflow, which is similar to Icechunk Workflow." class="figure mx-auto d-block"><div class="figcaption">Git Workflow, which is similar to Icechunk
+Workflow. Source: <a href="https://yakiloo.com/getting-started-git-flow/" class="external-link uri">https://yakiloo.com/getting-started-git-flow/</a>
+</div>
 </figure><div id="exercise-5---tag-a-reproducible-version" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -915,10 +1139,13 @@ and to reopen that same version later for verification or reruns.</p>
 <div id="exercise-5---tag-a-reproducible-version" class="callout-inner">
 <h3 class="callout-title">Exercise 5 - Tag a reproducible version</h3>
 <div class="callout-content">
-<ol style="list-style-type: decimal"><li>Create a tag for the version you want to treat as a release.</li>
+<ol style="list-style-type: decimal"><li>Create a tag for the last version of main branch that you want to
+treat as a release.</li>
 <li>Open the dataset using that tag.</li>
-<li>Run a small analysis, such as a mean over space or time.</li>
-<li>Repeat the same analysis later using the same tag.</li>
+<li>Run a small analysis, such as a mean over space.</li>
+<li>Update the main branch with a new commit.</li>
+<li>Repeat the same analysis later using the main branch and the tag,
+and compare the results.</li>
 </ol><p>Questions:</p>
 <ul><li>Did the results stay the same?</li>
 <li>Why is a tag better than saying “we used the latest version”?</li>
@@ -932,8 +1159,54 @@ and to reopen that same version later for verification or reruns.</p>
 </button>
 <div id="collapseSolution5" class="accordion-collapse collapse" aria-labelledby="headingSolution5" data-bs-parent="#accordionSolution5">
 <div class="accordion-body">
-<p>Learners should see how tags provide stable, human-readable
-references to immutable data versions.</p>
+<p>Create a tag for the last version of the main branch:</p>
+<div class="codewrapper sourceCode" id="cb30">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" tabindex="-1" aria-label="code-block-30-1"></a><span class="co"># Get the current snapshot of the main branch</span></span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1" aria-label="code-block-30-2"></a>snapshot <span class="op">=</span> repo.lookup_branch(<span class="st">"main"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1" aria-label="code-block-30-3"></a></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1" aria-label="code-block-30-4"></a><span class="co"># Create a tag pointing to this snapshot</span></span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1" aria-label="code-block-30-5"></a>repo.create_tag(<span class="st">"v1.0.0"</span>, snapshot)</span></code></pre>
+</div>
+<p>Open the dataset using that tag and run a small analysis:</p>
+<div class="codewrapper sourceCode" id="cb31">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" tabindex="-1" aria-label="code-block-31-1"></a>session_tag <span class="op">=</span> repo.readonly_session(tag<span class="op">=</span><span class="st">"v1.0.0"</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1" aria-label="code-block-31-2"></a>ds_tag <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1" aria-label="code-block-31-3"></a>    session_tag.store,</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1" aria-label="code-block-31-4"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1" aria-label="code-block-31-5"></a>)</span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1" aria-label="code-block-31-6"></a>mean_sst_tag <span class="op">=</span> ds_tag.sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1" aria-label="code-block-31-7"></a><span class="bu">print</span>(mean_sst_tag)</span></code></pre>
+</div>
+<p>Update the main branch with a new commit:</p>
+<div class="codewrapper sourceCode" id="cb32">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" tabindex="-1" aria-label="code-block-32-1"></a><span class="cf">with</span> repo.transaction(<span class="st">"main"</span>, message<span class="op">=</span><span class="st">"New update"</span>) <span class="im">as</span> store:</span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1" aria-label="code-block-32-2"></a>    root <span class="op">=</span> zarr.open_group(store)</span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1" aria-label="code-block-32-3"></a>    root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">=</span> root[<span class="st">"sst"</span>][<span class="dv">0</span>, :, :] <span class="op">+</span> <span class="fl">2.0</span></span></code></pre>
+</div>
+<p>Open the dataset again using the main branch and run the same
+analysis:</p>
+<div class="codewrapper sourceCode" id="cb33">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" tabindex="-1" aria-label="code-block-33-1"></a>session_main <span class="op">=</span> repo.readonly_session(<span class="st">"main"</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1" aria-label="code-block-33-2"></a>ds_main <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1" aria-label="code-block-33-3"></a>    session_main.store,</span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1" aria-label="code-block-33-4"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1" aria-label="code-block-33-5"></a>)</span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1" aria-label="code-block-33-6"></a>mean_sst_main <span class="op">=</span> ds_main.sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1" aria-label="code-block-33-7"></a><span class="bu">print</span>(mean_sst_main)</span></code></pre>
+</div>
+<p>You can compare the results from the tag and the main branch. The
+results should differ, as the main branch has been updated while the tag
+points to a specific snapshot. This demonstrates that using a tag
+provides a stable reference for reproducible analysis, while relying on
+the latest version can lead to inconsistencies.</p>
 </div>
 </div>
 </div>
@@ -945,12 +1218,14 @@ references to immutable data versions.</p>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>Plain Zarr lacks built-in transactions, history, and recovery.</li>
-<li>Icechunk adds repositories, transactions, snapshots, branches, and
-tags.</li>
-<li>Transactions make multi-variable updates atomic.</li>
-<li>Branches and tags make reproducible analysis possible.</li>
-<li>Version history makes it much easier to recover from mistakes.</li>
+<ul><li>“Plain Zarr lacks built-in transactions, history, and
+recovery.”</li>
+<li>“Icechunk adds repositories, transactions, snapshots, branches, and
+tags.”</li>
+<li>“Transactions make multi-variable updates atomic.”</li>
+<li>“Branches and tags make reproducible analysis possible.”</li>
+<li>“Version history makes it much easier to recover from
+mistakes.”</li>
 </ul></div>
 </div>
 </div>
@@ -1018,8 +1293,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/12-icechunk.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/12-icechunk.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

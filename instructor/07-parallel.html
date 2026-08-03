@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">30%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">33%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -265,6 +265,7 @@
       <div class="accordion-body">
         <ul><li><a href="#why-parallel-processing">Why parallel processing?</a></li>
 <li><a href="#dask-distributed-processing-for-python">Dask: distributed processing for Python</a></li>
+<li><a href="#dask-with-zarr-via-xarray">Dask with Zarr via xarray</a></li>
 <li><a href="#visualising-the-task-graph">Visualising the Task Graph</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
@@ -411,13 +412,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Parallel Processing for Zarr</h1>
-        <p>Last updated on 2026-07-28 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/07-parallel.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 40 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 65 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -432,11 +433,11 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>Why do we need parallel processing for large Zarr datasets?</li>
-<li>How does Dask parallelise xarray and Zarr computations?</li>
-<li>How do chunking and lazy loading support parallel work?</li>
-<li>What other parallelism tools do Python users sometimes combine with
-Zarr?</li>
+<ul><li>“Why do we need parallel processing for large Zarr datasets?”</li>
+<li>“How does Dask parallelise xarray and Zarr computations?”</li>
+<li>“How do chunking and lazy loading support parallel work?”</li>
+<li>“What other parallelism tools do Python users sometimes combine with
+Zarr?”</li>
 </ul></div>
 </div>
 </div>
@@ -444,14 +445,14 @@ Zarr?</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>Explain why parallel processing matters for large Zarr
-datasets.</li>
-<li>Use Dask with xarray and Zarr to parallelise common array
-computations.</li>
-<li>Understand how chunking, lazy loading, and task graphs work
-together.</li>
-<li>Recognise a few other Python parallelism patterns that are sometimes
-used with Zarr workflows.</li>
+<ul><li>“Explain why parallel processing matters for large Zarr
+datasets.”</li>
+<li>“Use Dask with xarray and Zarr to parallelise common array
+computations.”</li>
+<li>“Understand how chunking, lazy loading, and task graphs work
+together.”</li>
+<li>“Recognise a few other Python parallelism patterns that are
+sometimes used with Zarr workflows.”</li>
 </ul></div>
 </div>
 </div>
@@ -465,15 +466,11 @@ written chunk-by-chunk, which makes it a natural fit for parallel
 work.</p>
 <p>Processing such data on a single core or in a single process can
 be:</p>
-<ul><li>
-<strong>Slow</strong> - long runtimes for even simple
-operations.</li>
-<li>
-<strong>Memory-limited</strong> - datasets or intermediate results
-may not fit into RAM.</li>
-<li>
-<strong>I/O-bound</strong> - reading and writing data dominates
-computation time, especially from disks or across networks.</li>
+<ul><li>Slow: long runtimes for even simple operations.</li>
+<li>Memory-limited: datasets or intermediate results may not fit into
+RAM.</li>
+<li>I/O-bound: reading and writing data dominates computation time,
+especially from disks or across networks.</li>
 </ul><p>Parallel processing helps when your workflow needs to:</p>
 <ul><li>read many chunks from a Zarr store,</li>
 <li>compute statistics over large spatial or temporal regions,</li>
@@ -486,17 +483,17 @@ work across those chunks.</p>
 <figure><img src="../fig/parallel_processing.png" alt="Diagram showing parallel vs serial processing." class="figure mx-auto d-block"><div class="figcaption">Parallel vs Serial processing. Source: <a href="https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html" class="external-link uri">https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html</a>
 </div>
 </figure></section><section><h2 class="section-heading" id="dask-distributed-processing-for-python">Dask: distributed processing for Python<a class="anchor" aria-label="anchor" href="#dask-distributed-processing-for-python"></a></h2>
-<hr class="half-width"><p>Dask is a Distributed processing library for Python. It enables
+<hr class="half-width"><p>Dask is a distributed processing library for Python. It enables
 parallel processing of Python code across multiple cores on the same
 computer or across multiple computers. It can be used behind the scenes
-by Xarray with minimal modification to code. JASMIN users can make use
-of a Dask gateway that allows their Dask code submitted from the Jupyter
-notebook interface to run on the LOTUS HPC cluster. Dask has two broad
-categories of features, high level data structures which behave in a
-similar way to common Python data structures but with the ability to
-perform operations in parallel and low level task scheduling to run any
-Python code in parallel.</p>
-<p>Key ideas:</p>
+by Xarray with minimal modification to code.</p>
+<p>JASMIN users can make use of a Dask gateway that allows their Dask
+code submitted from the Jupyter notebook interface to run on the HPC
+cluster. Dask has two broad categories of features: high level data
+structures which behave in a similar way to common Python data
+structures but with the ability to perform operations in parallel and
+low level task scheduling to run any Python code in parallel.</p>
+<p>The keys to understanding Dask are:</p>
 <ul><li>
 <strong>Task graph</strong>: Dask builds a graph of tasks and
 dependencies when you write code, but does not execute immediately.</li>
@@ -504,10 +501,11 @@ dependencies when you write code, but does not execute immediately.</li>
 <strong>Lazy evaluation</strong>: computations are only executed
 when you call <code>.compute()</code> or similar methods.</li>
 <li>
-<strong>Cluster</strong>: a set of workers managed by a scheduler;
-can be local (one machine) or remote (HPC cluster, Kubernetes,
+<strong>Cluster</strong>: a set of workers managed by a scheduler.
+Can be local (one machine) or remote (HPC cluster, Kubernetes,
 etc.).</li>
-</ul><p>Basic setup on a local machine:</p>
+</ul><p>To create a basic Dask cluster on your local machine, you can use the
+following code snippet:</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -527,13 +525,12 @@ threads for each worker and a limit of 2GB of memory. Displaying the
 webpage. From the Dashboard we can monitor our Dask cluster and see how
 busy it is, view a graph of task dependencies, memory usage and the
 status of the Dask workers. This can be really useful when checking if
-our Dask cluster is behaving correctly and working out how optimially
-our code is making use of Dask’s parallelism. Note that it is not
-possible (or at least not without significant additional complexity) to
-access the Dask dashboard when running on the JASMIN notebook
-service.</p>
+our Dask cluster is behaving correctly and working out how optimally our
+code is making use of Dask’s parallelism. Note that it is not possible
+(or at least not without significant additional complexity) to access
+the Dask dashboard when running on the JASMIN notebook service.</p>
 <figure><img src="../fig/dask_dashboard.png" alt="Dask dashboard showing task progress and worker status." class="figure mx-auto d-block"><div class="figcaption">Dask dashboard graph view</div>
-</figure><figure><img src="../fig/dask_status.png" alt="Dask dashboard task view" class="figure mx-auto d-block"><div class="figcaption">Dask dashboard task view</div>
+</figure><figure><img src="../fig/dask_status.png" alt="Dask dashboard showing task progress and worker status." class="figure mx-auto d-block"><div class="figcaption">Dask dashboard task view</div>
 </figure></div>
 <div class="section level3">
 <h3 id="using-the-jasmin-dask-gateway">Using the JASMIN Dask gateway<a class="anchor" aria-label="anchor" href="#using-the-jasmin-dask-gateway"></a></h3>
@@ -562,7 +559,7 @@ notebook.</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>options.worker_cores <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience'</span></span></code></pre>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'</span></span></code></pre>
 </div>
 <p>Finally we can check if we already had a cluster running and reuse
 that if we do and then get a <code>client</code> object from the cluster
@@ -582,8 +579,8 @@ that will behave the same way as the local Dask client did.</p>
 <p>Now that we have a running cluster we can allow it to adapt and scale
 up and down as we demand it. This will translate to jobs being launched
 on the JASMIN cluster itself. JASMIN allows users to spawn up to 16 jobs
-in the Dask queue, but one of these will be taken by the scheduler so
-the we can only launch a maximum of 15 workers.</p>
+in the Dask queue, but one of these will be taken by the scheduler so we
+can only launch a maximum of 15 workers.</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -597,6 +594,8 @@ finish.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>cluster.shutdown()</span></code></pre>
 </div>
+<p>With a Dask cluster running using dask_gateway you can now see the
+dashboard by clicking on the link in the <code>client</code> object.</p>
 </div>
 <div class="section level3">
 <h3 id="dask-arrays-and-lazy-computation">Dask arrays and lazy computation<a class="anchor" aria-label="anchor" href="#dask-arrays-and-lazy-computation"></a></h3>
@@ -645,7 +644,7 @@ computation and will be of the type numpy.ndarray.</p>
 <p>Important points:</p>
 <ul><li>Creating <code>x</code> and <code>y</code> defines a Dask array with
 specified chunking, but no data is computed until needed.</li>
-<li>Operations build a task graph; <code>.compute()</code> runs the
+<li>Operations build a task graph. <code>.compute()</code> runs the
 tasks.</li>
 <li>Chunking lets Dask process different blocks in parallel and only
 load chunks into memory when required.</li>
@@ -687,6 +686,8 @@ did? Try making the dataset a little larger, going much beyond
 terminal while your notebook is running, look at the CPU % when running
 the Numpy and Dask versions and compare them. Try changing the number of
 Dask threads and see what effect this has on the CPU %.</p>
+<p>To see the CPU % in a terminal you can use the command
+<code>top</code> or <code>htop</code>.</p>
 </div>
 </div>
 </div>
@@ -726,9 +727,8 @@ computing a statistic).</p>
 </div>
 </div>
 </div>
-<div class="section level3">
-<h3 id="dask-with-zarr-via-xarray">Dask with Zarr via xarray<a class="anchor" aria-label="anchor" href="#dask-with-zarr-via-xarray"></a></h3>
-<p>The most common pattern in this workshop is to open a Zarr store with
+</section><section><h2 class="section-heading" id="dask-with-zarr-via-xarray">Dask with Zarr via xarray<a class="anchor" aria-label="anchor" href="#dask-with-zarr-via-xarray"></a></h2>
+<hr class="half-width"><p>The most common pattern in this workshop is to open a Zarr store with
 xarray and ask xarray to use Dask-backed chunks. Xarray then keeps the
 data lazy until you compute something.</p>
 <p>First, create the client:</p>
@@ -761,7 +761,6 @@ to specify the chunk sizes when opening the dataset. For example:</p>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>ds <span class="op">=</span> xr.open_dataset(<span class="st">"data/ocean_temperature.nc"</span>, chunks<span class="op">=</span>{<span class="st">"time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span></code></pre>
-</div>
 </div>
 <div class="section level3">
 <h3 id="a-simple-parallel-computation">A simple parallel computation<a class="anchor" aria-label="anchor" href="#a-simple-parallel-computation"></a></h3>
@@ -808,7 +807,7 @@ datasets?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>For the Zarr dataset:</p>
 <div class="codewrapper sourceCode" id="cb17">
@@ -896,7 +895,8 @@ they depend on each other.</p>
 <p>This will create a PNG file showing the task graph for the
 computation. You can also use <code>global_mean.visualize()</code> to
 see the graph directly in a Jupyter notebook.</p>
-<div id="exercise-2---a-small-parallel-workflow" class="callout challenge">
+<figure><img src="../fig/task_graph.png" alt="Dask task graph showing the dependencies of tasks for performing calculations in a variable." class="figure mx-auto d-block"><div class="figcaption">Dask task graph</div>
+</figure><div id="exercise-2---a-small-parallel-workflow" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
@@ -937,7 +937,7 @@ in a Jupyter notebook to time the execution of a cell.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>For the original zarr dataset:</p>
 <div class="codewrapper sourceCode" id="cb21">
@@ -1012,7 +1012,7 @@ multiply by a factor and subtract an offset). For example
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>Create a Dask cluster on JASMIN using the Dask Gateway service. You
 can use the following code snippet to set up the cluster and connect to
@@ -1143,8 +1143,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-28",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

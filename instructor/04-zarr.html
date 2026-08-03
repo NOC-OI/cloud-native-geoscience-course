@@ -238,8 +238,6 @@
       <div class="accordion-body">
         <ul><li><a href="#zarr-in-context">Zarr in context</a></li>
 <li><a href="#zarr-as-a-data-model">Zarr as a data model</a></li>
-<li><a href="#zarr-v2">Zarr v2</a></li>
-<li><a href="#zarr-v3">Zarr v3</a></li>
 <li><a href="#chunked-storage-how-zarr-stores-large-arrays">Chunked storage: how Zarr stores large arrays</a></li>
 <li><a href="#why-zarr-matters-for-oceanography-climate-and-meteorology">Why Zarr matters for oceanography, climate, and meteorology</a></li>
 <li><a href="#inspect-a-zarr-store-with-python">Inspect a Zarr store with Python</a></li>
@@ -415,13 +413,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Zarr - Data Model, Metadata, and Chunked Storage</h1>
-        <p>Last updated on 2026-07-20 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/04-zarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 30 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 50 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -469,9 +467,10 @@ N-dimensional arrays in a way that works naturally with cloud object
 storage and file systems. It was originally developed in the scientific
 Python community, and has since grown into a multi-language ecosystem
 with implementations in <a href="https://zarr.readthedocs.io/en/stable/" class="external-link">Python</a>, <a href="https://zarrs.dev/" class="external-link">Rust</a>, <a href="https://github.com/JuliaIO/Zarr.jl" class="external-link">Julia</a>, <a href="https://github.com/mathworks/MATLAB-support-for-Zarr-files" class="external-link">Matlab</a>,
-<a href="https://cran.r-project.org/web/packages/zarr/index.html" class="external-link">R</a>,
-<a href="https://zarrita.dev/" class="external-link">JavaScript</a> and others. In the Zarr
-website and documentation, you can find a list of <a href="https://zarr.dev/" class="external-link">implementations</a>.</p>
+<a href="https://cran.r-project.org/web/packages/zarr/index.html" class="external-link">R
+(programing language)</a>, <a href="https://zarrita.dev/" class="external-link">JavaScript</a>
+and others. In the Zarr website and documentation, you can find a list
+of <a href="https://zarr.dev/" class="external-link">implementations</a>.</p>
 <p>For Earth and climate data, Zarr is being adopted by major providers
 (e.g. ESA’s Sentinel products and National Weather Service-USA) and
 projects such as Earth Data Hub, Pangeo, and DestinE, precisely because
@@ -501,8 +500,9 @@ file, each array is split into chunks, and each chunk can be stored and
 read separately.</p>
 <figure><img src="../fig/zarr_organisation.png" alt="Zarr organisation, showing groups and arrays with chunked storage." class="figure mx-auto d-block"><div class="figcaption">Zarr Organisation. Source: <a href="https://tutorial.xarray.dev/intermediate/intro-to-zarr.html" class="external-link uri">https://tutorial.xarray.dev/intermediate/intro-to-zarr.html</a>
 </div>
-</figure></section><section><h2 class="section-heading" id="zarr-v2">Zarr v2<a class="anchor" aria-label="anchor" href="#zarr-v2"></a></h2>
-<hr class="half-width"><p>Zarr version 2 is the older, widely used storage specification. In
+</figure><div class="section level3">
+<h3 id="zarr-v2">Zarr v2<a class="anchor" aria-label="anchor" href="#zarr-v2"></a></h3>
+<p>Zarr version 2 is the older, widely used storage specification. In
 Zarr v2, the dataset is organised as a directory-like structure with a
 few small metadata files plus folders for groups, arrays, and
 chunks.</p>
@@ -527,7 +527,8 @@ on.</li>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="ex">tree</span> <span class="at">-L</span> 2 data/ocean_temperature_v2.zarr</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="co"># This command shows the directory structure of a Zarr v2 store for an ocean temperature dataset that we have in the example data folder. You can run this command in a terminal to see the structure of the Zarr store.</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="ex">tree</span> <span class="at">-L</span> 2 data/ocean_temperature_v2.zarr</span></code></pre>
 </div>
 <div class="codewrapper">
 <h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -589,18 +590,19 @@ That makes it convenient for browsing dataset structure and
 understanding how the data are organised before any analysis begins.</p>
 <figure><img src="../fig/zarrv2.png" alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files." class="figure mx-auto d-block"><div class="figcaption">Zarr V2. Source: <a href="https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/" class="external-link uri">https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/</a>
 </div>
-</figure></section><section><h2 class="section-heading" id="zarr-v3">Zarr v3<a class="anchor" aria-label="anchor" href="#zarr-v3"></a></h2>
-<hr class="half-width"><p>Zarr version 3 is the newer core specification. It keeps the same
+</figure></div>
+<div class="section level3">
+<h3 id="zarr-v3">Zarr v3<a class="anchor" aria-label="anchor" href="#zarr-v3"></a></h3>
+<p>Zarr version 3 is the newer core specification. It keeps the same
 basic idea of chunked arrays and groups, but it updates the metadata
 structure and some of the terminology to better support modern
 scientific and cloud-native use cases.</p>
 <p>At a high level, a Zarr v3 store still contains groups, arrays, and
-chunks, but the metadata is more explicit and consolidated. The main
-difference is that Zarr v3 uses a more explicit metadata layout. Instead
-of several small hidden JSON files spread through a directory tree, Zarr
-v3 uses <code>zarr.json</code> files to describe groups and arrays. In
-the metadata itself, the terminology has changed slightly to make it
-clearer and more flexible. Some important changes from v2 to v3 are:</p>
+chunks, but the metadata is more explicit and consolidated. Instead of
+several small hidden JSON files spread through a directory tree, Zarr v3
+uses <code>zarr.json</code> files to describe groups and arrays. In the
+metadata itself, the terminology has changed slightly to make it clearer
+and more flexible. Some important changes from v2 to v3 are:</p>
 <ul><li>
 <code>dtype</code> becomes <code>data_type</code>.</li>
 <li>
@@ -617,7 +619,8 @@ more general <code>codecs</code> field.</li>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="ex">tree</span> <span class="at">-L</span> 2 data/ocean_temperature.zarr</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="co"># This command shows the directory structure of a Zarr v3 store for an ocean temperature dataset that we have in the example data folder.</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a><span class="ex">tree</span> <span class="at">-L</span> 2 data/ocean_temperature.zarr</span></code></pre>
 </div>
 <div class="codewrapper">
 <h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -681,7 +684,9 @@ the <code>sst</code> array, you can run:</p>
 <p>Zarr v3 also adds more explicit support for features such as
 sharding, where several chunks can be grouped together inside a larger
 storage object. This helps reduce the overhead of managing very large
-numbers of tiny files or keys, especially in cloud object storage.</p>
+numbers of tiny files or keys, especially in cloud object storage. We
+will talk more about sharding in later lessons.</p>
+</div>
 </section><section><h2 class="section-heading" id="chunked-storage-how-zarr-stores-large-arrays">Chunked storage: how Zarr stores large arrays<a class="anchor" aria-label="anchor" href="#chunked-storage-how-zarr-stores-large-arrays"></a></h2>
 <hr class="half-width"><p>Chunking is central to Zarr’s design. Instead of storing one very
 large array as a single block, Zarr splits it into many smaller pieces
@@ -691,19 +696,15 @@ block of the array, for example a subset in
 separately.</p>
 <p>You can think of this like cutting a very large map into tiles. If
 you only want to look at one region, you do not need to unroll the whole
-map — you only fetch the tiles you need. Zarr does the same thing for
+map. You only fetch the tiles you need. Zarr does the same thing for
 multidimensional data.</p>
 <p>For environmental data, chunking is useful because:</p>
-<ul><li>
-<strong>Selective reads</strong>: a time series at one point, one
-region, or one variable can often be read without scanning the whole
-dataset.</li>
-<li>
-<strong>Parallelism</strong>: different chunks can be processed at
-the same time by different workers.</li>
-<li>
-<strong>Compression</strong>: each chunk can be compressed
-separately, which can reduce storage costs and data transfer.</li>
+<ul><li>Selective reads: a time series at one point, one region, or one
+variable can often be read without scanning the whole dataset.</li>
+<li>Parallelism: different chunks can be processed at the same time by
+different workers.</li>
+<li>Compression: each chunk can be compressed separately, which can
+reduce storage costs and data transfer.</li>
 </ul><p>This is one reason Zarr fits cloud workflows well: object storage and
 HTTP-based access work naturally when data is organised into many
 addressable pieces rather than one large monolithic file.</p>
@@ -760,23 +761,24 @@ directly from S3/HTTPS in notebooks or applications, reading only needed
 chunks instead of downloading entire files.</li>
 <li>
 <strong>Interoperability and tooling</strong>: Zarr integrates well
-with xarray, dask, kerchunk, TileDB, Icechunk, and visualization tools
-such as browzarr and browser-based explorers, enabling rich, interactive
-workflows.</li>
+with xarray, dask, Icechunk, and visualization tools such as <a href="https://browzarr.io/latest/" class="external-link">browzarr</a> and <a href="https://noc-oi.github.io/zarr-cesium/docs/" class="external-link">zarr-cesium</a>,
+enabling rich, interactive workflows.</li>
 <li>
-<strong>Community-driven standards</strong>: the Zarr Summit
-outcomes show a strong momentum for conventions, cross-language
-conformance, sparse arrays, and linked arrays, helping climate and ocean
-communities align around robust, shared practices.</li>
+<strong>Community-driven standards</strong>: Zarr is being adopted
+by major providers and projects, and conventions are emerging to ensure
+interoperability and best practices.</li>
 </ul><p>In short, Zarr doesn’t replace scientific semantics like CF or the
-Common Data Model—it gives us a new storage and access layer that works
+Common Data Model. It gives us a new storage and access layer that works
 natively with cloud infrastructure and modern analysis tools.</p>
 </section><section><h2 class="section-heading" id="inspect-a-zarr-store-with-python">Inspect a Zarr store with Python<a class="anchor" aria-label="anchor" href="#inspect-a-zarr-store-with-python"></a></h2>
 <hr class="half-width"><p>To inspect a Zarr store, we can use the <code>zarr</code> library in
 Python. For example, in the example datasets, we have a Zarr store
 called <code>data/ocean_temperature_with_groups.zarr</code>. This zarr
 store represents a subset of the ERA5 reanalysis dataset, with sea
-surface temperature data organised into pyramid groups and arrays.</p>
+surface temperature data organised into pyramid groups and arrays. We
+will talk later about pyramids and how they are used for multiscale
+visualisation, but for now we will focus on the Zarr structure
+itself.</p>
 <p>To open this Zarr store, we can run:</p>
 <div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -824,26 +826,24 @@ access it and print its shape, chunk shape, and data type:</p>
 Python</h3>
 <div class="callout-content">
 <p>Using the Zarr store called
-<code>data/ocean_temperature_with_groups.zarr</code>, this store
-contains a hierarchical dataset with sea surface temperature data
-organised into groups and arrays.</p>
-<p>It contains several arrays, including sea surface temperature
-(<code>sst</code>), valid time, latitude, and longitude.</p>
+<code>data/ocean_temperature_with_groups.zarr</code>, please complete
+the following tasks:</p>
 <ol style="list-style-type: decimal"><li>Use the Python <code>zarr</code> library to open the store.</li>
 <li>Inspect the group hierarchy and list available arrays, groups, and
 their attributes.</li>
-<li>Check the information about the <code>sst</code> array, including
-its shape, chunk shape, and data type.</li>
+<li>Identify the dimensions, shape, and data type of the
+<code>sst</code> array.</li>
 <li>Explore the metadata files (<code>.zarray</code>,
-<code>.zgroup</code>, <code>.zattrs</code>) for one array.</li>
+<code>.zgroup</code>, <code>.zattrs</code> or <code>zarr.json</code>)
+for one array.</li>
 </ol><p>Questions:</p>
-<ul><li>How are arrays and groups organised in the store (e.g. top-level
-group, subgroups)?</li>
-<li>What chunk shape and data type does the <code>sst</code> array
-use?</li>
-<li>Which attributes (metadata) are present on the array and group?</li>
-<li>Are we opening the entire dataset into memory, or just inspecting
-the structure?</li>
+<ul><li>How is the store organised (root group, subgroups, arrays)?</li>
+<li>Which variables are stored inside each group?</li>
+<li>What are the shape and data type of the sst array?</li>
+<li>Which attributes are attached to the root group and the sst
+array?</li>
+<li>Are you loading the dataset into memory, or only inspecting its
+structure?</li>
 </ul></div>
 </div>
 </div>
@@ -861,24 +861,21 @@ the structure?</li>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> zarr</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a></span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a>store <span class="op">=</span> zarr.open_group(<span class="st">"data/ocean_temperature_with_groups.zarr"</span>, mode<span class="op">=</span><span class="st">"r"</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a><span class="bu">print</span>(store)</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a><span class="bu">print</span>(<span class="bu">list</span>(store.arrays()))  <span class="co"># List arrays</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))  <span class="co"># List groups</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a><span class="bu">print</span>(store)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a></span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a><span class="co"># Show arrays inside group "1"</span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a><span class="co"># Inspect a specific array</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a><span class="bu">print</span>(sst)</span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1" aria-label="code-block-13-15"></a><span class="bu">print</span>(sst.shape, sst.chunks, sst.dtype)</span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1" aria-label="code-block-13-16"></a></span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1" aria-label="code-block-13-17"></a><span class="co"># Access attributes</span></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1" aria-label="code-block-13-18"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a><span class="bu">print</span>(sst.shape)</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a><span class="bu">print</span>(sst.dtype)</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a><span class="bu">print</span>(<span class="bu">dict</span>(store.attrs))</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
 </div>
-<p>Code to list the files and to see the content of the metadata
-files:</p>
+<p>Code to list the files and to see the content of the metadata files
+(as this is a Zarr v3 store, the metadata files are
+<code>zarr.json</code>):</p>
 <div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -893,40 +890,31 @@ example, the root group does not contain any arrays directly:</p>
 </h3>
 <pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="ex">ocean_temperature_with_groups.zarr</span></span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a><span class="ex">├──</span> 0/</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a><span class="ex">└──</span> 1/</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a><span class="ex">├──</span> sst</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a><span class="ex">├──</span> valid_time</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a><span class="ex">├──</span> latitude</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a><span class="ex">├──</span> longitude</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a><span class="ex">├──</span> spatial_ref</span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a><span class="ex">└──</span> number</span></code></pre>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>    <span class="ex">├──</span> sst</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>    <span class="ex">├──</span> valid_time</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>    <span class="ex">├──</span> latitude</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    <span class="ex">├──</span> longitude</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>    <span class="ex">├──</span> spatial_ref</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a>    <span class="ex">├──</span> number</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a>    <span class="ex">└──</span> zarr.json</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a><span class="ex">├──</span> 1/</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a>    <span class="ex">└──</span> ...</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1" aria-label="code-block-15-12"></a><span class="ex">└──</span> zarr.json</span></code></pre>
 </div>
 <p>The root <code>Group</code> contains two child groups (<code>0</code>
-and <code>1</code>). The <code>sst</code> variable is stored inside
-group <code>1</code>, together with its coordinate arrays
-(<code>valid_time</code>, <code>latitude</code>, and
-<code>longitude</code>) and additional metadata arrays.</p>
-<p>The <code>sst</code> array has:</p>
-<ul><li>
-<p>Shape: <code>(10, 360, 720)</code></p>
+and <code>1</code>). The <code>sst</code> variable is stored inside each
+group <code>1</code>. The <code>sst</code> array has:</p>
+<ul><li>Shape: <code>(10, 360, 720)</code>
 <ul><li>10 time steps</li>
 <li>360 latitude points</li>
 <li>720 longitude points</li>
 </ul></li>
-<li><p>Chunk shape: <code>(1, 360, 360)</code></p></li>
-<li><p>Data type: <code>float32</code></p></li>
-</ul><p>The chunking strategy stores one time step per chunk while splitting
-the longitude dimension into smaller spatial tiles. This allows
-efficient access when reading individual time slices or spatial
-subsets.</p>
-<p>The array attributes contain metadata inherited from the original
+<li>Data type: <code>float32</code>
+</li>
+</ul><p>The array attributes contain metadata inherited from the original
 GRIB dataset and CF-style information, including <code>long_name</code>
 -&gt; <code>"Sea surface temperature"</code>, for example.</p>
-<p>These attributes demonstrate how Zarr separates the data storage
-structure (groups, arrays, chunks) from the metadata description. This
-enables flexible storage of scientific datasets while preserving
-information required for interpretation and analysis.</p>
-<p>We are not loading the entire dataset into memory; we are only
+<p>We are not loading the entire dataset into memory. We are only
 inspecting the structure and metadata. The actual data is read from disk
 or object storage only when we explicitly request it (e.g., by slicing
 the array). This lazy loading is a key feature of Zarr and xarray,
@@ -944,22 +932,16 @@ allowing efficient handling of large datasets.</p>
 <h3 class="callout-title">Exercise 2 - Thinking about chunked
 storage</h3>
 <div class="callout-content">
-<p>Using the same Zarr dataset, answer these conceptual questions:</p>
-<ol style="list-style-type: decimal"><li>Your array has dimensions
-<code>(valid_time, latitude, longitude)</code> and a chunk shape
-<code>(10, 100, 100)</code>, what does each chunk represent in terms of
-space and time?</li>
-<li>How might different chunk shapes (e.g. more time vs. more space in
-each chunk) affect typical operations, such as:
-<ul><li>Reading a time series at one grid point.</li>
-<li>Computing a spatial mean for each time step.</li>
+<p>Using the same Zarr dataset:</p>
+<ol style="list-style-type: decimal"><li>Inspect the chunk shape of the <code>sst</code> array.</li>
+<li>Explain what one chunk represents in terms of time and space.</li>
+<li>Consider how this chunking would affect:
+<ul><li>reading a time series at one location;</li>
+<li>computing a spatial mean for each time step.</li>
 </ul></li>
-<li>Imagine you are designing a Zarr layout for a high‑resolution global
-reanalysis. What types of operations would you prioritise when choosing
-chunk shapes?</li>
-</ol><p>You do not need to change any code. Focus on reasoning about chunks
-and operations.</p>
-</div>
+<li>If you were storing a high-resolution global reanalysis, what
+workloads would you optimise for when choosing chunk shapes?</li>
+</ol></div>
 </div>
 </div>
 <div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
@@ -969,11 +951,18 @@ and operations.</p>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
+<p>To explore the chunk shape of the <code>sst</code> array, you can
+run:</p>
+<div class="codewrapper sourceCode" id="cb16">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="bu">print</span>(sst.chunks)</span></code></pre>
+</div>
 <p>A chunk shape such as <code>(10, 100, 100)</code> represents 10 time
 steps over a 100×100 spatial block. Chunk shapes that are “tall in time”
 can be efficient for time series at specific locations, while chunk
 shapes that cover larger spatial regions may be better for spatial
-aggregates; in practice, chunk shapes are a compromise based on dominant
+aggregates. In practice, chunk shapes are a compromise based on dominant
 workloads. This exercise prepares you to think critically about chunking
 decisions, sharding (you will see later what this means), and
 performance optimisation covered in later lessons (e.g. on cloud-native
@@ -981,6 +970,29 @@ formats, Zarr V3 features, and tools like Icechunk and
 Virtualizarr).</p>
 </div>
 </div>
+</div>
+</div>
+<div id="keypoints1" class="callout keypoints">
+<div class="callout-square">
+<i class="callout-icon" data-feather="key"></i>
+</div>
+<span class="callout-header">Key Points</span>
+<div class="callout-inner">
+<div class="callout-content">
+<ul><li>“Zarr organises data into groups and arrays stored as addressable
+chunks, which supports efficient partial reads and writes.”</li>
+<li>“Metadata in Zarr describes array structure, chunking, and
+attributes, and can be extended through shared conventions for
+geoscience workflows.”</li>
+<li>“Chunked storage is central to Zarr performance because it lets
+tools read only the pieces needed for a given query or
+computation.”</li>
+<li>“Inspecting a Zarr store with Python and xarray helps distinguish
+cheap metadata exploration from actual data loading.”</li>
+<li>“Understanding data model, metadata, and chunk layout is the
+foundation for later lessons on rechunking, parallel processing, and
+cloud-native analysis.”</li>
+</ul></div>
 </div>
 </div>
 <!--
@@ -1047,8 +1059,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-zarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-zarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-20",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

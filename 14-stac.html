@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">82%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 83%" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">83%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -412,7 +412,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Zarr Data Organization in the Cloud with STAC</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/14-stac.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -469,31 +469,33 @@ search. See the spec overview at:</p>
 </li>
 </ul><p>The core STAC objects are:</p>
 <ul><li>
-<strong>Catalog</strong> - provides a simple, hierarchical structure
+<strong>Catalog</strong>: provides a simple, hierarchical structure
 of links that group Items (and other Catalogs/Collections) for
 browsing.</li>
 <li>
-<strong>Collection</strong> - extends Catalog with additional
+<strong>Collection</strong>: extends Catalog with additional
 metadata (spatial/temporal extent, license, keywords, providers) for a
 coherent group of Items.</li>
 <li>
-<strong>Item</strong> - describes a single spatiotemporal asset
+<strong>Item</strong>: describes a single spatiotemporal asset
 (e.g. one satellite scene, one product, or one Zarr datacube at a given
 extent/time).</li>
 </ul><p>The actual data files (e.g. Zarr stores, NetCDF files, Cloud
-Optimized GeoTIFFs) are referenced as <strong>assets</strong> in the
-Item. Each asset has a URL (or S3 path), media type, and optional roles
-(e.g. “data”, “thumbnail”, “metadata”).</p>
-<p>For cloud‑native workflows, STAC is important because:</p>
+Optimized GeoTIFFs) are referenced as <code>assets</code> in the Item.
+Each asset has a URL (or Object Store path), media type, and optional
+roles (e.g. “data”, “thumbnail”, “metadata”).</p>
+<figure><img src="fig/stac_organisation.png" alt="STAC organisation diagram showing Catalog, Collection, Item, and Asset relationships." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/" class="external-link uri">https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/</a>
+</div>
+</figure><p>For cloud‑native workflows, STAC is important because:</p>
 <ul><li>It standardises how we describe and organise datasets (including
 Zarr) so that tools and portals can discover them without custom code
 for each provider.</li>
-<li>It works equally well as <strong>static JSON files in object
-storage</strong> or as <strong>dynamic APIs backed by
-databases</strong>, making it flexible for different scales and
-infrastructures.</li>
-<li>Many ecosystem tools (STAC Browser, PySTAC, STAC API servers,
-pgSTAC) already understand STAC, so using STAC makes our Zarr data
+<li>It works equally well as static JSON files in object storage or as
+dynamic APIs backed by databases, making it flexible for different
+scales and infrastructures.</li>
+<li>Many ecosystem tools (<a href="https://github.com/radiantearth/stac-browser" class="external-link">STAC Browser</a>, <a href="https://pystac.readthedocs.io/en/latest/" class="external-link">PySTAC</a>, STAC API
+servers, <a href="https://github.com/stac-utils/pgstac" class="external-link">pgSTAC</a>)
+already understand STAC, so using STAC makes our Zarr data
 “plug‑and‑play” in that ecosystem.</li>
 </ul><div class="section level3">
 <h3 id="stac-catalog">STAC Catalog<a class="anchor" aria-label="anchor" href="#stac-catalog"></a></h3>
@@ -503,25 +505,27 @@ Collections, and Items:</p>
 <h3 class="code-label">JSON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode json" tabindex="0"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="fu">{</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.0.0"</span><span class="fu">,</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.1.0"</span><span class="fu">,</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>  <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Catalog"</span><span class="fu">,</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"root-catalog"</span><span class="fu">,</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>  <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Root catalog for our cloud-native Zarr data"</span><span class="fu">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>    <span class="fu">{</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a>      <span class="dt">"rel"</span><span class="fu">:</span> <span class="st">"child"</span><span class="fu">,</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"collections/era5-collection.json"</span><span class="fu">,</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/json"</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1" aria-label="code-block-1-11"></a>    <span class="fu">}</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1" aria-label="code-block-1-12"></a>  <span class="ot">]</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1" aria-label="code-block-1-13"></a><span class="fu">}</span></span></code></pre>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>  <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"ERA5 Zarr Data Catalog"</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>  <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Root catalog for our cloud-native Zarr data"</span><span class="fu">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a>    <span class="fu">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a>      <span class="dt">"rel"</span><span class="fu">:</span> <span class="st">"child"</span><span class="fu">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"./era5-zarr/collection.json"</span><span class="fu">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1" aria-label="code-block-1-11"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/json"</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1" aria-label="code-block-1-12"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1" aria-label="code-block-1-13"></a>    <span class="er">/*</span> <span class="er">...</span> <span class="er">*/</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1" aria-label="code-block-1-14"></a>  <span class="ot">]</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1" aria-label="code-block-1-15"></a><span class="fu">}</span></span></code></pre>
 </div>
-<p>The Catalog:</p>
-<ul><li>Acts as an entry point.</li>
-<li>Organises content hierarchically via <code>links</code> with
-<code>rel</code> values like <code>child</code>, <code>item</code>,
-<code>collection</code>.</li>
-</ul><p>Catalog spec: <a href="https://github.com/radiantearth/stac-spec/tree/master/catalog-spec" class="external-link uri">https://github.com/radiantearth/stac-spec/tree/master/catalog-spec</a></p>
+<p>The Catalog acts as a top-level entry point for browsing and
+searching the dataset hierarchy. It can link to other Catalogs,
+Collections, or Items via <code>links</code> with <code>rel</code>
+values like <code>child</code>, <code>item</code>, or
+<code>collection</code>. More details on the <a href="https://github.com/radiantearth/stac-spec/tree/master/catalog-spec" class="external-link">Catalog
+spec</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="stac-collection">STAC Collection<a class="anchor" aria-label="anchor" href="#stac-collection"></a></h3>
@@ -531,7 +535,7 @@ coherent group of Items:</p>
 <h3 class="code-label">JSON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode json" tabindex="0"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="fu">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.0.0"</span><span class="fu">,</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.1.0"</span><span class="fu">,</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>  <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Collection"</span><span class="fu">,</span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"era5-zarr"</span><span class="fu">,</span></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>  <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"ERA5 surface Zarr datacubes"</span><span class="fu">,</span></span>
@@ -540,68 +544,73 @@ coherent group of Items:</p>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a>    <span class="dt">"spatial"</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">"bbox"</span><span class="fu">:</span> <span class="ot">[[</span><span class="dv">-180</span><span class="ot">,</span> <span class="dv">-90</span><span class="ot">,</span> <span class="dv">180</span><span class="ot">,</span> <span class="dv">90</span><span class="ot">]]</span> <span class="fu">},</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a>    <span class="dt">"temporal"</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">"interval"</span><span class="fu">:</span> <span class="ot">[[</span><span class="st">"1950-01-01T00:00:00Z"</span><span class="ot">,</span> <span class="kw">null</span><span class="ot">]]</span> <span class="fu">}</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a>  <span class="fu">},</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a>    <span class="fu">{</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a>      <span class="dt">"rel"</span><span class="fu">:</span> <span class="st">"item"</span><span class="fu">,</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"../items/era5-zarr-2020.json"</span><span class="fu">,</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1" aria-label="code-block-2-15"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/json"</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1" aria-label="code-block-2-16"></a>    <span class="fu">}</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1" aria-label="code-block-2-17"></a>  <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1" aria-label="code-block-2-18"></a>  <span class="dt">"summaries"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1" aria-label="code-block-2-19"></a>    <span class="dt">"platform"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"ERA5"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1" aria-label="code-block-2-20"></a>    <span class="dt">"keywords"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"reanalysis"</span><span class="ot">,</span> <span class="st">"atmosphere"</span><span class="ot">,</span> <span class="st">"zarr"</span><span class="ot">]</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1" aria-label="code-block-2-21"></a>  <span class="fu">}</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1" aria-label="code-block-2-22"></a><span class="fu">}</span></span></code></pre>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a>  <span class="dt">"keywords"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"reanalysis"</span><span class="ot">,</span> <span class="st">"atmosphere"</span><span class="ot">,</span> <span class="st">"zarr"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1" aria-label="code-block-2-13"></a>    <span class="fu">{</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1" aria-label="code-block-2-14"></a>      <span class="dt">"rel"</span><span class="fu">:</span> <span class="st">"parent"</span><span class="fu">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1" aria-label="code-block-2-15"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"../catalog.json"</span><span class="fu">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1" aria-label="code-block-2-16"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/json"</span><span class="fu">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1" aria-label="code-block-2-17"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"ERA5 Zarr Data Catalog"</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1" aria-label="code-block-2-18"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1" aria-label="code-block-2-19"></a>    <span class="fu">{</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1" aria-label="code-block-2-20"></a>      <span class="dt">"rel"</span><span class="fu">:</span> <span class="st">"item"</span><span class="fu">,</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1" aria-label="code-block-2-21"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"../items/era5-zarr-2020.json"</span><span class="fu">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1" aria-label="code-block-2-22"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/geo+json"</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1" aria-label="code-block-2-23"></a>    <span class="fu">}</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1" aria-label="code-block-2-24"></a>  <span class="ot">]</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1" aria-label="code-block-2-25"></a><span class="fu">}</span></span></code></pre>
 </div>
-<p>Here:</p>
-<ul><li>
-<code>extent</code> gives spatial and temporal coverage.</li>
-<li>
-<code>summaries</code> can list common attributes across Items
-(e.g. platforms, variables).</li>
-</ul><p>Collection spec: <a href="https://github.com/radiantearth/stac-spec/tree/master/collection-spec" class="external-link uri">https://github.com/radiantearth/stac-spec/tree/master/collection-spec</a></p>
+<p>Here, <code>extent</code> describes the spatial and temporal coverage
+of the collection, <code>license</code> indicates usage rights, and
+<code>keywords</code> help with discovery. The <code>links</code>
+section connects to parent Catalogs and child Items. More details and
+the full list of fields are available on the <a href="https://github.com/radiantearth/stac-spec/tree/master/collection-spec" class="external-link">Collection
+spec</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="stac-item">STAC Item<a class="anchor" aria-label="anchor" href="#stac-item"></a></h3>
-<p>A STAC Item is the smallest unit in STAC - an atomic bundle of
-inseparable metadata and assets, representing data at a specific place
-and time. It is a GeoJSON Feature with additional STAC fields:</p>
+<p>A STAC Item is the smallest unit in STAC, an atomic bundle of
+inseparable metadata and assets. It represents the data at a specific
+place and time. It is a GeoJSON Feature with additional STAC fields:</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">JSON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode json" tabindex="0"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="fu">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.0.0"</span><span class="fu">,</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>  <span class="dt">"stac_version"</span><span class="fu">:</span> <span class="st">"1.1.0"</span><span class="fu">,</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>  <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Feature"</span><span class="fu">,</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"example-item"</span><span class="fu">,</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>  <span class="dt">"bbox"</span><span class="fu">:</span> <span class="ot">[</span><span class="fl">5.5</span><span class="ot">,</span> <span class="fl">46.0</span><span class="ot">,</span> <span class="fl">8.0</span><span class="ot">,</span> <span class="fl">47.4</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a>  <span class="dt">"geometry"</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Polygon"</span><span class="fu">,</span> <span class="dt">"coordinates"</span><span class="fu">:</span> <span class="ot">[</span><span class="er">/*</span> <span class="er">...</span> <span class="er">*/</span><span class="ot">]</span> <span class="fu">},</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a>  <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a>    <span class="dt">"datetime"</span><span class="fu">:</span> <span class="st">"2020-12-11T22:38:32Z"</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1" aria-label="code-block-3-9"></a>  <span class="fu">},</span></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1" aria-label="code-block-3-10"></a>  <span class="dt">"collection"</span><span class="fu">:</span> <span class="st">"example-collection"</span><span class="fu">,</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1" aria-label="code-block-3-11"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1" aria-label="code-block-3-12"></a>  <span class="dt">"assets"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1" aria-label="code-block-3-13"></a>    <span class="dt">"data"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1" aria-label="code-block-3-14"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"s3://my-bucket/path/to/data.zarr"</span><span class="fu">,</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1" aria-label="code-block-3-15"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"application/vnd+zarr"</span><span class="fu">,</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1" aria-label="code-block-3-16"></a>      <span class="dt">"roles"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"data"</span><span class="ot">]</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1" aria-label="code-block-3-17"></a>    <span class="fu">}</span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1" aria-label="code-block-3-18"></a>  <span class="fu">}</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1" aria-label="code-block-3-19"></a><span class="fu">}</span></span></code></pre>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="st">"era5-zarr-2020"</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>  <span class="dt">"bbox"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a>    <span class="dv">0</span><span class="ot">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a>    <span class="dv">-90</span><span class="ot">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a>    <span class="dv">360</span><span class="ot">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1" aria-label="code-block-3-9"></a>    <span class="dv">90</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1" aria-label="code-block-3-10"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1" aria-label="code-block-3-11"></a>  <span class="dt">"geometry"</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Polygon"</span><span class="fu">,</span> <span class="dt">"coordinates"</span><span class="fu">:</span> <span class="ot">[</span><span class="er">/*</span> <span class="er">...</span> <span class="er">*/</span><span class="ot">]</span> <span class="fu">},</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1" aria-label="code-block-3-12"></a>  <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1" aria-label="code-block-3-13"></a>    <span class="dt">"start_datetime"</span><span class="fu">:</span> <span class="st">"2020-01-01T00:00:00Z"</span><span class="fu">,</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1" aria-label="code-block-3-14"></a>    <span class="dt">"end_datetime"</span><span class="fu">:</span> <span class="st">"2020-12-31T23:59:59Z"</span><span class="fu">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1" aria-label="code-block-3-15"></a>  <span class="fu">},</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1" aria-label="code-block-3-16"></a>  <span class="dt">"collection"</span><span class="fu">:</span> <span class="st">"era5-zarr"</span><span class="fu">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1" aria-label="code-block-3-17"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1" aria-label="code-block-3-18"></a>  <span class="dt">"assets"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1" aria-label="code-block-3-19"></a>    <span class="dt">"data"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1" aria-label="code-block-3-20"></a>      <span class="dt">"href"</span><span class="fu">:</span> <span class="st">"s3://my-bucket/path/to/data.zarr"</span><span class="fu">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1" aria-label="code-block-3-21"></a>      <span class="dt">"media_type"</span><span class="fu">:</span> <span class="st">"application/vnd+zarr"</span><span class="fu">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1" aria-label="code-block-3-22"></a>    <span class="fu">}</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1" aria-label="code-block-3-23"></a>  <span class="fu">}</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1" aria-label="code-block-3-24"></a><span class="fu">}</span></span></code></pre>
 </div>
-<p>Key points:</p>
-<ul><li>It is a GeoJSON Feature with additional STAC fields
-(<code>stac_version</code>, <code>assets</code>, <code>links</code>,
-etc.).</li>
-<li>
-<code>assets</code> is where we point to actual data files - here a
-Zarr store in object storage.</li>
-</ul><p>See the Item spec for more details: <a href="https://github.com/radiantearth/stac-spec/tree/master/item-spec" class="external-link uri">https://github.com/radiantearth/stac-spec/tree/master/item-spec</a></p>
+<p>An Item has a <code>geometry</code> and <code>bbox</code> for spatial
+coverage, <code>properties</code> for temporal coverage and other
+metadata, and an <code>assets</code> dictionary that points to the
+actual data files (e.g. Zarr or Icechunk store in object storage). See
+the <a href="https://github.com/radiantearth/stac-spec/tree/master/item-spec" class="external-link">Item
+spec</a> for more details.</p>
 </div>
 </section><section><h2 class="section-heading" id="stac-and-cloud-native-zarr-workflows">STAC and cloud-native Zarr workflows<a class="anchor" aria-label="anchor" href="#stac-and-cloud-native-zarr-workflows"></a></h2>
 <hr class="half-width"><p>For Zarr datasets in object storage:</p>
-<ul><li>Each Zarr <strong>store</strong> is typically referenced as an
-<strong>asset</strong> in a STAC Item pointing to the store’s root
+<ul><li>Each Zarr store is typically referenced as an <strong>asset</strong>
+in a STAC Item pointing to the store’s root
 (e.g. <code>s3://bucket/path.zarr</code>).</li>
 <li>Collections can group multiple Zarr stores that share a product
 (e.g. “ERA5 surface daily Zarr cubes” or “CMIP6 model X Zarr
@@ -609,118 +618,206 @@ outputs”).</li>
 <li>Catalogs provide top-level organisation (e.g. per provider, per
 project).</li>
 </ul><p>Benefits for cloud-native workflows:</p>
-<ul><li>STAC makes Zarr datasets <strong>discoverable</strong> by
-spatial/temporal criteria and keywords, rather than “hidden” as raw
-paths in buckets.</li>
-<li>Tools like <strong>STAC Browser</strong> can display and search your
-STAC catalog or API, making Zarr assets visible in a generic UI: <a href="https://github.com/radiantearth/stac-browser" class="external-link uri">https://github.com/radiantearth/stac-browser</a>
-</li>
+<ul><li>STAC makes Zarr datasets “discoverable” by spatial/temporal criteria
+and keywords, rather than “hidden” as raw paths in buckets.</li>
+<li>Tools like <a href="https://github.com/radiantearth/stac-browser" class="external-link">STAC Browser</a> can
+display and search your STAC catalog or API, making Zarr assets visible
+in a generic UI.</li>
 <li>STAC API servers backed by databases (e.g. pgSTAC/PgPystac) can
-support fast, scalable search over many Zarr datasets. See STAC API and
-pgSTAC docs (e.g. <a href="https://github.com/stac-utils/pgstac" class="external-link uri">https://github.com/stac-utils/pgstac</a>).</li>
-</ul></section><section><h2 class="section-heading" id="pystac-basics-creating-catalogs-collections-and-items">PySTAC basics: creating Catalogs, Collections, and Items<a class="anchor" aria-label="anchor" href="#pystac-basics-creating-catalogs-collections-and-items"></a></h2>
+support fast, scalable search over many Zarr datasets. More information
+on <a href="https://github.com/radiantearth/stac-api-spec" class="external-link">STAC API</a>
+and <a href="https://github.com/stac-utils/pgstac" class="external-link">pgSTAC</a>
+documentation.</li>
+</ul><div class="section level3">
+<h3 id="examples-of-stac-zarr-in-the-wild">Examples of STAC + Zarr in the wild<a class="anchor" aria-label="anchor" href="#examples-of-stac-zarr-in-the-wild"></a></h3>
+<p>STAC is already being used to organise and publish Zarr datasets in
+operational and research settings. A few good examples are:</p>
+<ul><li>
+<a href="https://noc-msm.github.io/OceanDataStore/catalog/" class="external-link"><strong>NOC
+STAC Catalog</strong></a>: The NOC Ocean Data Store publishes
+oceanographic Zarr datasets as STAC Collections and Items, making them
+discoverable and accessible via a web interface.</li>
+<li>
+<a href="https://api.explorer.eopf.copernicus.eu/browser" class="external-link"><strong>EOPF
+Sentinel Explorer</strong></a>: The catalog exposes Sentinel Zarr
+samples as STAC Collections and Items, and you can inspect individual
+datasets directly in the browser. This is the link for the <a href="https://api.explorer.eopf.copernicus.eu/stac/api.html" class="external-link">STAC
+API</a>.</li>
+<li>
+<a href="https://browser.moregeo.it/external/planetarycomputer.microsoft.com/api/stac/v1/" class="external-link"><strong>Microsoft
+Planetary Computer</strong></a>: Searchable spatiotemporal metadata
+describing Earth science datasets hosted by the Microsoft Planetary
+Computer. This is the link for the <a href="https://planetarycomputer.microsoft.com/api/stac/v1/docs" class="external-link">STAC
+API</a>.</li>
+</ul><p>These examples all follow the same idea: STAC describes the dataset,
+while the Zarr store remains the actual data asset. That makes the data
+easier to search, browse, and share without inventing a custom metadata
+format for each project</p>
+</div>
+</section><section><h2 class="section-heading" id="pystac-basics-creating-catalogs-collections-and-items">PySTAC basics: creating Catalogs, Collections, and Items<a class="anchor" aria-label="anchor" href="#pystac-basics-creating-catalogs-collections-and-items"></a></h2>
 <hr class="half-width"><p><a href="https://pystac.readthedocs.io/en/latest/" class="external-link">PySTAC</a> is a
 Python library for working with STAC objects in code, mirroring the JSON
-structure.<a href="https://pystac.readthedocs.io/en/latest/quickstart.html" class="external-link">https://pystac.readthedocs.io/en/latest/quickstart.html</a></p>
+structure. You can create Catalogs, Collections, and Items
+programmatically, add metadata and assets, and save them as JSON files
+or feed them into a STAC API.</p>
 <div class="section level3">
 <h3 id="create-a-catalog">Create a catalog<a class="anchor" aria-label="anchor" href="#create-a-catalog"></a></h3>
+<p>In this example, we will use the Zarr dataset created in the <a href="./10-conversion-workflow.html">NetCDF to Zarr conversion
+lesson</a>. The original data is a subset of the ERA5 reanalysis
+(<code>data/daily_swh/*.nc</code>) containing the significant wave
+height (<code>swh</code>) variable. Instead of converting the NetCDF
+files again, we will use the Zarr dataset that has already been
+generated and uploaded to the object store.</p>
+<p>The first step is to create a root <code>Catalog</code>. A Catalog is
+the top-level entry point of a STAC hierarchy and can contain one or
+more Collections.</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">import</span> pystac</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>catalog <span class="op">=</span> pystac.Catalog(</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"root-catalog"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>    description<span class="op">=</span><span class="st">"Root catalog for our cloud-native Zarr data"</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"Era5-Catalog"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>    description<span class="op">=</span><span class="st">"Root catalog for ERA5 datasets"</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1" aria-label="code-block-4-6"></a>)</span></code></pre>
 </div>
+<p>In this example, the Catalog represents all variables available from
+the ERA5 reanalysis. You can add Collections (or other Catalogs) to it
+using <code>add_child()</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="create-a-collection">Create a collection<a class="anchor" aria-label="anchor" href="#create-a-collection"></a></h3>
+<p>A STAC Collection groups related Items and describes their shared
+metadata, such as their spatial and temporal extent, license, and
+description.</p>
+<p>Here, we will create a Collection for the significant wave height
+(<code>swh</code>) dataset. To define its spatial and temporal extent,
+we first open the Zarr dataset and extract its bounding box and time
+range.</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>extent <span class="op">=</span> pystac.Extent(</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>    spatial<span class="op">=</span>pystac.SpatialExtent(bboxes<span class="op">=</span>[[<span class="op">-</span><span class="dv">180</span>, <span class="op">-</span><span class="dv">90</span>, <span class="dv">180</span>, <span class="dv">90</span>]]),</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a>    temporal<span class="op">=</span>pystac.TemporalExtent(intervals<span class="op">=</span>[[datetime(<span class="dv">1950</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="va">None</span>]])</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>)</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a>collection <span class="op">=</span> pystac.Collection(</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"era5-zarr"</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a>    description<span class="op">=</span><span class="st">"ERA5 surface Zarr datacubes"</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1" aria-label="code-block-5-11"></a>    extent<span class="op">=</span>extent,</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1" aria-label="code-block-5-12"></a>    license<span class="op">=</span><span class="st">"CC-BY-4.0"</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1" aria-label="code-block-5-13"></a>)</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1" aria-label="code-block-5-14"></a>catalog.add_child(collection)</span></code></pre>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/daily_swh"</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>ds <span class="op">=</span> xr.open_zarr(url, consolidated<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="co"># Get spatial extent (bounding box)</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>lon_min, lon_max <span class="op">=</span> <span class="bu">float</span>(ds.longitude.<span class="bu">min</span>()), <span class="bu">float</span>(ds.longitude.<span class="bu">max</span>())</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>lat_min, lat_max <span class="op">=</span> <span class="bu">float</span>(ds.latitude.<span class="bu">min</span>()), <span class="bu">float</span>(ds.latitude.<span class="bu">max</span>())</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a><span class="co"># Get temporal extent (start and end time)</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>time_min, time_max <span class="op">=</span> ds.time.<span class="bu">min</span>().values, ds.time.<span class="bu">max</span>().values</span></code></pre>
+</div>
+<p>For this tutorial, we will define the Collection as covering the
+years 2000–2026, even though the example dataset represents only a
+subset of that period.</p>
+<div class="codewrapper sourceCode" id="cb6">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>extent <span class="op">=</span> pystac.Extent(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>    spatial<span class="op">=</span>pystac.SpatialExtent(bboxes<span class="op">=</span>[[lon_min, lat_min, lon_max, lat_max]]),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>    temporal<span class="op">=</span>pystac.TemporalExtent(intervals<span class="op">=</span>[[datetime(<span class="dv">2000</span>, <span class="dv">1</span>, <span class="dv">1</span>), datetime(<span class="dv">2026</span>, <span class="dv">12</span>, <span class="dv">31</span>)]])</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a>collection <span class="op">=</span> pystac.Collection(</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"era5-zarr-swh"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a>    description<span class="op">=</span><span class="st">"ERA5 surface Zarr datacubes for significant wave height (swh)"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>    extent<span class="op">=</span>extent,</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>    license<span class="op">=</span><span class="st">"CC-BY-4.0"</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>)</span></code></pre>
+</div>
+<p>Add the Collection to the Catalog:</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>catalog.add_child(collection)</span></code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="create-an-item-pointing-to-a-zarr-store">Create an item pointing to a Zarr store<a class="anchor" aria-label="anchor" href="#create-an-item-pointing-to-a-zarr-store"></a></h3>
-<p>Assume you have a Zarr dataset from the conversion lesson, stored at
-<code>s3://my-bucket/converted.zarr</code> or
-<code>data/converted.zarr</code> on disk.</p>
-<div class="codewrapper sourceCode" id="cb6">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> box</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>bbox <span class="op">=</span> [<span class="op">-</span><span class="fl">180.0</span>, <span class="op">-</span><span class="fl">90.0</span>, <span class="fl">180.0</span>, <span class="fl">90.0</span>]</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>geom <span class="op">=</span> box(<span class="op">*</span>bbox).__geo_interface__</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>item <span class="op">=</span> pystac.Item(</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"era5-zarr-2020"</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a>    geometry<span class="op">=</span>geom,</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a>    bbox<span class="op">=</span>bbox,</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>    datetime<span class="op">=</span>datetime(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a>    properties<span class="op">=</span>{</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>        <span class="st">"title"</span>: <span class="st">"ERA5 surface Zarr datacube for 2020"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>        <span class="st">"source_format"</span>: <span class="st">"NetCDF → Zarr"</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>    }</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>)</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a><span class="co"># Add a Zarr asset</span></span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1" aria-label="code-block-6-18"></a>item.add_asset(</span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1" aria-label="code-block-6-19"></a>    <span class="st">"zarr-data"</span>,</span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1" aria-label="code-block-6-20"></a>    pystac.Asset(</span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1" aria-label="code-block-6-21"></a>        href<span class="op">=</span><span class="st">"s3://my-bucket/converted.zarr"</span>,  <span class="co"># or a local path</span></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1" aria-label="code-block-6-22"></a>        media_type<span class="op">=</span><span class="st">"application/vnd+zarr"</span>,</span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1" aria-label="code-block-6-23"></a>        roles<span class="op">=</span>[<span class="st">"data"</span>]</span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1" aria-label="code-block-6-24"></a>    )</span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1" aria-label="code-block-6-25"></a>)</span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1" aria-label="code-block-6-26"></a></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1" aria-label="code-block-6-27"></a>collection.add_item(item)</span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="save-as-a-static-catalog-json-files">Save as a static catalog (JSON files)<a class="anchor" aria-label="anchor" href="#save-as-a-static-catalog-json-files"></a></h3>
-<div class="codewrapper sourceCode" id="cb7">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>catalog.normalize_hrefs(<span class="st">"stac"</span>)  <span class="co"># write into ./stac directory</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a>catalog.save()</span></code></pre>
-</div>
-<p>This will create <code>catalog.json</code>,
-<code>collections/era5-zarr.json</code>, and
-<code>items/era5-zarr-2020.json</code> in the <code>stac/</code>
-directory. See the PySTAC quickstart for more details: <a href="https://pystac.readthedocs.io/en/latest/quickstart.html" class="external-link uri">https://pystac.readthedocs.io/en/latest/quickstart.html</a>.</p>
-</div>
-<div class="section level3">
-<h3 id="upload-the-catalog-to-object-storage">Upload the catalog to object storage<a class="anchor" aria-label="anchor" href="#upload-the-catalog-to-object-storage"></a></h3>
-<p>To upload the files, you can use <code>boto3</code> commands in
-python:</p>
+<p>An Item represents a single dataset within a Collection. It contains
+metadata describing the dataset, including its spatial footprint,
+temporal coverage, and one or more Assets that point to the data
+itself.</p>
+<p>We will create an Item representing the Zarr dataset. Its geometry
+and bounding box come from the dataset coordinates, while its temporal
+coverage is taken from the first and last timestamps.</p>
 <div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">import</span> boto3</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>s3 <span class="op">=</span> boto3.client(<span class="st">'s3'</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a><span class="cf">for</span> root, dirs, files <span class="kw">in</span> os.walk(<span class="st">"stac"</span>):</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>    <span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> files:</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>        local_path <span class="op">=</span> os.path.join(root, <span class="bu">file</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a>        s3_path <span class="op">=</span> os.path.relpath(local_path, <span class="st">"stac"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>        s3.upload_file(local_path, <span class="st">"my-bucket"</span>, <span class="ss">f"stac/</span><span class="sc">{</span>s3_path<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> box</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>bbox <span class="op">=</span> [lon_min, lat_min, lon_max, lat_max]</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>geom <span class="op">=</span> box(<span class="op">*</span>bbox).__geo_interface__</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a><span class="co"># Convert time to datetime objects</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>start_datetime <span class="op">=</span> pd.Timestamp(time_min).to_pydatetime()</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>end_datetime <span class="op">=</span> pd.Timestamp(time_max).to_pydatetime()</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a>item <span class="op">=</span> pystac.Item(</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1" aria-label="code-block-8-12"></a>    <span class="bu">id</span><span class="op">=</span><span class="st">"era5-zarr-swh-2025"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1" aria-label="code-block-8-13"></a>    geometry<span class="op">=</span>geom,</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1" aria-label="code-block-8-14"></a>    bbox<span class="op">=</span>bbox,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1" aria-label="code-block-8-15"></a>    datetime<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1" aria-label="code-block-8-16"></a>    start_datetime<span class="op">=</span>start_datetime,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1" aria-label="code-block-8-17"></a>    end_datetime<span class="op">=</span>end_datetime,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1" aria-label="code-block-8-18"></a>    properties<span class="op">=</span>{</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1" aria-label="code-block-8-19"></a>        <span class="st">"description"</span>: <span class="st">"ERA5 surface Zarr datacube for swh for 2025"</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1" aria-label="code-block-8-20"></a>    }</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1" aria-label="code-block-8-21"></a>)</span></code></pre>
 </div>
+<p>Next, create an Asset that points to the Zarr store. The Asset
+contains the location of the data and describes its format.</p>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/daily_swh"</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>asset <span class="op">=</span> pystac.Asset(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>    href<span class="op">=</span>url,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a>    media_type<span class="op">=</span><span class="st">"application/vnd+zarr"</span>, <span class="co"># Media type for Zarr stores. For icechunk stores, use "application/vnd.zarr+icechunk".</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>    roles<span class="op">=</span>[<span class="st">"data"</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a>)</span></code></pre>
+</div>
+<p>Attach the Asset to the Item:</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="co"># Add a Zarr asset</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a>item.add_asset(<span class="st">"data"</span>, asset)</span></code></pre>
+</div>
+<p>Finally, add the Item to the Collection:</p>
+<div class="codewrapper sourceCode" id="cb11">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>collection.add_item(item)</span></code></pre>
+</div>
+<p>This completes a minimal STAC hierarchy consisting of a
+<strong>Catalog</strong>, which contains a <strong>Collection</strong>,
+which in turn contains an <strong>Item</strong> pointing to a Zarr
+dataset stored in the object store.</p>
+</div>
+<div class="section level3">
+<h3 id="save-as-a-static-catalog-json-files">Save as a static catalog (JSON files)<a class="anchor" aria-label="anchor" href="#save-as-a-static-catalog-json-files"></a></h3>
+<p>To save the Catalog, Collection, and Item as static JSON files in a
+directory (e.g. <code>stac/</code>), use the
+<code>normalize_and_save()</code> method:</p>
+<div class="codewrapper sourceCode" id="cb12">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a>catalog.normalize_and_save(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a>    <span class="st">"stac"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a>    catalog_type<span class="op">=</span>pystac.CatalogType.SELF_CONTAINED,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>)</span></code></pre>
+</div>
+<p>This will create <code>catalog.json</code> (catalog),
+<code>era5-zarr-swh/collection.json</code> (collection), and
+<code>era5-zarr-swh/era5-zarr-swh-2025/era5-zarr-swh-2025.json</code>
+(item) in the <code>stac/</code> directory. It will normalize the links
+so that they are relative to the catalog root, making it easy to upload
+the entire directory to an object store or web server.</p>
 <div id="exercise-1---build-a-stac-catalog-for-your-zarr-dataset" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -730,27 +827,15 @@ python:</p>
 <h3 class="callout-title">Exercise 1 - Build a STAC catalog for your
 Zarr dataset</h3>
 <div class="callout-content">
-<p>Using the Zarr dataset you generated in the NetCDF→Zarr conversion
+<p>Using the Zarr dataset you generated in the NetCDF to Zarr conversion
 lesson:</p>
-<ol style="list-style-type: decimal"><li>
-<p>Install PySTAC if needed:</p>
-<div class="codewrapper sourceCode" id="cb9">
-<h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="ex">pip</span> install pystac</span></code></pre>
-</div>
-</li>
-<li>
-<p>In Python:</p>
-<ul><li>Create a root <code>Catalog</code> with a clear description.</li>
+<ol style="list-style-type: decimal"><li>Create a root <code>Catalog</code> with a clear description.</li>
 <li>Create a <code>Collection</code> describing your dataset group
 (e.g. “Example Zarr conversions”).</li>
 <li>Create an <code>Item</code> whose <code>assets</code> include your
-Zarr store (local path or S3 URL).</li>
-</ul></li>
-<li><p>Use <code>catalog.normalize_hrefs("stac")</code> and
-<code>catalog.save()</code> to write a static STAC catalog to a
-<code>stac/</code> directory.</p></li>
+Zarr store (Object Store URL).</li>
+<li>Use <code>catalog.normalize_and_save()</code> to write a static STAC
+catalog to a <code>stac/</code> directory.</li>
 </ol><p>Questions:</p>
 <ul><li>How did you choose the <code>id</code>, <code>description</code>,
 and <code>extent</code> for your Collection?</li>
@@ -767,10 +852,11 @@ discoverable?</li>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<p>Learners should end up with a small STAC catalog on disk that
-describes their Zarr dataset in terms of space, time, and metadata. They
-will see how PySTAC mirrors the STAC JSON structure and how easy it is
-to attach a Zarr store as an Item asset.</p>
+<p>Create a STAC catalog with a clear description, a Collection with an
+appropriate extent and license, and an Item that points to the Zarr
+store. Use PySTAC to save the catalog as JSON files. Include relevant
+metadata in the Collection and Item to make the dataset
+discoverable.</p>
 </div>
 </div>
 </div>
@@ -782,24 +868,15 @@ server) are simple to publish and work well for small to medium
 datasets.</p>
 <p>As the number of Items grows (e.g. millions of scenes or many Zarr
 datacubes), searching via JSON files becomes less efficient. Many
-deployments therefore:</p>
-<ul><li>Store STAC objects in a <strong>PostgreSQL/PostGIS database</strong>
-using schemas like <strong>pgSTAC</strong> (often used via
-<em>PgPystac</em> or other tooling).</li>
-<li>Provide a <strong>STAC API</strong> that exposes
-<code>/stac/search</code> and other endpoints backed by database
-queries.</li>
-</ul><p>Advantages of database-backed STAC:</p>
+deployments therefore store STAC metadata in a database (like <a href="https://github.com/stac-utils/pgstac" class="external-link">pgSTAC</a>) and expose it
+via a <a href="https://github.com/radiantearth/stac-api-spec" class="external-link">STAC
+API</a>. This allows for fast queries, filtering, and pagination.
+Advantages of database-backed STAC:</p>
 <ul><li>Fast spatial/temporal and attribute queries over large
 catalogs.</li>
 <li>Indexes and query planners handle complex filters.</li>
 <li>Single source of truth for STAC metadata that can be updated
 transactionally.</li>
-</ul><p>Useful references:</p>
-<ul><li>pgSTAC: <a href="https://github.com/stac-utils/pgstac" class="external-link uri">https://github.com/stac-utils/pgstac</a>
-</li>
-<li>STAC API overview: <a href="https://github.com/radiantearth/stac-api-spec" class="external-link uri">https://github.com/radiantearth/stac-api-spec</a>
-</li>
 </ul><div id="exercise-2---discuss-json-vs-database-backed-stac" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -809,15 +886,13 @@ transactionally.</li>
 <h3 class="callout-title">Exercise 2 - Discuss JSON vs database-backed
 STAC</h3>
 <div class="callout-content">
-<p>In pairs or small groups, discuss:</p>
 <ol style="list-style-type: decimal"><li>When would you prefer a simple static STAC catalog (JSON files in
 object storage)?</li>
 <li>When would you prefer a database-backed STAC API
 (pgSTAC/PgPystac)?</li>
 <li>How might you evolve from a static JSON catalog to a STAC API over
 time as your collection of Zarr datasets grows?</li>
-</ol><p>Write a brief summary of your conclusions.</p>
-</div>
+</ol></div>
 </div>
 </div>
 <div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
@@ -827,11 +902,11 @@ time as your collection of Zarr datasets grows?</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<p>Learners should recognise that static STAC is ideal for simple,
-low‑maintenance publishing, while database-backed STAC scales better for
-large collections and complex search. They will see that PySTAC lets
-them use the same object model regardless of whether the final catalog
-lives as JSON or in a database.</p>
+<p>Static STAC is ideal for simple, low-maintenance publishing, while
+database-backed STAC scales better for large collections and complex
+search. You might start with a static catalog for a small number of Zarr
+datasets, and as your collection grows, migrate to a database-backed
+STAC API to support efficient queries and updates.</p>
 </div>
 </div>
 </div>
@@ -849,19 +924,33 @@ Browser</h3>
 Browser</a> is a web application for browsing static STAC catalogs and
 STAC APIs as a human‑friendly UI.</p>
 <p>To visualise your catalog:</p>
-<ol style="list-style-type: decimal"><li>
-<p>Serve your <code>stac/</code> directory over HTTP (for example
-with a simple Python server):</p>
-<div class="codewrapper sourceCode" id="cb10">
-<h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+<ol style="list-style-type: decimal"><li>Upload your <code>stac/</code> directory to a web server or object
+storage bucket. To upload the files, you can use <code>boto3</code>
+commands in python:</li>
+</ol><div class="codewrapper sourceCode" id="cb13">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="bu">cd</span> stac</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="co"># catalog is now at http://localhost:8000/catalog.json</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> boto3</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a><span class="im">import</span> os</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a>s3 <span class="op">=</span> boto3.client(</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>    <span class="st">"s3"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a>    endpoint_url<span class="op">=</span><span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a>    aws_access_key_id<span class="op">=</span><span class="st">"your-access-key"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a>    aws_secret_access_key<span class="op">=</span><span class="st">"your-secret-key"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a>bucket_name <span class="op">=</span> <span class="st">"my-bucket"</span> <span class="co"># Replace with your bucket name</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a><span class="cf">for</span> root, dirs, files <span class="kw">in</span> os.walk(<span class="st">"stac"</span>):</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a>    <span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> files:</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1" aria-label="code-block-13-15"></a>        local_path <span class="op">=</span> os.path.join(root, <span class="bu">file</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1" aria-label="code-block-13-16"></a>        s3_path <span class="op">=</span> os.path.relpath(local_path, <span class="st">"stac"</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1" aria-label="code-block-13-17"></a>        s3.upload_file(local_path, bucket_name, <span class="ss">f"stac/</span><span class="sc">{</span>s3_path<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
 </div>
-</li>
-<li><p>Serve the stac catalog already in the object storage bucket (if
-you uploaded it) via a public URL or signed URL.</p></li>
+<ol start="2" style="list-style-type: decimal"><li>With the link to your <code>catalog.json</code>, you can use a
+hosted STAC Browser demo (e.g. <a href="https://browser.moregeo.it/" class="external-link uri">https://browser.moregeo.it/</a>) and enter your catalog
+URL.</li>
 </ol></div>
 </div>
 </div>
@@ -874,12 +963,8 @@ you uploaded it) via a public URL or signed URL.</p></li>
 <h3 class="callout-title">Exercise 3 (optional) - Publish and browse
 your catalog</h3>
 <div class="callout-content">
-<ol style="list-style-type: decimal"><li>Serve your <code>stac/</code> directory with a simple local web
-server.</li>
-<li>Run STAC Browser locally (Docker) or use a hosted STAC Browser
-demo.</li>
-<li>Configure STAC Browser to use your catalog URL
-(e.g. <code>http://localhost:8000/catalog.json</code>).</li>
+<ol style="list-style-type: decimal"><li>Upload your <code>stac/</code> directory to the object store.</li>
+<li>Use a hosted STAC Browser demo.</li>
 <li>Explore:
 <ul><li>Your root catalog and collection.</li>
 <li>The Item representing your Zarr dataset.</li>
@@ -903,8 +988,8 @@ documentation)?</li>
 <div class="accordion-body">
 <p>STAC makes their Zarr datasets visible in a generic browser without
 writing custom UI code. You can see how the hierarchical structure of
-Catalog → Collection → Item helps users navigate and understand the
-datasets.</p>
+Catalog → Collection → Item → Assets helps users navigate and understand
+the datasets.</p>
 </div>
 </div>
 </div>
@@ -998,8 +1083,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/14-stac.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/14-stac.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

@@ -548,7 +548,22 @@ and FlatGeobuf.”</li>
 <li>“Cloud-native approaches can reduce data movement, improve sharing,
 and support scalable analysis of large environmental datasets.”</li>
 </ul></section><section id="04-zarr"><h2 class="section-heading"><a href="04-zarr.html">Zarr - Data Model, Metadata, and Chunked Storage</a></h2>
-<hr class="half-width"></section><section id="05-python-zarr"><h2 class="section-heading"><a href="05-python-zarr.html">Python Tools for Working with Zarr</a></h2>
+<hr class="half-width">
+<ul>
+<li>“Zarr organises data into groups and arrays stored as addressable
+chunks, which supports efficient partial reads and writes.”</li>
+<li>“Metadata in Zarr describes array structure, chunking, and
+attributes, and can be extended through shared conventions for
+geoscience workflows.”</li>
+<li>“Chunked storage is central to Zarr performance because it lets
+tools read only the pieces needed for a given query or
+computation.”</li>
+<li>“Inspecting a Zarr store with Python and xarray helps distinguish
+cheap metadata exploration from actual data loading.”</li>
+<li>“Understanding data model, metadata, and chunk layout is the
+foundation for later lessons on rechunking, parallel processing, and
+cloud-native analysis.”</li>
+</ul></section><section id="05-python-zarr"><h2 class="section-heading"><a href="05-python-zarr.html">Python Tools for Working with Zarr</a></h2>
 <hr class="half-width">
 <ul>
 <li>“The zarr Python package provides low-level access to Zarr stores,
@@ -594,9 +609,8 @@ fit for chunked environmental data.”</li>
 <li>“Many open Zarr datasets are available for oceanography, climate,
 and meteorology, including ERA5 ARCO, Sofar Spotter drifters, ECMWF IFS
 ensemble forecasts, CMIP6, and marine products.”</li>
-<li>“Python tools like xarray, zarr, fsspec, and clouddrift make it
-straightforward to open and explore Zarr datasets hosted on cloud object
-storage.”</li>
+<li>“Python tools like xarray, zarr, and fsspec make it straightforward
+to open and explore Zarr datasets hosted on cloud object storage.”</li>
 <li>“Real-world Zarr datasets illustrate regular grids, ragged arrays,
 ensemble dimensions, and more, providing rich practice for accessing,
 analysing, and understanding chunked data.”</li>
@@ -636,28 +650,42 @@ and tools to access the same datasets efficiently.”</li>
 versions helps verify that conversions preserve scientific
 content.”</li>
 </ul></section><section id="11-case-studies"><h2 class="section-heading"><a href="11-case-studies.html">Invited Case Studies</a></h2>
-<hr class="half-width"></section><section id="12-icechunk"><h2 class="section-heading"><a href="12-icechunk.html">Data Versioning with Icechunk</a></h2>
 <hr class="half-width">
 <ul>
-<li>Plain Zarr lacks built-in transactions, history, and recovery.</li>
-<li>Icechunk adds repositories, transactions, snapshots, branches, and
-tags.</li>
-<li>Transactions make multi-variable updates atomic.</li>
-<li>Branches and tags make reproducible analysis possible.</li>
-<li>Version history makes it much easier to recover from mistakes.</li>
+<li>“Real-world case studies show that cloud-native architectures differ
+by mission, user needs, scale, and operational constraints.”</li>
+<li>“Successful teams make explicit trade-offs among performance, cost,
+governance, reproducibility, and maintainability.”</li>
+<li>“Common building blocks include Zarr (physical or virtual), STAC for
+discovery, and versioning approaches for controlled updates.”</li>
+<li>“Architectural decisions should be guided by concrete workloads and
+user access patterns, not only by tool popularity.”</li>
+<li>“Cross-team sharing of implementation lessons helps avoid repeated
+mistakes and speeds up adoption of robust workflows.”</li>
+</ul></section><section id="12-icechunk"><h2 class="section-heading"><a href="12-icechunk.html">Data Versioning with Icechunk</a></h2>
+<hr class="half-width">
+<ul>
+<li>“Plain Zarr lacks built-in transactions, history, and
+recovery.”</li>
+<li>“Icechunk adds repositories, transactions, snapshots, branches, and
+tags.”</li>
+<li>“Transactions make multi-variable updates atomic.”</li>
+<li>“Branches and tags make reproducible analysis possible.”</li>
+<li>“Version history makes it much easier to recover from
+mistakes.”</li>
 </ul></section><section id="13-virtualizarr"><h2 class="section-heading"><a href="13-virtualizarr.html">Creating Virtual Zarr Stores with Virtualizarr</a></h2>
 <hr class="half-width">
 <ul>
-<li>Virtualizarr creates virtual Zarr datasets without copying the
-data.</li>
-<li>It is useful when full conversion is impractical or
-unnecessary.</li>
-<li>You can create a virtual dataset directly from NetCDF files already
-on the server.</li>
-<li>xarray can open the virtual dataset and analyse it like a familiar
-dataset.</li>
-<li>Virtualisation is a useful bridge between NetCDF archives and
-Zarr-style workflows.</li>
+<li>“Virtualizarr creates virtual Zarr datasets without copying the
+data.”</li>
+<li>“It is useful when full conversion is impractical or
+unnecessary.”</li>
+<li>“You can create a virtual dataset directly from NetCDF files already
+on the server.”</li>
+<li>“xarray can open the virtual dataset and analyse it like a familiar
+dataset.”</li>
+<li>“Virtualisation is a useful bridge between NetCDF archives and
+Zarr-style workflows.”</li>
 </ul></section><section id="14-stac"><h2 class="section-heading"><a href="14-stac.html">Zarr Data Organization in the Cloud with STAC</a></h2>
 <hr class="half-width">
 <ul>
@@ -694,7 +722,21 @@ WebGL and GPU acceleration, without a dedicated tiling server.”</li>
 HTML/JS clients, you can build fully cloud-native visualisation
 workflows for your geospatial datasets.”</li>
 </ul></section><section id="16-best-practices"><h2 class="section-heading"><a href="16-best-practices.html">Architectures and Best Practices</a></h2>
-<hr class="half-width"></section>
+<hr class="half-width">
+<ul>
+<li>“Cloud-native workflows are strongest when formats, metadata,
+storage, and operations are designed together as one architecture.”</li>
+<li>“There is no single best stack: choices between physical Zarr,
+virtual Zarr, STAC, Icechunk, and GeoZarr depend on workload,
+governance, and resources.”</li>
+<li>“Practical trade-offs among simplicity, performance, cost, and
+maintainability should be documented and revisited over time.”</li>
+<li>“Chunking, metadata quality, and discoverability are foundational
+decisions that strongly affect usability and long-term
+sustainability.”</li>
+<li>“A short, explicit best-practice checklist helps teams apply course
+concepts consistently in real projects.”</li>
+</ul></section>
 </div>
     </main>
 </div>
@@ -744,8 +786,8 @@ workflows for your geospatial datasets.”</li>
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/key-points.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/key-points.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-28",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">75%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 77%" aria-valuenow="77" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">77%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -318,8 +318,7 @@
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
         <ul><li><a href="#why-virtual-zarr-stores">Why virtual Zarr stores?</a></li>
-<li><a href="#when-to-use-virtualizarr-instead-of-physical-conversion">When to use Virtualizarr instead of physical conversion</a></li>
-<li><a href="#virtualizarr-example-workflow">Virtualizarr example workflow</a></li>
+<li><a href="#virtualizarr-workflow">Virtualizarr workflow</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
 
@@ -411,13 +410,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Creating Virtual Zarr Stores with Virtualizarr</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/13-virtualizarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 40 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 50 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -432,13 +431,13 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>Why might we prefer a virtual Zarr store over fully converting data
-to Zarr?</li>
-<li>How do we create a virtual dataset from NetCDF files already on the
-server?</li>
-<li>How does a virtual Zarr store look when opened with xarray?</li>
-<li>What do we gain by virtualising instead of copying all the
-data?</li>
+<ul><li>“Why might we prefer a virtual Zarr store over fully converting data
+to Zarr?”</li>
+<li>“How do we create a virtual dataset from NetCDF files already on the
+server?”</li>
+<li>“How does a virtual Zarr store look when opened with xarray?”</li>
+<li>“What do we gain by virtualising instead of copying all the
+data?”</li>
 </ul></div>
 </div>
 </div>
@@ -446,10 +445,11 @@ data?</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>Explain what a virtual Zarr store is.</li>
-<li>Create a virtual Zarr dataset from local NetCDF files.</li>
-<li>Open the virtual dataset with xarray and inspect its structure.</li>
-<li>Compare virtual access with direct NetCDF access.</li>
+<ul><li>“Explain what a virtual Zarr store is.”</li>
+<li>“Create a virtual Zarr dataset from local NetCDF files.”</li>
+<li>“Open the virtual dataset with xarray and inspect its
+structure.”</li>
+<li>“Compare virtual access with direct NetCDF access.”</li>
 </ul></div>
 </div>
 </div>
@@ -463,30 +463,25 @@ keep the original NetCDF files for legacy workflows or operational
 reasons.</p>
 <p>A virtual Zarr store gives you a way to access those files in a
 Zarr-like way without copying all the data. Instead of writing new chunk
-files, Virtualizarr builds a virtual dataset that points back to the
-original NetCDF data.</p>
-<p>This is useful when you want:</p>
-<ul><li>Fast, chunked access without full conversion.</li>
-<li>A way to keep the original NetCDF files unchanged.</li>
-<li>A simple bridge between NetCDF archives and xarray-based
-analysis.</li>
-</ul></section><section><h2 class="section-heading" id="when-to-use-virtualizarr-instead-of-physical-conversion">When to use Virtualizarr instead of physical conversion<a class="anchor" aria-label="anchor" href="#when-to-use-virtualizarr-instead-of-physical-conversion"></a></h2>
-<hr class="half-width"><p>Common scenarios:</p>
-<ul><li>You have a large archive of NetCDF/HDF/GRIB files and want
-<strong>fast, chunked access</strong> with xarray and Dask, but cannot
-or do not want to rewrite everything.</li>
+files, <a href="https://virtualizarr.readthedocs.io/en/stable/" class="external-link">Virtualizarr</a>
+builds a virtual dataset that points back to the original NetCDF
+data.</p>
+<figure><img src="../fig/fake_zarr.png" alt="An illustration NetCDF files trying to looking like a Zarr Store." class="figure mx-auto d-block"></figure><div class="section level3">
+<h3 id="when-to-use-virtualizarr-instead-of-physical-conversion">When to use Virtualizarr instead of physical conversion<a class="anchor" aria-label="anchor" href="#when-to-use-virtualizarr-instead-of-physical-conversion"></a></h3>
+<p>Common scenarios:</p>
+<ul><li>You have a large archive of NetCDF/GRIB files and want fast, chunked
+access with xarray and Dask, but cannot or do not want to rewrite
+everything.</li>
 <li>You must keep the original files unchanged for regulatory, legacy,
 or operational reasons.</li>
 <li>Your storage system struggles with huge numbers of small files that
 physical Zarr stores generate.</li>
-<li>You want to <strong>prototype cloud‑optimised data access</strong>
-before committing to a full migration.</li>
-</ul><p>Physical Zarr conversion is still useful when:</p>
-<ul><li>You expect heavy use and want maximum performance.</li>
-<li>You have resources to restructure data into coherent Zarr
-datacubes.</li>
-<li>You don’t need original files for legacy applications.</li>
-</ul><p>Virtualizarr provides a middle path: a lightweight abstraction layer
+<li>You want to prototype cloud‑optimised data access before committing
+to a full migration.</li>
+</ul><p>However, physical Zarr conversion is still useful when you expect
+heavy use and want maximum performance, or when you want to restructure
+the data into a more efficient layout.</p>
+<p>Virtualizarr provides a middle path: a lightweight abstraction layer
 that lets archival data behave like Zarr without copying or
 restructuring underlying files.</p>
 <p>Virtualizarr lets you create a virtual dataset from one file or many
@@ -496,8 +491,7 @@ files rather than copied into new Zarr chunks.</p>
 <p>In this lesson, we will use the NetCDF files already available on the
 server. That means the workflow stays small and practical: open the
 files, virtualise them, and inspect the result.</p>
-<figure><img src="../fig/virtualizarr.png" alt="Diagram showing NetCDF files with a virtual Zarr layer on top." class="figure mx-auto d-block"><div class="figcaption">Virtualizarr Layer</div>
-</figure><div id="exercise-1---decide-when-to-virtualise" class="callout challenge">
+<div id="exercise-1---decide-when-to-virtualise" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
@@ -513,8 +507,7 @@ files, virtualise them, and inspect the result.</p>
 <ul><li>Keep the files as NetCDF.</li>
 <li>Create a virtual Zarr store.</li>
 <li>Fully convert to physical Zarr.</li>
-</ul><p>Write down your reasoning.</p>
-</div>
+</ul></div>
 </div>
 </div>
 <div id="accordionSolution1" class="accordion challenge-accordion accordion-flush">
@@ -524,137 +517,249 @@ files, virtualise them, and inspect the result.</p>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<p>Virtualisation is a good fit when the original files must remain in
-place or when full conversion is too expensive.</p>
+<p>A reasonable set of answers is:</p>
+<ol style="list-style-type: decimal"><li><p><strong>A small archive used by one team</strong> Keep the files
+as NetCDF if the workflow is already working well and there is no strong
+need for browser-style or chunked access. If the team wants easier
+interactive analysis without copying data, a virtual Zarr store is a
+good middle ground.</p></li>
+<li><p><strong>A large archive that must keep the original NetCDF
+files</strong> Create a virtual Zarr store. This gives you Zarr-like
+access without rewriting the archive, while preserving the original
+files for legacy or operational use.</p></li>
+<li><p><strong>A dataset that will be queried repeatedly by many
+users</strong> Fully convert to physical Zarr if performance is the top
+priority and you expect heavy repeated use. Physical Zarr is often the
+best choice when you want the fastest access and the storage cost of
+conversion is acceptable.</p></li>
+</ol></div>
 </div>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="virtualizarr-example-workflow">Virtualizarr example workflow<a class="anchor" aria-label="anchor" href="#virtualizarr-example-workflow"></a></h2>
-<hr class="half-width"><div class="section level3">
-<h3 id="inspect-the-netcdf-files">Inspect the NetCDF files<a class="anchor" aria-label="anchor" href="#inspect-the-netcdf-files"></a></h3>
-<p>Before virtualising, look at the files you already have.</p>
+</section><section><h2 class="section-heading" id="virtualizarr-workflow">Virtualizarr workflow<a class="anchor" aria-label="anchor" href="#virtualizarr-workflow"></a></h2>
+<hr class="half-width"><p>The VirtualiZarr workflow is similar to a physical conversion
+workflow, but with one key difference: instead of copying data into new
+Zarr chunks, VirtualiZarr creates a virtual Zarr dataset whose chunks
+reference the original NetCDF files. This avoids duplicating the
+underlying data while providing a Zarr-compatible interface.</p>
+<p>In this lesson, we will use a subset of the ERA5 dataset containing
+significant wave height data, located in <code>data/daily_swh/</code>,
+which is already available on the server.</p>
+<p>All examples in this lesson use files stored on the server for
+simplicity. However, the same workflow also works with NetCDF files
+stored in an object store.</p>
+<div class="section level3">
+<h3 id="step-1-inspect-the-netcdf-files">Step 1: inspect the NetCDF files<a class="anchor" aria-label="anchor" href="#step-1-inspect-the-netcdf-files"></a></h3>
+<p>First, inspect the NetCDF files with xarray so you know what you are
+working with.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="st">"data/example_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="st">"data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="bu">print</span>(ds_nc)</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds_nc.dims)</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(ds_nc.coords)</span></code></pre>
 </div>
-<p>This helps you check the dimensions, variables, and coordinates
-before you build the virtual store.</p>
 </div>
 <div class="section level3">
-<h3 id="create-a-virtual-dataset">Create a virtual dataset<a class="anchor" aria-label="anchor" href="#create-a-virtual-dataset"></a></h3>
-<p>Now create a virtual dataset from the NetCDF files. You point
-Virtualizarr at the files and let it build the virtual store for
-you.</p>
+<h3 id="step-2-create-a-virtual-dataset">Step 2: create a virtual dataset<a class="anchor" aria-label="anchor" href="#step-2-create-a-virtual-dataset"></a></h3>
+<p>Now create a virtual dataset from the NetCDF files. Virtualizarr will
+read the files and build a lightweight virtual store that points back to
+the original data.</p>
+<p>We first import the required modules and set up access to the local
+files. In this example, we use <a href="https://developmentseed.org/obstore/latest/" class="external-link"><code>obstore</code></a>
+to provide a consistent interface to the local filesystem. It lets
+Virtualizarr work with the NetCDF files in the same way it would work
+with other storage backends.</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> virtualizarr <span class="im">as</span> vz</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>vds <span class="op">=</span> vz.open_virtual_mfdataset(</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>    <span class="st">"data/example_*.nc"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>    combine<span class="op">=</span><span class="st">"by_coords"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>    engine<span class="op">=</span><span class="st">"netcdf4"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a>)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a><span class="bu">print</span>(vds)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1" aria-label="code-block-2-10"></a><span class="bu">print</span>(vds.dims)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1" aria-label="code-block-2-11"></a><span class="bu">print</span>(vds.data_vars)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1" aria-label="code-block-2-12"></a><span class="bu">print</span>(vds.coords)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> glob</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a><span class="im">from</span> obstore.store <span class="im">import</span> LocalStore</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a><span class="im">from</span> obspec_utils.registry <span class="im">import</span> ObjectStoreRegistry</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a><span class="im">from</span> virtualizarr <span class="im">import</span> open_virtual_mfdataset</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a><span class="im">from</span> virtualizarr.parsers <span class="im">import</span> HDFParser</span></code></pre>
 </div>
-<p>The key idea is that this does not copy the full dataset into new
-Zarr files. It creates a virtual representation that can be opened and
-analysed like a Zarr-like dataset.</p>
-</div>
-<div class="section level3">
-<h3 id="save-the-virtual-dataset-to-a-reference-file">Save the virtual dataset to a reference file<a class="anchor" aria-label="anchor" href="#save-the-virtual-dataset-to-a-reference-file"></a></h3>
-<p>You can save the virtual dataset to a reference file (JSON) that
-describes how to access the underlying NetCDF files. This allows you to
-share the virtual dataset with others without copying all the data.</p>
+<p>Next, collect the NetCDF file paths. Here we use a local directory
+containing daily significant wave height data.</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>vds.virtualize.to_kerchunk(<span class="st">"data/example_virtual.parquet"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"parquet"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>data_dir <span class="op">=</span> <span class="st">"data/daily_swh/"</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>file_paths <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">*.nc"</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>urls <span class="op">=</span> [<span class="ss">f"file://</span><span class="sc">{</span>path<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> path <span class="kw">in</span> file_paths]</span></code></pre>
 </div>
-<p>And then, you can load it later with:</p>
+<p>Then create a local store and register it. The
+<code>LocalStore</code> gives Virtualizarr access to the files on disk,
+and the <code>ObjectStoreRegistry</code> tells it where those files
+live.</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>vds_loaded <span class="op">=</span> vz.open_virtual_mfdataset(<span class="st">"data/example_virtual.parquet"</span>, engine<span class="op">=</span><span class="st">"kerchunk"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>store <span class="op">=</span> LocalStore(data_dir)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a>registry <span class="op">=</span> ObjectStoreRegistry({<span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>: store})</span></code></pre>
 </div>
-</div>
-<div class="section level3">
-<h3 id="open-the-virtual-dataset-with-xarray">Open the virtual dataset with xarray<a class="anchor" aria-label="anchor" href="#open-the-virtual-dataset-with-xarray"></a></h3>
-<p>Once the virtual dataset is created, open it with xarray and inspect
-it as usual.</p>
+<p>Because these are HDF5-based NetCDF files, we also need the HDF
+parser.</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds_virtual <span class="op">=</span> xr.open_zarr(vds.store, consolidated<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds_virtual)</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="bu">print</span>(ds_virtual.dims)</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a><span class="bu">print</span>(ds_virtual.data_vars)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a>parser <span class="op">=</span> HDFParser()</span></code></pre>
 </div>
-<p>Now, you can work with the virtual dataset as if it were a physical
-Zarr store, but the data remain in the original NetCDF files.</p>
-</div>
-<div class="section level3">
-<h3 id="compare-a-simple-analysis">Compare a simple analysis<a class="anchor" aria-label="anchor" href="#compare-a-simple-analysis"></a></h3>
-<p>Now compare a small analysis on the original NetCDF files and on the
-virtual dataset.</p>
+<p>Now open the virtual dataset. This returns an xarray-like dataset
+backed by virtual references rather than copied Zarr chunks.</p>
 <div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> time</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>pattern <span class="op">=</span> <span class="st">"data/example_*.nc"</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>t0 <span class="op">=</span> time.time()</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(pattern, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>result_nc <span class="op">=</span> ds_nc[<span class="st">"temperature"</span>].mean(dim<span class="op">=</span>(<span class="st">"lat"</span>, <span class="st">"lon"</span>)).compute()</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a>t1 <span class="op">=</span> time.time()</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a><span class="bu">print</span>(<span class="st">"NetCDF time:"</span>, t1 <span class="op">-</span> t0)</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a>t0 <span class="op">=</span> time.time()</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>vds <span class="op">=</span> vz.open_virtual_mfdataset(pattern, combine<span class="op">=</span><span class="st">"by_coords"</span>, engine<span class="op">=</span><span class="st">"netcdf4"</span>)</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>ds_virtual <span class="op">=</span> xr.open_zarr(vds.store, consolidated<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>result_virtual <span class="op">=</span> ds_virtual[<span class="st">"temperature"</span>].mean(dim<span class="op">=</span>(<span class="st">"lat"</span>, <span class="st">"lon"</span>)).compute()</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>t1 <span class="op">=</span> time.time()</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a><span class="bu">print</span>(<span class="st">"Virtual time:"</span>, t1 <span class="op">-</span> t0)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>vds <span class="op">=</span> open_virtual_mfdataset(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a>    urls<span class="op">=</span>urls,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>    parser<span class="op">=</span>parser,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>    registry<span class="op">=</span>registry,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>    combine<span class="op">=</span><span class="st">"nested"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>    concat_dim<span class="op">=</span><span class="st">"time"</span>, <span class="co"># the files are combined along the time dimension</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a><span class="bu">print</span>(vds)</span></code></pre>
 </div>
-<p>The exact timings will depend on the dataset and environment, but the
-goal is to show that virtualisation can give you a Zarr-like access
-pattern without fully converting the data.</p>
-<div id="why-this-is-useful" class="callout">
+<p>The important point is that this does <strong>not</strong> copy the
+data into new Zarr files. It creates a virtual representation that can
+be opened and analysed like a Zarr-style dataset.</p>
+<div id="obstore" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
 </div>
 <span class="callout-header">Callout</span>
-<div id="why-this-is-useful" class="callout-inner">
-<h3 class="callout-title">Why this is useful</h3>
+<div id="obstore" class="callout-inner">
+<h3 class="callout-title">Obstore</h3>
 <div class="callout-content">
-<p>Virtualizarr keeps the original files in place, but lets you work
-with a chunked, cloud-friendly view of the data. You can choose chunks
-that match your access pattern, such as time-based chunks for time
-series or spatial chunks for maps.</p>
-<p>A small caveat: if the underlying files are poorly aligned with your
-chosen chunks, access may be less efficient because the virtual store
-still has to read from those files underneath. So the best chunk
-strategy is usually the one that fits analysis needs while also staying
-reasonably aligned with the source layout.</p>
+<p><a href="https://developmentseed.org/obstore/latest/" class="external-link"><code>obstore</code></a>
+gives a simple Python interface to cloud object storage that is built
+for speed and works well with safer, more predictable data access
+patterns. It can be a good choice when you want fast S3/GCS/Azure reads
+and writes without the extra complexity of working directly with
+provider-specific clients or filesystem-style wrappers.</p>
+<p>Take a look at this <a href="https://www.youtube.com/watch?v=z_CkATeUe-Y" class="external-link">talk</a> if you want
+to explore it further. It is not the focus of this lesson, but it is
+interesting if you want to work with cloud object storage more
+efficiently.</p>
 </div>
 </div>
 </div>
+</div>
+<div class="section level3">
+<h3 id="step-3-create-a-local-icechunk-repository">Step 3: create a local Icechunk repository<a class="anchor" aria-label="anchor" href="#step-3-create-a-local-icechunk-repository"></a></h3>
+<p>One advantage of virtual datasets is that they can be saved to an
+Icechunk repository. This allows you to create a snapshot of the virtual
+dataset that can be reopened later.</p>
+<p>First you need to create a local Icechunk repository. This is done by
+specifying a path where the repository will be stored and creating a
+configuration that allows Icechunk to resolve the virtual chunks.</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a><span class="co"># This is the path where the Icechunk repository will be created</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>repo_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a>storage <span class="op">=</span> ic.local_filesystem_storage(repo_path)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1" aria-label="code-block-7-8"></a><span class="co"># Because we are using a virtual dataset, we need to tell Icechunk where to find the original NetCDF files when reopening the snapshot. This is done by creating a virtual chunk container that points to the local filesystem store.</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1" aria-label="code-block-7-9"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1" aria-label="code-block-7-10"></a>config.set_virtual_chunk_container(</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1" aria-label="code-block-7-11"></a>    ic.VirtualChunkContainer(<span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>, ic.local_filesystem_store(data_dir))</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1" aria-label="code-block-7-12"></a>)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1" aria-label="code-block-7-13"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1" aria-label="code-block-7-14"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1" aria-label="code-block-7-15"></a>repo.save_config()</span></code></pre>
+</div>
+<p>Now you have a local Icechunk repository that can store virtual
+datasets. The next step is to write the virtual dataset into the
+repository.</p>
+</div>
+<div class="section level3">
+<h3 id="step-4-write-the-virtual-dataset-into-icechunk">Step 4: write the virtual dataset into Icechunk<a class="anchor" aria-label="anchor" href="#step-4-write-the-virtual-dataset-into-icechunk"></a></h3>
+<p>Now write the virtual dataset into the repository and commit it as a
+snapshot.</p>
+<div class="codewrapper sourceCode" id="cb8">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a>vds.vz.to_icechunk(session.store)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>snapshot_id <span class="op">=</span> session.commit(<span class="st">"Initial virtual reference set for daily_swh NetCDF files"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a><span class="bu">print</span>(<span class="st">"Committed snapshot:"</span>, snapshot_id)</span></code></pre>
+</div>
+</div>
+<div class="section level3">
+<h3 id="step-5-reopen-the-snapshot">Step 5: reopen the snapshot<a class="anchor" aria-label="anchor" href="#step-5-reopen-the-snapshot"></a></h3>
+<p>With the virtual dataset saved in Icechunk, you can now reopen
+it:</p>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="co"># Because we are using a virtual dataset, we need to authorize access to the original NetCDF files when reopening the snapshot.</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>repo <span class="op">=</span> ic.Repository.<span class="bu">open</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>    storage,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a>    authorize_virtual_chunk_access<span class="op">=</span>{</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>: ic.credentials.LocalFileSystemAccess,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a>    },</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1" aria-label="code-block-9-8"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1" aria-label="code-block-9-9"></a>ds_main <span class="op">=</span> xr.open_zarr(session.store, consolidated<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1" aria-label="code-block-9-10"></a><span class="bu">print</span>(ds_main)</span></code></pre>
+</div>
+<p>You can see that the dataset structure is the same as before, but now
+it is backed by the Icechunk repository. You can work with the virtual
+dataset like a Zarr store, while the original NetCDF files remain
+unchanged.</p>
+</div>
+<div class="section level3">
+<h3 id="compare-a-simple-analysis">Compare a simple analysis<a class="anchor" aria-label="anchor" href="#compare-a-simple-analysis"></a></h3>
+<p>Let’s compare a simple analysis on the original NetCDF files and on
+the virtual dataset. We will compute the mean significant wave height
+over latitude and longitude for both datasets and measure the time taken
+for each operation.</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> time</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a>pattern <span class="op">=</span> <span class="st">"data/daily_swh/swh_*.nc"</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(pattern, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a>result_nc <span class="op">=</span> ds_nc[<span class="st">"swh"</span>].isel(time<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a><span class="bu">print</span>(<span class="ss">f"Result for original dataset: </span><span class="sc">{</span>result_nc<span class="sc">.</span>values<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1" aria-label="code-block-10-10"></a><span class="bu">print</span>(<span class="st">"NetCDF time:"</span>, t1 <span class="op">-</span> t0)</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1" aria-label="code-block-10-11"></a></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1" aria-label="code-block-10-12"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1" aria-label="code-block-10-13"></a>repo <span class="op">=</span> ic.Repository.<span class="bu">open</span>(</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1" aria-label="code-block-10-14"></a>    storage,</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1" aria-label="code-block-10-15"></a>    authorize_virtual_chunk_access<span class="op">=</span>{</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1" aria-label="code-block-10-16"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>: ic.credentials.LocalFileSystemAccess,</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1" aria-label="code-block-10-17"></a>    },</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1" aria-label="code-block-10-18"></a>)</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1" aria-label="code-block-10-19"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1" aria-label="code-block-10-20"></a>ds_virtual <span class="op">=</span> xr.open_zarr(session.store, consolidated<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1" aria-label="code-block-10-21"></a>result_virtual <span class="op">=</span> ds_virtual[<span class="st">"swh"</span>].isel(time<span class="op">=</span><span class="dv">0</span>).mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1" aria-label="code-block-10-22"></a><span class="bu">print</span>(<span class="ss">f"Result for virtual zarr: </span><span class="sc">{</span>result_virtual<span class="sc">.</span>values<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1" aria-label="code-block-10-23"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1" aria-label="code-block-10-24"></a><span class="bu">print</span>(<span class="st">"Virtual time:"</span>, t1 <span class="op">-</span> t0)</span></code></pre>
+</div>
+<p>The exact timings will depend on the dataset and environment, but we
+expect the virtual dataset to be faster than opening all the NetCDF
+files directly. The goal is to show that virtualisation can give you a
+Zarr-like + Icechunk access pattern without fully converting the
+data.</p>
 <div id="exercise-2---open-a-virtual-dataset-from-server-netcdf-files" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -664,23 +769,18 @@ reasonably aligned with the source layout.</p>
 <h3 class="callout-title">Exercise 2 - Open a virtual dataset from
 server NetCDF files</h3>
 <div class="callout-content">
-<p>Using the NetCDF files available on your server:</p>
-<ol style="list-style-type: decimal"><li>Identify a pattern (e.g. <code>data/example_*.nc</code>) covering
-several files with compatible dimensions.</li>
-<li>Use <code>virtualizarr.open_virtual_mfdataset</code> (or equivalent
-function in your installed version) to create a virtual dataset.</li>
+<p>Using the NetCDF files related to daily significant wave height from
+ERA5 (<code>data/daily_swh/*.nc</code>):</p>
+<ol style="list-style-type: decimal"><li>Identify a pattern covering several files with compatible
+dimensions.</li>
+<li>Use <code>virtualizarr.open_virtual_mfdataset</code> to create a
+virtual dataset.</li>
 <li>Print:
 <ul><li>Dimensions (<code>.dims</code>).</li>
 <li>Data variables (<code>.data_vars</code>).</li>
 <li>Coordinates (<code>.coords</code>).</li>
 </ul></li>
-<li>Save the virtual dataset to a reference file (JSON or Parquet).</li>
-</ol><p>Questions:</p>
-<ul><li>Does the virtual dataset look similar to an xarray dataset created
-via <code>open_mfdataset</code>?</li>
-<li>How does Virtualizarr differ in terms of storage usage (no new data
-files created)?</li>
-</ul></div>
+</ol></div>
 </div>
 </div>
 <div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
@@ -690,45 +790,267 @@ files created)?</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb7">
+<div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> virtualizarr <span class="im">as</span> vz</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a>vds <span class="op">=</span> vz.open_virtual_mfdataset(<span class="st">"data/example_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>, engine<span class="op">=</span><span class="st">"netcdf4"</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a><span class="bu">print</span>(vds.dims)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a><span class="bu">print</span>(vds.data_vars)</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a><span class="bu">print</span>(vds.coords)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="im">import</span> glob</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="im">from</span> obstore.store <span class="im">import</span> LocalStore</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a><span class="im">from</span> obspec_utils.registry <span class="im">import</span> ObjectStoreRegistry</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="im">from</span> virtualizarr <span class="im">import</span> open_virtual_mfdataset</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a><span class="im">from</span> virtualizarr.parsers <span class="im">import</span> HDFParser</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1" aria-label="code-block-11-7"></a>data_dir <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh/"</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1" aria-label="code-block-11-8"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1" aria-label="code-block-11-9"></a>file_paths <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">*.nc"</span>))</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1" aria-label="code-block-11-10"></a>urls <span class="op">=</span> [<span class="ss">f"file://</span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> p <span class="kw">in</span> file_paths]</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1" aria-label="code-block-11-11"></a></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1" aria-label="code-block-11-12"></a>store <span class="op">=</span> LocalStore(data_dir)</span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1" aria-label="code-block-11-13"></a>registry <span class="op">=</span> ObjectStoreRegistry({<span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>: store})</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1" aria-label="code-block-11-14"></a></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1" aria-label="code-block-11-15"></a>parser <span class="op">=</span> HDFParser()</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1" aria-label="code-block-11-16"></a>vds <span class="op">=</span> open_virtual_mfdataset(</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1" aria-label="code-block-11-17"></a>    urls<span class="op">=</span>urls,</span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1" aria-label="code-block-11-18"></a>    parser<span class="op">=</span>parser,</span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1" aria-label="code-block-11-19"></a>    registry<span class="op">=</span>registry,</span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1" aria-label="code-block-11-20"></a>    combine<span class="op">=</span><span class="st">"nested"</span>,</span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1" aria-label="code-block-11-21"></a>    concat_dim<span class="op">=</span><span class="st">"time"</span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1" aria-label="code-block-11-22"></a>)</span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1" aria-label="code-block-11-23"></a></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1" aria-label="code-block-11-24"></a><span class="bu">print</span>(vds.dims)</span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1" aria-label="code-block-11-25"></a><span class="bu">print</span>(vds.data_vars)</span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1" aria-label="code-block-11-26"></a><span class="bu">print</span>(vds.coords)</span></code></pre>
 </div>
-<p>Save to a file if desired:</p>
-<div class="codewrapper sourceCode" id="cb8">
+</div>
+</div>
+</div>
+</div>
+<div id="exercise-3---add-icechunk-and-create-the-first-snapshot" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<span class="callout-header">Challenge</span>
+<div id="exercise-3---add-icechunk-and-create-the-first-snapshot" class="callout-inner">
+<h3 class="callout-title">Exercise 3 - Add Icechunk and create the first
+snapshot</h3>
+<div class="callout-content">
+<p>Now use the virtual dataset inside Icechunk.</p>
+<ol style="list-style-type: decimal"><li>With the virtual dataset, write it into the Icechunk
+repository.</li>
+<li>Create the first snapshot.</li>
+<li>Reopen <code>main</code> and confirm that the dataset structure is
+the same as before.</li>
+</ol></div>
+</div>
+</div>
+<div id="accordionSolution3" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
+  <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
+</button>
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div class="accordion-body">
+<p>A typical workflow is:</p>
+<ol style="list-style-type: decimal"><li>Write the virtual dataset into Icechunk.</li>
+</ol><div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>vds.virtualize.to_kerchunk(<span class="st">"data/example_virtual.parquet"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"parquet"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a>repo_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>storage <span class="op">=</span> ic.local_filesystem_storage(repo_path)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>config.set_virtual_chunk_container(</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>    ic.VirtualChunkContainer(</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>        ic.local_filesystem_store(data_dir),</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>    )</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a>)</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1" aria-label="code-block-12-14"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1" aria-label="code-block-12-15"></a>repo.save_config()</span></code></pre>
 </div>
-<p>You can obtain an xarray-like dataset from multiple NetCDF files
-without physically converting them to Zarr. Virtualizarr constructs a
-virtual datacube on top of existing files, rather than writing new chunk
-files.</p>
+<ol start="2" style="list-style-type: decimal"><li>Commit the virtual dataset as a snapshot.</li>
+</ol><div class="codewrapper sourceCode" id="cb13">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>vds.vz.to_icechunk(session.store)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a>snapshot_id <span class="op">=</span> session.commit(<span class="st">"Initial virtual reference set for daily_swh NetCDF files"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a><span class="bu">print</span>(<span class="st">"Committed snapshot:"</span>, snapshot_id)</span></code></pre>
+</div>
+<ol start="3" style="list-style-type: decimal"><li>Reopen <code>main</code> and confirm that the dataset structure is
+the same as before. Remember to first authorize access to the original
+NetCDF files:</li>
+</ol><div class="codewrapper sourceCode" id="cb14">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a>repo <span class="op">=</span> ic.Repository.<span class="bu">open</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a>    storage,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a>    authorize_virtual_chunk_access<span class="op">=</span>{</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>: ic.credentials.LocalFileSystemAccess,</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a>    },</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a>ds_main <span class="op">=</span> xr.open_zarr(session.store, consolidated<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a><span class="bu">print</span>(ds_main)</span></code></pre>
 </div>
 </div>
 </div>
 </div>
-<div id="integration-with-other-tools-and-examples" class="callout">
+</div>
+<div id="watch-api-churn" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
 </div>
 <span class="callout-header">Callout</span>
-<div id="integration-with-other-tools-and-examples" class="callout-inner">
-<h3 class="callout-title">Integration with other tools and examples</h3>
+<div id="watch-api-churn" class="callout-inner">
+<h3 class="callout-title">Watch API churn</h3>
 <div class="callout-content">
-<p>Virtualizarr is part of a broader ecosystem:</p>
-<ul><li>It builds on ideas from Kerchunk (reference files for virtual
-Zarr).</li>
-<li>It can integrate with Icechunk for storing and reusing virtual
-references in a versioned manner.</li>
-</ul></div>
+<p>VirtualiZarr and Icechunk are both moving fast. The API for
+opening/authorizing has changed release to release. Pin versions in your
+environment and note the versions in any shared code, since a working
+script today may need updating on <code>pip install --upgrade</code> in
+a few months.</p>
 </div>
 </div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="why-this-is-useful">Why this is useful<a class="anchor" aria-label="anchor" href="#why-this-is-useful"></a></h3>
+<p>Virtualizarr keeps the original files in place, but lets you work
+with a chunked, cloud-friendly view of the data. You can choose chunks
+that match your access pattern, such as time-based chunks for time
+series or spatial chunks for maps.</p>
+<p>This becomes even more useful when combined with Icechunk.
+Virtualizarr can create the virtual references, and Icechunk can store
+them as versioned snapshots. That means you can build a cloud-optimised
+virtual dataset without copying the original NetCDF files, while still
+gaining version history, reproducibility, and safe incremental
+updates.</p>
+<p>The same idea works not only for local NetCDF files, but also for
+NetCDF files that are already stored in object storage such as S3, GCS,
+Azure, or compatible systems. In that case, the virtual references point
+directly to the remote objects, so you can create a Zarr-like view of an
+existing archive in place, without moving or rewriting the source data.
+Please take a look at this <a href="https://www.youtube.com/watch?v=QBkZQ53vE6o" class="external-link">talk</a> with more
+information about virtualisation and Icechunk directly from cloud object
+storage.</p>
+<p>A small caveat is that performance still depends on the layout of the
+original files. If the underlying files are poorly aligned with your
+chosen chunks, access may be less efficient because the virtual store
+still has to read from those files underneath. In practice, the best
+chunk strategy is usually the one that matches your analysis needs while
+staying reasonably aligned with the source layout.</p>
+<p>You can see below a table comparing different approaches to accessing
+large NetCDF archives<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+<div style="background-color: #f9f9f9; border-left: 5px solid #ccc; display:flex; justify-content:center; align-items:center; margin-bottom: 1em;">
+<table class="table"><thead><tr style="color: black;"><th>
+Format
+</th>
+<th>
+NetCDF4
+</th>
+<th>
+“Native” Zarr
+</th>
+<th>
+Kerchunk
+</th>
+<th>
+Icechunk
+</th>
+</tr></thead><tbody><tr><th style="color: black;">
+# of URLs
+</th>
+<td style="color: red;">
+500,000
+</td>
+<td style="color: green;">
+1
+</td>
+<td style="color: green;">
+1
+</td>
+<td style="color: green;">
+1
+</td>
+</tr><tr><th style="color: black;">
+Time to open
+</th>
+<td style="color: red;">
+~1 year
+</td>
+<td style="color: green;">
+&lt; 1 sec
+</td>
+<td style="color: green;">
+&lt; 1 sec
+</td>
+<td style="color: green;">
+&lt; 1 sec
+</td>
+</tr><tr><th style="color: black;">
+Storage increase
+</th>
+<td style="color: green;">
+0%
+</td>
+<td style="color: red;">
+100%
+</td>
+<td style="color: red;">
+0.0004%
+</td>
+<td style="color: red;">
+0.0004%
+</td>
+</tr><tr><th style="color: black;">
+Convert using Xarray?
+</th>
+<td style="color: black;">
+N/a
+</td>
+<td style="color: green;">
+Yes
+</td>
+<td style="color: red;">
+No
+</td>
+<td style="color: green;">
+Yes
+</td>
+</tr><tr><th style="color: black;">
+Version-controlled?
+</th>
+<td style="color: red;">
+No
+</td>
+<td style="color: red;">
+No
+</td>
+<td style="color: red;">
+No
+</td>
+<td style="color: green;">
+Yes
+</td>
+</tr><tr><th style="color: black;">
+Update-safe?
+</th>
+<td style="color: red;">
+No
+</td>
+<td style="color: red;">
+No
+</td>
+<td style="color: red;">
+No
+</td>
+<td style="color: green;">
+Yes
+</td>
+</tr></tbody></table></div>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
 <i class="callout-icon" data-feather="key"></i>
@@ -736,16 +1058,16 @@ references in a versioned manner.</li>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>Virtualizarr creates virtual Zarr datasets without copying the
-data.</li>
-<li>It is useful when full conversion is impractical or
-unnecessary.</li>
-<li>You can create a virtual dataset directly from NetCDF files already
-on the server.</li>
-<li>xarray can open the virtual dataset and analyse it like a familiar
-dataset.</li>
-<li>Virtualisation is a useful bridge between NetCDF archives and
-Zarr-style workflows.</li>
+<ul><li>“Virtualizarr creates virtual Zarr datasets without copying the
+data.”</li>
+<li>“It is useful when full conversion is impractical or
+unnecessary.”</li>
+<li>“You can create a virtual dataset directly from NetCDF files already
+on the server.”</li>
+<li>“xarray can open the virtual dataset and analyse it like a familiar
+dataset.”</li>
+<li>“Virtualisation is a useful bridge between NetCDF archives and
+Zarr-style workflows.”</li>
 </ul></div>
 </div>
 </div>
@@ -754,7 +1076,16 @@ Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
 </div>
-</section></div> <!-- / div.lesson-content -->
+</section><div class="footnotes footnotes-end-of-document">
+<hr><ol><li id="fn1"><p>Nicholas, T. VirtualiZarr + Icechunk: Build
+Cloud-Optimised DataCube of Archival Files. Cloud-Native Geospatial
+Conference, 2025. Available at <a href="https://www.youtube.com/watch?v=QBkZQ53vE6o" class="external-link">https://www.youtube.com/watch?v=QBkZQ53vE6o</a>,
+2025.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol></div>
+
+
+
+      </div> <!-- / div.lesson-content -->
     </main><!-- / main#main-content.main-content --><nav class="bottom-pagination mx-md-4" aria-label="Previous and Next Chapter Bottom"><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link" href="../instructor/12-icechunk.html"><i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>Previous</a>
         <a class="chapter-link float-end" href="../instructor/14-stac.html">Next<i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
@@ -814,8 +1145,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-virtualizarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-virtualizarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

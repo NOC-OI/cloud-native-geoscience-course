@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 24%" aria-valuenow="24" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">24%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">25%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -255,7 +255,6 @@
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
         <ul><li><a href="#what-are-chunks">What are chunks?</a></li>
-<li><a href="#thinking-in-dimensions-and-workloads">Thinking in dimensions and workloads</a></li>
 <li><a href="#inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store</a></li>
 <li><a href="#rechunking">Rechunking</a></li>
 <li><a href="#rechunk-can-be-expensive">Rechunk can be expensive</a></li>
@@ -414,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>How to Choose Chunks for Analysis and Processing at Scale</h1>
-        <p>Last updated on 2026-07-28 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/06-chunks.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -489,8 +488,9 @@ bookkeeping.</li>
 </ul><p>Choosing good chunk shapes is critical when you move from “toy”
 datasets to large-scale reanalysis, ensemble, or high-resolution model
 data.</p>
-</section><section><h2 class="section-heading" id="thinking-in-dimensions-and-workloads">Thinking in dimensions and workloads<a class="anchor" aria-label="anchor" href="#thinking-in-dimensions-and-workloads"></a></h2>
-<hr class="half-width"><p>To choose chunk shapes, start from your dimensions and typical
+<div class="section level3">
+<h3 id="thinking-in-dimensions-and-workloads">Thinking in dimensions and workloads<a class="anchor" aria-label="anchor" href="#thinking-in-dimensions-and-workloads"></a></h3>
+<p>To choose chunk shapes, start from your dimensions and typical
 workloads.</p>
 <p>Common dimensions in ocean, climate, and meteorology:</p>
 <ul><li><code>time</code></li>
@@ -499,7 +499,7 @@ workloads.</p>
 <code>y</code>)</li>
 <li>
 <code>level</code> (or <code>depth</code>) (pressure or model
-levels; depth in the ocean)</li>
+levels, depth in the ocean)</li>
 <li>
 <code>member</code> (ensemble member)</li>
 </ul><p>Common workloads:</p>
@@ -534,9 +534,10 @@ and work well with parallel processing, but still fit in memory
 comfortably (e.g. 10-100 MB size).</li>
 </ul><p>There is no single “best” chunking: it depends on which workloads are
 most important for your users.</p>
-<figure><img src="fig/chunk_strategy.png" alt="Chunk strategy. Source: Matt Piagge (UKCEH)" class="figure mx-auto d-block"><div class="figcaption">Chunk strategy. Source: Matt Piagge
+<figure><img src="fig/chunk_strategy.png" alt="Diagram showing how different chunking strategies affect performance for different workloads." class="figure mx-auto d-block"><div class="figcaption">Chunk strategy. Source: Matt Piagge
 (UKCEH)</div>
-</figure></section><section><h2 class="section-heading" id="inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store<a class="anchor" aria-label="anchor" href="#inspecting-chunk-shapes-in-a-zarr-store"></a></h2>
+</figure></div>
+</section><section><h2 class="section-heading" id="inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store<a class="anchor" aria-label="anchor" href="#inspecting-chunk-shapes-in-a-zarr-store"></a></h2>
 <hr class="half-width"><p>Let’s take a look on one of our example Zarr datasets to see how
 chunks are laid out. Now we are using a subset of the GLORYS Reanalysis
 dataset (<a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description" class="external-link uri">https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description</a>),
@@ -594,7 +595,7 @@ seems “friendly” or “unfriendly”:</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -683,7 +684,7 @@ datasets. The basic steps are:</p>
 <p>Start by opening the original Zarr dataset. For the examples below,
 we will use the ERA5 reanalysis dataset, because it is smaller and
 easier to work with than the GLORYS dataset (you can try larger datasets
-later if you have the resources).</p>
+later if you want).</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -742,7 +743,8 @@ right.</p>
 <p>This approach is convenient, but it is not always the most efficient
 for very large datasets. If the original and target chunk layouts are
 very different, rechunking can require substantial temporary storage and
-memory.</p>
+memory. And we will also create a new Zarr store, which may be expensive
+in terms of storage.</p>
 <div id="rechunking-with-rechunker-or-cubed" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
@@ -756,16 +758,16 @@ library designed specifically for rechunking large array datasets
 efficiently. It is useful when you want to move from one chunk layout to
 another without loading the whole dataset into memory at once. However,
 <code>rechunker</code> does not work with zarr v3 stores.</p>
-<p><a href="https://cubed.readthedocs.io/" class="external-link">Cubed</a> is a newer library
-that provides an array API for rechunking and other operations, designed
-to work with serverless backends or locally without needing a live Dask
-scheduler.</p>
+<p><a href="https://cubed-dev.github.io/cubed/" class="external-link">Cubed</a> is a newer
+library that provides an array API for rechunking and other operations,
+designed to work with serverless backends or locally without needing a
+live Dask scheduler.</p>
 <p>You can also integrate Cubed with xarray to rechunk datasets in a
 more memory-efficient way.</p>
 <div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">1</span>, <span class="st">"latitude"</span>: <span class="dv">721</span>, <span class="st">"longitude"</span>: <span class="dv">1440</span>}, , chunked_array_type<span class="op">=</span><span class="st">"cubed"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>ds_chunked <span class="op">=</span> ds.chunk({<span class="st">"valid_time"</span>: <span class="dv">1</span>, <span class="st">"latitude"</span>: <span class="dv">721</span>, <span class="st">"longitude"</span>: <span class="dv">1440</span>}, chunked_array_type<span class="op">=</span><span class="st">"cubed"</span>)</span></code></pre>
 </div>
 </div>
 </div>
@@ -811,7 +813,7 @@ calculate the approximate chunk size, you can use:</li>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>chunk_size_bytes <span class="op">=</span> np.prod(chunk_shape) <span class="op">*</span> ds[<span class="st">"sst"</span>].dtype.itemsize</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a><span class="bu">print</span>(<span class="ss">f"Approximate chunk size: </span><span class="sc">{</span>chunk_size_bytes <span class="op">/</span> <span class="fl">1e6</span><span class="sc">:.2f}</span><span class="ss"> MB"</span>)</span></code></pre>
 </div>
-<p>You do not need to run the code yet; focus on design:</p>
+<p>You do not need to run the code yet, focus on design:</p>
 <ul><li>Write down your proposed chunk sizes per dimension.</li>
 <li>Explain how they help your chosen workload.</li>
 <li>Note any trade-offs you are making for other workloads.</li>
@@ -823,7 +825,7 @@ calculate the approximate chunk size, you can use:</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>You should choose chunk sizes that reflect their dominant workloads
 and keep chunk sizes in a plausible range. For example:</p>
@@ -889,7 +891,7 @@ environments.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <pre><code>import time
 import xarray as xr
@@ -945,12 +947,10 @@ objects.</p>
 into shard files. Source: <a href="https://element84.com/software-engineering/is-zarr-the-new-cog/" class="external-link uri">https://element84.com/software-engineering/is-zarr-the-new-cog/</a>
 </div>
 </figure><div class="section level3">
-<h3 id="why-sharding-helps">Why sharding helps<a class="anchor" aria-label="anchor" href="#why-sharding-helps"></a></h3>
+<h3 id="benefits">Benefits<a class="anchor" aria-label="anchor" href="#benefits"></a></h3>
 <p>Sharding can be useful when:</p>
-<ul><li>You want <strong>small chunks</strong> for fast, selective
-reads.</li>
-<li>You want to <strong>reduce object counts</strong> in cloud
-storage.</li>
+<ul><li>You want small chunks for fast, selective reads.</li>
+<li>You want to reduce object counts in cloud storage.</li>
 <li>You want to reduce filesystem overhead from very large numbers of
 files.</li>
 <li>You want to keep the benefits of chunk-based analysis without paying
@@ -1051,23 +1051,15 @@ the Zarr metadata directly:</p>
 </div>
 <p>Two fields matter:</p>
 <ul><li>“chunk_grid.configuration.chunk_shape”: this is actually the shard
-shape ([100, 100] in our case). Confusingly, at the top level “chunk”
-means “storage object” (i.e. shard).</li>
-<li>“codecs”: look for the entry with “name”: “sharding_indexed”. Its
-configuration.chunk_shape ([10, 10]) is the real sub-chunk size inside
-each shard, along with the compressor used.</li>
+shape ([100, 100] in our case).</li>
+<li>“codecs”: look for the entry with
+<code>"name": "sharding_indexed"</code>. Its configuration.chunk_shape
+([10, 10]) is the real sub-chunk size inside each shard, along with the
+compressor used.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="seeing-the-effect-of-sharding">Seeing the effect of sharding<a class="anchor" aria-label="anchor" href="#seeing-the-effect-of-sharding"></a></h3>
-<p>Sharding “groups small chunks into larger files”. For example, if you
-have a 1000×1000 array with 10×10 chunks, you would have 10,000 chunks.
-If you shard them into 100×100 shards, you would only have 100 shards.
-This reduces the number of files or objects in storage, which can
-improve performance and reduce overhead.</p>
-</div>
-<div class="section level3">
 <h3 id="using-xarray-with-sharded-zarr">Using xarray with sharded Zarr<a class="anchor" aria-label="anchor" href="#using-xarray-with-sharded-zarr"></a></h3>
-<p>xarray can open a sharded Zarr store the same way it opens other Zarr
+<p>Xarray can open a sharded Zarr store the same way it opens other Zarr
 datasets, so the sharding is mostly a storage detail from the analyst’s
 point of view.</p>
 <div class="codewrapper sourceCode" id="cb19">
@@ -1075,7 +1067,7 @@ point of view.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example_sharded_ds.zarr"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/example_sharded.zarr"</span>)</span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a><span class="bu">print</span>(ds)</span>
 <span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a></span>
 <span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>temp <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
@@ -1112,7 +1104,7 @@ stores.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb20">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -1156,10 +1148,10 @@ still maintaining the benefits of chunked access for analysis.</p>
 <h3 class="callout-title">Remember:Chunking and sharding are not the
 same</h3>
 <div class="callout-content">
-<p>Chunking answers the question: <strong>what is the unit of
-computation and access?</strong></p>
-<p>Sharding answers the question: <strong>how are those chunks
-physically packed into storage objects?</strong></p>
+<p>Chunking answers the question: what is the unit of computation and
+access?</p>
+<p>Sharding answers the question: how are those chunks physically packed
+into storage objects?</p>
 <p>A dataset may use small chunks for flexible analysis, but store those
 chunks inside larger shards to make cloud storage more efficient.</p>
 </div>
@@ -1260,8 +1252,8 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/06-chunks.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/06-chunks.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-28",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

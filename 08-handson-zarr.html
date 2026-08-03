@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 37%" aria-valuenow="37" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">37%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 41%" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">41%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -412,7 +412,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Hands-On with Open Zarr Datasets Using Python</h1>
-        <p>Last updated on 2026-07-28 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/08-handson-zarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -448,8 +448,8 @@ datasets?”</li>
 <h3 class="card-title">Objectives</h3>
 <ul><li>“Discover several open Zarr datasets for oceanography, climate, and
 meteorology.”</li>
-<li>“Use Python tools (xarray, zarr, fsspec, clouddrift) to open and
-explore Zarr datasets hosted in the cloud.”</li>
+<li>“Use Python tools (xarray, zarr, fsspec) to open and explore Zarr
+datasets hosted in the cloud.”</li>
 <li>“Inspect dimensions, coordinates, and chunk layouts in real-world
 Zarr stores.”</li>
 <li>“Practice basic analysis and think about how chunking and storage
@@ -472,12 +472,12 @@ ARCO</strong></a> reanalysis in Zarr on Climate Data Store - global
 atmospheric data ready for analysis.</li>
 <li>
 <a href="https://registry.opendata.aws/sofar-spotter-archive/" class="external-link"><strong>Sofar
-Spotter drifters</strong></a> - ragged array buoy data in Zarr,
-accessible via <code>clouddrift</code>.</li>
+Spotter drifters</strong></a> - global Spotter wave drifter buoys from
+2019-2023 stored as ragged array in Zarr.</li>
 <li>
-<strong>Additional examples</strong> such as CMIP6, downscaled
-climate, or Copernicus marine Zarr data, depending on your
-interests.</li>
+<strong>Additional examples</strong> such as CMIP6, CarbonPlan
+datasets, Earthmover Marketplace and NEMO Near-Present-Day, depending on
+your interests.</li>
 </ul><p>Each dataset illustrates different aspects:</p>
 <ul><li>Regular latitude-longitude grids.</li>
 <li>Ragged arrays (varying-length trajectories).</li>
@@ -485,15 +485,15 @@ interests.</li>
 <li>Ensembles with <code>member</code> dimensions.</li>
 </ul><p>All these datasets are hosted in cloud object storage (Google Cloud,
 AWS S3, or HTTPS) and can be accessed programmatically with Python tools
-like <code>xarray</code>, <code>zarr</code>, and <code>fsspec</code>. I
-will explain later what object storage is and how it differs from
-traditional file systems.</p>
-<p>These datasets can be several terabytes in size. DO NOT DOWNLOAD THEM
-LOCALLY.</p>
+like <code>xarray</code> and <code>zarr</code>. I will explain later
+what object storage is and how it differs from traditional file
+systems.</p>
+<p>These datasets can be several terabytes in size. <strong>DO NOT
+DOWNLOAD THEM LOCALLY.</strong></p>
 </section><section><h2 class="section-heading" id="ensemble-forecasts---ecmwf-aifs-ens-icechunkzarr">Ensemble forecasts - ECMWF AIFS ENS Icechunk/Zarr<a class="anchor" aria-label="anchor" href="#ensemble-forecasts---ecmwf-aifs-ens-icechunkzarr"></a></h2>
 <hr class="half-width"><p>Dynamical.org hosts ECMWF AIFS single and ensemble forecasts (ENS) in
 Icechunk/Zarr format on AWS S3. It is possible to access the data using
-dynamical.org API or directly via the S3 url.</p>
+the <code>dynamical.org</code> API or directly via the S3 url.</p>
 <p>For example, the ECMWF AIFS SINGLE are accessible this way:</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -535,10 +535,10 @@ actually using a Dask array underneath.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="bu">print</span>(temperature_2m)</span></code></pre>
 </div>
-<p>To convert this into a standard Xarray DataArray we can call .compute
-on the temperature_2m. Note that only now will the data be loaded into
-memory. This is a good example of lazy loading, where the data is not
-actually read until we explicitly ask for it.</p>
+<p>To convert this into a standard Xarray DataArray we can call
+<code>.compute()</code> on the temperature_2m. Note that only now will
+the data be loaded into memory. This is a good example of lazy loading,
+where the data is not actually read until we explicitly ask for it.</p>
 <div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -552,28 +552,31 @@ time since we only have one):</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>temperature_2m_local.isel(init_time<span class="op">=</span><span class="dv">0</span>, lead_time<span class="op">=</span><span class="dv">0</span>).plot()</span></code></pre>
 </div>
-<p>Or access some of the data:</p>
+<figure><img src="fig/dynamical_temperature_map_plot.png" alt="Temperature at 2 meters above the surface from ECMWF AIFS SINGLE dataset." class="figure mx-auto d-block"></figure><p>Or access some of the data:</p>
 <div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>temperature_2m_local[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>].values</span></code></pre>
 </div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code><span><span class="fu">array</span><span class="op">(</span><span class="fl">0.15820312</span>, dtype<span class="op">=</span><span class="va">float32</span><span class="op">)</span></span></code></pre>
+</div>
 <p>If you want to slice the data by the latitude and longitude
-coordinates you can use sel instead of isel:</p>
-<div class="codewrapper sourceCode" id="cb8">
+coordinates you can use <code>sel</code> instead of
+<code>isel</code>:</p>
+<div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>temperature_2m_slice <span class="op">=</span> ds[<span class="st">'temperature_2m'</span>].sel(latitude<span class="op">=</span><span class="bu">slice</span>(<span class="dv">50</span>, <span class="dv">60</span>), longitude<span class="op">=</span><span class="bu">slice</span>(<span class="op">-</span><span class="dv">10</span>, <span class="dv">0</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>temperature_2m_slice</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>temperature_2m_slice <span class="op">=</span> ds[<span class="st">'temperature_2m'</span>].sel(latitude<span class="op">=</span><span class="bu">slice</span>(<span class="dv">50</span>, <span class="dv">60</span>), longitude<span class="op">=</span><span class="bu">slice</span>(<span class="op">-</span><span class="dv">10</span>, <span class="dv">0</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a>temperature_2m_slice</span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="exploring-more-datasets-and-examples">Exploring more datasets and examples<a class="anchor" aria-label="anchor" href="#exploring-more-datasets-and-examples"></a></h3>
-<p>If you want to have access to more datasets, you can explore the
-dynamical.org catalog for other ECMWF datasets in Icechunk/Zarr
-format.</p>
-<p>You can also find some examples of how to access and manipulate these
-datasets in the <a href="https://dynamical.org/docs/" class="external-link">dynamical.org
-documentation</a>.</p>
+<p>If you want to have access to more datasets, you can explore the <a href="https://dynamical.org/catalog/" class="external-link">dynamical.org catalog</a> for
+other ECMWF datasets in Icechunk/Zarr format. You can also find some
+examples of how to access and manipulate these datasets in the <a href="https://dynamical.org/docs/" class="external-link">dynamical.org documentation</a>.</p>
 <div id="integrate-cartopy-for-better-visualisation" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
@@ -586,35 +589,35 @@ visualisation</h3>
 <p>You can see below an example of the integration of cartopy to
 visualise the sea zonal wind at 10 meters above the surface from the
 ECMWF AIFS SINGLE dataset:</p>
-<div class="codewrapper sourceCode" id="cb9">
+<div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a><span class="im">import</span> cartopy.feature <span class="im">as</span> cfeature</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr"</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a>wind_u_10m <span class="op">=</span> ds[<span class="st">'wind_u_10m'</span>].isel(init_time<span class="op">=</span><span class="st">"2025-01-01"</span>,method<span class="op">=</span><span class="st">"nearest"</span>).isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a></span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1" aria-label="code-block-9-8"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1" aria-label="code-block-9-9"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span>ccrs.PlateCarree())</span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1" aria-label="code-block-9-10"></a></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1" aria-label="code-block-9-11"></a><span class="co"># Add white land background</span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1" aria-label="code-block-9-12"></a>ax.add_feature(cfeature.LAND, facecolor<span class="op">=</span><span class="st">'white'</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1" aria-label="code-block-9-13"></a></span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1" aria-label="code-block-9-14"></a>ax.coastlines()</span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1" aria-label="code-block-9-15"></a>pcm <span class="op">=</span> ax.pcolormesh(</span>
-<span id="cb9-16"><a href="#cb9-16" tabindex="-1" aria-label="code-block-9-16"></a>    wind_u_10m.longitude, wind_u_10m.latitude, wind_u_10m,</span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1" aria-label="code-block-9-17"></a>    transform<span class="op">=</span>ccrs.PlateCarree(),</span>
-<span id="cb9-18"><a href="#cb9-18" tabindex="-1" aria-label="code-block-9-18"></a>    cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
-<span id="cb9-19"><a href="#cb9-19" tabindex="-1" aria-label="code-block-9-19"></a>    shading<span class="op">=</span><span class="st">"auto"</span>,</span>
-<span id="cb9-20"><a href="#cb9-20" tabindex="-1" aria-label="code-block-9-20"></a>    zorder<span class="op">=</span><span class="dv">0</span>  <span class="co"># Ensure it overlays the land</span></span>
-<span id="cb9-21"><a href="#cb9-21" tabindex="-1" aria-label="code-block-9-21"></a>)</span>
-<span id="cb9-22"><a href="#cb9-22" tabindex="-1" aria-label="code-block-9-22"></a></span>
-<span id="cb9-23"><a href="#cb9-23" tabindex="-1" aria-label="code-block-9-23"></a>plt.title(<span class="st">"Sea Zonal Wind at 10 Meters Above the Surface"</span>)</span>
-<span id="cb9-24"><a href="#cb9-24" tabindex="-1" aria-label="code-block-9-24"></a>plt.colorbar(pcm, label<span class="op">=</span>wind_u_10m.attrs.get(<span class="st">"units"</span>, <span class="st">""</span>))</span>
-<span id="cb9-25"><a href="#cb9-25" tabindex="-1" aria-label="code-block-9-25"></a>plt.tight_layout()</span>
-<span id="cb9-26"><a href="#cb9-26" tabindex="-1" aria-label="code-block-9-26"></a>plt.show()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a><span class="im">import</span> cartopy.feature <span class="im">as</span> cfeature</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>wind_u_10m <span class="op">=</span> ds[<span class="st">'wind_u_10m'</span>].isel(init_time<span class="op">=</span><span class="st">"2025-01-01"</span>,method<span class="op">=</span><span class="st">"nearest"</span>).isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span>ccrs.PlateCarree())</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1" aria-label="code-block-10-10"></a></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1" aria-label="code-block-10-11"></a><span class="co"># Add white land background</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1" aria-label="code-block-10-12"></a>ax.add_feature(cfeature.LAND, facecolor<span class="op">=</span><span class="st">'white'</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1" aria-label="code-block-10-13"></a></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1" aria-label="code-block-10-14"></a>ax.coastlines()</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1" aria-label="code-block-10-15"></a>pcm <span class="op">=</span> ax.pcolormesh(</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1" aria-label="code-block-10-16"></a>    wind_u_10m.longitude, wind_u_10m.latitude, wind_u_10m,</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1" aria-label="code-block-10-17"></a>    transform<span class="op">=</span>ccrs.PlateCarree(),</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1" aria-label="code-block-10-18"></a>    cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1" aria-label="code-block-10-19"></a>    shading<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1" aria-label="code-block-10-20"></a>    zorder<span class="op">=</span><span class="dv">0</span>  <span class="co"># Ensure it overlays the land</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1" aria-label="code-block-10-21"></a>)</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1" aria-label="code-block-10-22"></a></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1" aria-label="code-block-10-23"></a>plt.title(<span class="st">"Sea Zonal Wind at 10 Meters Above the Surface"</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1" aria-label="code-block-10-24"></a>plt.colorbar(pcm, label<span class="op">=</span>wind_u_10m.attrs.get(<span class="st">"units"</span>, <span class="st">""</span>))</span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1" aria-label="code-block-10-25"></a>plt.tight_layout()</span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1" aria-label="code-block-10-26"></a>plt.show()</span></code></pre>
 </div>
 </div>
 </div>
@@ -622,11 +625,12 @@ ECMWF AIFS SINGLE dataset:</p>
 </div>
 </section><section><h2 class="section-heading" id="era5-arco---global-reanalysis-in-zarr">ERA5 ARCO - global reanalysis in Zarr<a class="anchor" aria-label="anchor" href="#era5-arco---global-reanalysis-in-zarr"></a></h2>
 <hr class="half-width"><p>A subset of the ERA5 single-levels dataset is available in
-analysis-ready, cloud-optimised (ARCO) Zarr stores. The ARCO data is a
-repackaged version of the original ERA5 data. It allows direct
-programmatic access to a selection of the surface and wave variables
-(see below) without downloading individual files, enabling efficient and
-scalable data access and retrieval.</p>
+analysis-ready, cloud-optimised (ARCO) Zarr stores in the <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data" class="external-link">Copernicus
+Climate Data Store (CDS)</a>. The ARCO data is a repackaged version of
+the original ERA5 data. It allows direct programmatic access to a
+selection of the surface and wave variables (see below) without
+downloading individual files, enabling efficient and scalable data
+access and retrieval.</p>
 <div class="section level3">
 <h3 id="create-a-cds-account-and-get-an-api-key">Create a CDS account and get an API key<a class="anchor" aria-label="anchor" href="#create-a-cds-account-and-get-an-api-key"></a></h3>
 <ol style="list-style-type: decimal"><li><p>Go to the <a href="https://cds.climate.copernicus.eu/" class="external-link">Copernicus
@@ -639,43 +643,43 @@ copy your API key.</p></li>
 <p>Set the <code>cdsapi_key</code> variable in the code below to your
 API key. This will allow you to access the ERA5 ARCO Zarr datasets
 hosted on the Copernicus Climate Data Store.</p>
-<div class="codewrapper sourceCode" id="cb10">
+<div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>cdsapi_key <span class="op">=</span> <span class="st">"&lt;INSERT-CDS-API-KEY-HERE&gt;"</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>cdsapi_key <span class="op">=</span> <span class="st">"&lt;INSERT-CDS-API-KEY-HERE&gt;"</span></span></code></pre>
 </div>
 <p>For this example, we will use the wave dataset from the ERA5 ARCO
 dataset, which includes variables such as significant wave height (swh),
 mean wave period (mwp), and mean wave direction (mwd). The dataset is
 available in two chunking layouts: geo-chunked and time-chunked.</p>
-<div class="codewrapper sourceCode" id="cb11">
+<div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="co"># Geo-chunked wave data (optimised for time-series at a single location)</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a>geochunked_wav_url <span class="op">=</span> <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-geo-003/arco/reanalysis_era5_single_levels/wav/geoChunked.zarr"</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="co"># Time-chunked wave data (optimised for global map at a single time step)</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a>timechunked_wav_url <span class="op">=</span> <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-time-003/arco/reanalysis_era5_single_levels/wav/timeChunked.zarr"</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="co"># Geo-chunked wave data (optimised for time-series at a single location)</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a>geochunked_wav_url <span class="op">=</span> <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-geo-003/arco/reanalysis_era5_single_levels/wav/geoChunked.zarr"</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a><span class="co"># Time-chunked wave data (optimised for global map at a single time step)</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a>timechunked_wav_url <span class="op">=</span> <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-time-003/arco/reanalysis_era5_single_levels/wav/timeChunked.zarr"</span></span></code></pre>
 </div>
 <p>Let’s open the time-chunked dataset using xarray. Make sure to
 replace <code>&lt;INSERT-CDS-API-KEY-HERE&gt;</code> with your actual
 API key.</p>
-<div class="codewrapper sourceCode" id="cb12">
+<div class="codewrapper sourceCode" id="cb13">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a><span class="co"># Open the zarr store with xarray, users must insert their API key where indicated.</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>ds <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a>    timechunked_wav_url,</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>     storage_options <span class="op">=</span> {</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>        <span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>    }</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>)</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a></span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a><span class="co"># Inspect the variables</span></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a><span class="bu">print</span>(ds)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a><span class="co"># Open the zarr store with xarray, users must insert their API key where indicated.</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a>ds <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>    timechunked_wav_url,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a>     storage_options <span class="op">=</span> {</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a>        <span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>    }</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a>)</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a><span class="co"># Inspect the variables</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 <p>This is the output you should see:</p>
 <div class="codewrapper">
@@ -708,46 +712,46 @@ ARCO documentation</a>.</p>
 <p>You can see below an example of how to create a plot of the
 significant wave height (swh) variable at a single time step using
 matplotlib:</p>
-<div class="codewrapper sourceCode" id="cb14">
+<div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a><span class="co"># Select a variable (e.g. significant wave height)</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a>swh <span class="op">=</span> ds[<span class="st">"swh"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a><span class="co"># Select a single time step</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a>one_time <span class="op">=</span> swh.sel(time<span class="op">=</span><span class="st">"2000-01-01T00:00:00"</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a><span class="co"># Plot the variable</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1" aria-label="code-block-14-10"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1" aria-label="code-block-14-11"></a>one_time.plot(cmap<span class="op">=</span><span class="st">"coolwarm"</span>)</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1" aria-label="code-block-14-12"></a>plt.title(<span class="st">"ERA5 Significant Wave Height on 2000-01-01"</span>)</span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1" aria-label="code-block-14-13"></a>plt.xlabel(<span class="st">"Longitude"</span>)</span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1" aria-label="code-block-14-14"></a>plt.ylabel(<span class="st">"Latitude"</span>)</span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1" aria-label="code-block-14-15"></a>plt.show()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a><span class="co"># Select a variable (e.g. significant wave height)</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>swh <span class="op">=</span> ds[<span class="st">"swh"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a><span class="co"># Select a single time step</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>one_time <span class="op">=</span> swh.sel(time<span class="op">=</span><span class="st">"2000-01-01T00:00:00"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a><span class="co"># Plot the variable</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a>one_time.plot(cmap<span class="op">=</span><span class="st">"coolwarm"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1" aria-label="code-block-15-12"></a>plt.title(<span class="st">"ERA5 Significant Wave Height on 2000-01-01"</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1" aria-label="code-block-15-13"></a>plt.xlabel(<span class="st">"Longitude"</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1" aria-label="code-block-15-14"></a>plt.ylabel(<span class="st">"Latitude"</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1" aria-label="code-block-15-15"></a>plt.show()</span></code></pre>
 </div>
 <p>You can also use the geo-chunked dataset to get a time series of a
 specific location and plot it. You can see an example below for the
 significant wave height (swh) variable at a specific latitude and
 longitude (Rio de Janeiro coast):</p>
-<div class="codewrapper sourceCode" id="cb15">
+<div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>ds_geo <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a>    geochunked_wav_url,</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>     storage_options <span class="op">=</span> {</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>        <span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    }</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>)</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a>swh <span class="op">=</span> ds_geo[<span class="st">"swh"</span>]</span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a><span class="co"># Select a specific location (e.g. Rio de Janeiro coast)</span></span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a>swh <span class="op">=</span> swh.sel(latitude<span class="op">=-</span><span class="fl">23.0</span>, longitude<span class="op">=-</span><span class="fl">43.0</span>, method<span class="op">=</span><span class="st">"nearest"</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1" aria-label="code-block-15-12"></a></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1" aria-label="code-block-15-13"></a><span class="co"># Plot the time series</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1" aria-label="code-block-15-14"></a>swh.plot()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a>ds_geo <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a>    geochunked_wav_url,</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a>     storage_options <span class="op">=</span> {</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1" aria-label="code-block-16-5"></a>        <span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1" aria-label="code-block-16-6"></a>    }</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1" aria-label="code-block-16-7"></a>)</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1" aria-label="code-block-16-8"></a>swh <span class="op">=</span> ds_geo[<span class="st">"swh"</span>]</span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1" aria-label="code-block-16-9"></a></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1" aria-label="code-block-16-10"></a><span class="co"># Select a specific location (e.g. Rio de Janeiro coast)</span></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1" aria-label="code-block-16-11"></a>swh <span class="op">=</span> swh.sel(latitude<span class="op">=-</span><span class="fl">23.0</span>, longitude<span class="op">=-</span><span class="fl">43.0</span>, method<span class="op">=</span><span class="st">"nearest"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1" aria-label="code-block-16-12"></a></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1" aria-label="code-block-16-13"></a><span class="co"># Plot the time series</span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1" aria-label="code-block-16-14"></a>swh.plot()</span></code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -758,26 +762,27 @@ Climate Data Store</a> and the <a href="https://github.com/ecmwf-training/dss-no
 Training datasets repository</a>.</p>
 </div>
 </section><section><h2 class="section-heading" id="sofar-spotter-drifters---ragged-arrays">Sofar Spotter drifters - ragged arrays<a class="anchor" aria-label="anchor" href="#sofar-spotter-drifters---ragged-arrays"></a></h2>
-<hr class="half-width"><p>The Sofar Spotter Archive provides historical wave and inferred wind
-data from a global network of Spotter buoys, in both NetCDF and Zarr
-formats. A Spotter is a small, solar-powered drifter buoy that measures
-wave height, period, and direction, as well as GPS location. The Sofar
-company has deployed thousands of Spotters worldwide, and some of the
-data is made available for research and analysis.</p>
+<hr class="half-width"><p>The <a href="https://registry.opendata.aws/sofar-spotter-archive/" class="external-link">Sofar
+Spotter Archive</a> provides historical wave and inferred wind data from
+a global network of Spotter buoys, in both NetCDF and Zarr formats. A
+Spotter is a small, solar-powered drifter buoy that measures wave
+height, period, and direction, as well as GPS location. The <a href="https://www.sofarocean.com/" class="external-link">Sofar Ocean company</a> has deployed
+thousands of Spotters worldwide, and some of the data is made available
+for research and analysis.</p>
 <figure><img src="fig/mb_drifters.png" alt="Sofar Spotter drifters deployed by Brazilian Navy and INPE, in partnership with Sofar Ocean" class="figure mx-auto d-block"><div class="figcaption">Sofar Spotter drifters deployed by Brazilian
 Navy and INPE, in partnership with Sofar Ocean</div>
 </figure><figure><img src="fig/spotter_buoys.png" alt="Array of spotter buoys" class="figure mx-auto d-block"><div class="figcaption">Array of spotter buoys</div>
 </figure><p>First, let’s open the Zarr dataset from the Sofar Spotter Archive
 using xarray. The dataset is hosted on AWS S3 and can be accessed
 directly via its URL:</p>
-<div class="codewrapper sourceCode" id="cb16">
+<div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a>s3_uri <span class="op">=</span> <span class="st">"https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a>ds <span class="op">=</span> xr.open_zarr(s3_uri)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1" aria-label="code-block-16-5"></a>ds</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>s3_uri <span class="op">=</span> <span class="st">"https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>ds <span class="op">=</span> xr.open_zarr(s3_uri)</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>ds</span></code></pre>
 </div>
 <div class="codewrapper">
 <h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -811,8 +816,9 @@ Attributes:
 <div class="section level3">
 <h3 id="dataset-structure">Dataset structure<a class="anchor" aria-label="anchor" href="#dataset-structure"></a></h3>
 <p>This dataset was designed to follow the conventions used by NOAA for
-a similar dataset: Global Drifter Program (GDP) Drifter data. The
-explanation below was extracted and adapted from the <a href="https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane" class="external-link">OHW
+a similar dataset: <a href="https://www.aoml.noaa.gov/global-drifter-program/" class="external-link">Global Drifter
+Program (GDP)</a> Drifter data. The explanation below about this dataset
+was extracted and adapted from the <a href="https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane" class="external-link">OHW
 2024 Tutorials -
 collocating_noaa_gfs_sofar_spotter_during_hurricane</a>.</p>
 <p>Each Spotter buoy records a different number of observations because
@@ -823,9 +829,9 @@ column corresponds to a Spotter:</p>
 <figure><img src="fig/incomplete_array.png" alt="incomplete Array representation" class="figure mx-auto d-block"><div class="figcaption">incomplete Array representation</div>
 </figure><p>Although this representation is intuitive, it requires padding
 shorter time series with missing values. For large datasets, these
-unused values can occupy a substantial amount of storage.</p>
-<p>To avoid this overhead, the GDP and Sofar Spotter Archive use a
-contiguous ragged array representation:</p>
+unused values can occupy a substantial amount of storage. To avoid this
+overhead, the GDP and Sofar Spotter Archive use a contiguous ragged
+array representation:</p>
 <figure><img src="fig/ragged_array.png" alt="Ragged array structure" class="figure mx-auto d-block"><div class="figcaption">Ragged array structure</div>
 </figure><p>In a contiguous ragged array, observations from all Spotters are
 stored sequentially in a single array. Additional index variables
@@ -835,65 +841,65 @@ to store missing values while preserving the original trajectories.</p>
 <div class="section level3">
 <h3 id="plot-drift-trajectory-for-individual-drifter-colored-by-date">Plot drift trajectory for individual drifter colored by date<a class="anchor" aria-label="anchor" href="#plot-drift-trajectory-for-individual-drifter-colored-by-date"></a></h3>
 <p>Get the data for a single drifter:</p>
-<div class="codewrapper sourceCode" id="cb18">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a><span class="co"># choose a drifter by ID</span></span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a>spotter_id <span class="op">=</span> <span class="st">'SPOT-0164'</span></span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a></span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a></span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1" aria-label="code-block-18-5"></a><span class="co"># create array that points to indices for each trajectory</span></span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1" aria-label="code-block-18-6"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1" aria-label="code-block-18-7"></a></span>
-<span id="cb18-8"><a href="#cb18-8" tabindex="-1" aria-label="code-block-18-8"></a></span>
-<span id="cb18-9"><a href="#cb18-9" tabindex="-1" aria-label="code-block-18-9"></a><span class="co"># find index of chosen drifter</span></span>
-<span id="cb18-10"><a href="#cb18-10" tabindex="-1" aria-label="code-block-18-10"></a>j <span class="op">=</span> np.where(ds.trajectory<span class="op">==</span>spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
-<span id="cb18-11"><a href="#cb18-11" tabindex="-1" aria-label="code-block-18-11"></a><span class="bu">print</span>(<span class="ss">f"Drifter index for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> is </span><span class="sc">{</span>j<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-12"><a href="#cb18-12" tabindex="-1" aria-label="code-block-18-12"></a></span>
-<span id="cb18-13"><a href="#cb18-13" tabindex="-1" aria-label="code-block-18-13"></a></span>
-<span id="cb18-14"><a href="#cb18-14" tabindex="-1" aria-label="code-block-18-14"></a><span class="co"># create the slice index `sli` for data from that drifter</span></span>
-<span id="cb18-15"><a href="#cb18-15" tabindex="-1" aria-label="code-block-18-15"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j<span class="op">+</span><span class="dv">1</span>])</span></code></pre>
-</div>
-<p>Plot the trajectory colored by significant wave height (swh):</p>
 <div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="co"># choose a drifter by ID</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a>spotter_id <span class="op">=</span> <span class="st">'SPOT-0164'</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a></span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a>fig, ax <span class="op">=</span> plt.subplots(</span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>    figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>),</span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>    subplot_kw<span class="op">=</span>{<span class="st">"projection"</span>: ccrs.PlateCarree()},</span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a>)</span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1" aria-label="code-block-19-9"></a></span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1" aria-label="code-block-19-10"></a>ax.coastlines()</span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1" aria-label="code-block-19-11"></a>ax.gridlines(draw_labels<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1" aria-label="code-block-19-12"></a>ax.set_extent([<span class="dv">110</span>, <span class="dv">260</span>, <span class="op">-</span><span class="dv">10</span>, <span class="dv">60</span>], crs<span class="op">=</span>ccrs.PlateCarree())</span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1" aria-label="code-block-19-13"></a><span class="co"># Convert longitudes to the [0, 360] range</span></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1" aria-label="code-block-19-14"></a>lons <span class="op">=</span> ds.longitude[sli].compute()</span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1" aria-label="code-block-19-15"></a>lons[lons<span class="op">&lt;</span><span class="dv">0</span>] <span class="op">+=</span> <span class="dv">360</span> <span class="co"># make sure lons span [0,360] for easier mapping</span></span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1" aria-label="code-block-19-16"></a></span>
-<span id="cb19-17"><a href="#cb19-17" tabindex="-1" aria-label="code-block-19-17"></a>sc <span class="op">=</span> ax.scatter(</span>
-<span id="cb19-18"><a href="#cb19-18" tabindex="-1" aria-label="code-block-19-18"></a>    lons,</span>
-<span id="cb19-19"><a href="#cb19-19" tabindex="-1" aria-label="code-block-19-19"></a>    ds.latitude[sli],</span>
-<span id="cb19-20"><a href="#cb19-20" tabindex="-1" aria-label="code-block-19-20"></a>    c<span class="op">=</span>ds.significantWaveHeight[sli],</span>
-<span id="cb19-21"><a href="#cb19-21" tabindex="-1" aria-label="code-block-19-21"></a>    s<span class="op">=</span><span class="dv">12</span>,</span>
-<span id="cb19-22"><a href="#cb19-22" tabindex="-1" aria-label="code-block-19-22"></a>    cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
-<span id="cb19-23"><a href="#cb19-23" tabindex="-1" aria-label="code-block-19-23"></a>    transform<span class="op">=</span>ccrs.PlateCarree(),</span>
-<span id="cb19-24"><a href="#cb19-24" tabindex="-1" aria-label="code-block-19-24"></a>)</span>
-<span id="cb19-25"><a href="#cb19-25" tabindex="-1" aria-label="code-block-19-25"></a></span>
-<span id="cb19-26"><a href="#cb19-26" tabindex="-1" aria-label="code-block-19-26"></a>plt.colorbar(</span>
-<span id="cb19-27"><a href="#cb19-27" tabindex="-1" aria-label="code-block-19-27"></a>    sc,</span>
-<span id="cb19-28"><a href="#cb19-28" tabindex="-1" aria-label="code-block-19-28"></a>    ax<span class="op">=</span>ax,</span>
-<span id="cb19-29"><a href="#cb19-29" tabindex="-1" aria-label="code-block-19-29"></a>    label<span class="op">=</span><span class="st">"Significant Wave Height (m)"</span>,</span>
-<span id="cb19-30"><a href="#cb19-30" tabindex="-1" aria-label="code-block-19-30"></a>    shrink<span class="op">=</span><span class="fl">0.3</span>,</span>
-<span id="cb19-31"><a href="#cb19-31" tabindex="-1" aria-label="code-block-19-31"></a>    pad<span class="op">=</span><span class="fl">0.08</span>,</span>
-<span id="cb19-32"><a href="#cb19-32" tabindex="-1" aria-label="code-block-19-32"></a>)</span>
-<span id="cb19-33"><a href="#cb19-33" tabindex="-1" aria-label="code-block-19-33"></a></span>
-<span id="cb19-34"><a href="#cb19-34" tabindex="-1" aria-label="code-block-19-34"></a>ax.set_title(<span class="ss">f"Trajectory of </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> colored by Significant Wave Height"</span>)</span>
-<span id="cb19-35"><a href="#cb19-35" tabindex="-1" aria-label="code-block-19-35"></a></span>
-<span id="cb19-36"><a href="#cb19-36" tabindex="-1" aria-label="code-block-19-36"></a>plt.show()</span></code></pre>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a><span class="co"># create array that points to indices for each trajectory</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1" aria-label="code-block-19-9"></a><span class="co"># find index of chosen drifter</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1" aria-label="code-block-19-10"></a>j <span class="op">=</span> np.where(ds.trajectory<span class="op">==</span>spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1" aria-label="code-block-19-11"></a><span class="bu">print</span>(<span class="ss">f"Drifter index for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> is </span><span class="sc">{</span>j<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1" aria-label="code-block-19-12"></a></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1" aria-label="code-block-19-13"></a></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1" aria-label="code-block-19-14"></a><span class="co"># create the slice index `sli` for data from that drifter</span></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1" aria-label="code-block-19-15"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j<span class="op">+</span><span class="dv">1</span>])</span></code></pre>
+</div>
+<p>Plot the trajectory colored by significant wave height (swh):</p>
+<div class="codewrapper sourceCode" id="cb20">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a>fig, ax <span class="op">=</span> plt.subplots(</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a>    figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a>    subplot_kw<span class="op">=</span>{<span class="st">"projection"</span>: ccrs.PlateCarree()},</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1" aria-label="code-block-20-8"></a>)</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1" aria-label="code-block-20-9"></a></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1" aria-label="code-block-20-10"></a>ax.coastlines()</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1" aria-label="code-block-20-11"></a>ax.gridlines(draw_labels<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1" aria-label="code-block-20-12"></a>ax.set_extent([<span class="dv">110</span>, <span class="dv">260</span>, <span class="op">-</span><span class="dv">10</span>, <span class="dv">60</span>], crs<span class="op">=</span>ccrs.PlateCarree())</span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1" aria-label="code-block-20-13"></a><span class="co"># Convert longitudes to the [0, 360] range</span></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1" aria-label="code-block-20-14"></a>lons <span class="op">=</span> ds.longitude[sli].compute()</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1" aria-label="code-block-20-15"></a>lons[lons<span class="op">&lt;</span><span class="dv">0</span>] <span class="op">+=</span> <span class="dv">360</span> <span class="co"># make sure lons span [0,360] for easier mapping</span></span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1" aria-label="code-block-20-16"></a></span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1" aria-label="code-block-20-17"></a>sc <span class="op">=</span> ax.scatter(</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1" aria-label="code-block-20-18"></a>    lons,</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1" aria-label="code-block-20-19"></a>    ds.latitude[sli],</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1" aria-label="code-block-20-20"></a>    c<span class="op">=</span>ds.significantWaveHeight[sli],</span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1" aria-label="code-block-20-21"></a>    s<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1" aria-label="code-block-20-22"></a>    cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1" aria-label="code-block-20-23"></a>    transform<span class="op">=</span>ccrs.PlateCarree(),</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1" aria-label="code-block-20-24"></a>)</span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1" aria-label="code-block-20-25"></a></span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1" aria-label="code-block-20-26"></a>plt.colorbar(</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1" aria-label="code-block-20-27"></a>    sc,</span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1" aria-label="code-block-20-28"></a>    ax<span class="op">=</span>ax,</span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1" aria-label="code-block-20-29"></a>    label<span class="op">=</span><span class="st">"Significant Wave Height (m)"</span>,</span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1" aria-label="code-block-20-30"></a>    shrink<span class="op">=</span><span class="fl">0.3</span>,</span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1" aria-label="code-block-20-31"></a>    pad<span class="op">=</span><span class="fl">0.08</span>,</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1" aria-label="code-block-20-32"></a>)</span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1" aria-label="code-block-20-33"></a></span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1" aria-label="code-block-20-34"></a>ax.set_title(<span class="ss">f"Trajectory of </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> colored by Significant Wave Height"</span>)</span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1" aria-label="code-block-20-35"></a></span>
+<span id="cb20-36"><a href="#cb20-36" tabindex="-1" aria-label="code-block-20-36"></a>plt.show()</span></code></pre>
 </div>
 <figure><img src="fig/trajectory_spot0164.png" alt="Trajectory of SPOT-0164" class="figure mx-auto d-block"><div class="figcaption">Trajectory of SPOT-0164</div>
 </figure><div id="exercise-1---ecmwf-aifs-single" class="callout challenge">
@@ -924,31 +930,31 @@ week).</li>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb20">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="co"># Open the AIFS single dataset</span></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a></span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a><span class="co"># Inspect dimensions and coordinates</span></span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a><span class="bu">print</span>(ds.dims)</span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1" aria-label="code-block-20-8"></a><span class="bu">print</span>(ds.coords)</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1" aria-label="code-block-20-9"></a></span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1" aria-label="code-block-20-10"></a><span class="co"># Choose a variable</span></span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1" aria-label="code-block-20-11"></a>temp <span class="op">=</span> ds[<span class="st">"temperature_2m"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1" aria-label="code-block-20-12"></a></span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1" aria-label="code-block-20-13"></a><span class="co"># Subset to one week (e.g. first week of the latest init_time)</span></span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1" aria-label="code-block-20-14"></a>temp_week <span class="op">=</span> temp.isel(init_time<span class="op">=-</span><span class="dv">1</span>).sel(lead_time<span class="op">=</span><span class="bu">slice</span>(np.timedelta64(<span class="dv">0</span>, <span class="st">"D"</span>), np.timedelta64(<span class="dv">7</span>, <span class="st">"D"</span>)))</span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1" aria-label="code-block-20-15"></a></span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1" aria-label="code-block-20-16"></a><span class="co"># Global mean time series</span></span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1" aria-label="code-block-20-17"></a>global_ts <span class="op">=</span> temp_week.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1" aria-label="code-block-20-18"></a><span class="bu">print</span>(global_ts)</span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1" aria-label="code-block-20-19"></a></span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1" aria-label="code-block-20-20"></a><span class="co"># Map at a single time step (e.g. first lead_time of the week)</span></span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1" aria-label="code-block-20-21"></a>one_time <span class="op">=</span> temp_week.isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1" aria-label="code-block-20-22"></a>one_time.plot()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Open the AIFS single dataset</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a><span class="co"># Inspect dimensions and coordinates</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a><span class="bu">print</span>(ds.dims)</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a><span class="bu">print</span>(ds.coords)</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a><span class="co"># Choose a variable</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a>temp <span class="op">=</span> ds[<span class="st">"temperature_2m"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a></span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1" aria-label="code-block-21-13"></a><span class="co"># Subset to one week (e.g. first week of the latest init_time)</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1" aria-label="code-block-21-14"></a>temp_week <span class="op">=</span> temp.isel(init_time<span class="op">=-</span><span class="dv">1</span>).sel(lead_time<span class="op">=</span><span class="bu">slice</span>(np.timedelta64(<span class="dv">0</span>, <span class="st">"D"</span>), np.timedelta64(<span class="dv">7</span>, <span class="st">"D"</span>)))</span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1" aria-label="code-block-21-15"></a></span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1" aria-label="code-block-21-16"></a><span class="co"># Global mean time series</span></span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1" aria-label="code-block-21-17"></a>global_ts <span class="op">=</span> temp_week.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb21-18"><a href="#cb21-18" tabindex="-1" aria-label="code-block-21-18"></a><span class="bu">print</span>(global_ts)</span>
+<span id="cb21-19"><a href="#cb21-19" tabindex="-1" aria-label="code-block-21-19"></a></span>
+<span id="cb21-20"><a href="#cb21-20" tabindex="-1" aria-label="code-block-21-20"></a><span class="co"># Map at a single time step (e.g. first lead_time of the week)</span></span>
+<span id="cb21-21"><a href="#cb21-21" tabindex="-1" aria-label="code-block-21-21"></a>one_time <span class="op">=</span> temp_week.isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb21-22"><a href="#cb21-22" tabindex="-1" aria-label="code-block-21-22"></a>one_time.plot()</span></code></pre>
 </div>
 </div>
 </div>
@@ -988,37 +994,37 @@ year).</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb21">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a>cdsapi_key <span class="op">=</span> <span class="st">"&lt;INSERT-CDS-API-KEY-HERE&gt;"</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a><span class="co"># Open the ERA5 dataset</span></span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a>era5 <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a>    <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-time-003/arco/reanalysis_era5_single_levels/wav/timeChunked.zarr"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a>    storage_options<span class="op">=</span>{<span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}}</span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>)</span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a><span class="co"># Inspect dimensions, data variables, and coordinates</span></span>
-<span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a><span class="bu">print</span>(era5.dims)</span>
-<span id="cb21-13"><a href="#cb21-13" tabindex="-1" aria-label="code-block-21-13"></a><span class="bu">print</span>(era5.data_vars)</span>
-<span id="cb21-14"><a href="#cb21-14" tabindex="-1" aria-label="code-block-21-14"></a><span class="bu">print</span>(era5.coords)</span>
-<span id="cb21-15"><a href="#cb21-15" tabindex="-1" aria-label="code-block-21-15"></a></span>
-<span id="cb21-16"><a href="#cb21-16" tabindex="-1" aria-label="code-block-21-16"></a><span class="co"># Select a variable (e.g. mean wave period)</span></span>
-<span id="cb21-17"><a href="#cb21-17" tabindex="-1" aria-label="code-block-21-17"></a>mwp <span class="op">=</span> era5[<span class="st">"mwp"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
-<span id="cb21-18"><a href="#cb21-18" tabindex="-1" aria-label="code-block-21-18"></a></span>
-<span id="cb21-19"><a href="#cb21-19" tabindex="-1" aria-label="code-block-21-19"></a><span class="co"># Subset to a specific time range (e.g. one year)</span></span>
-<span id="cb21-20"><a href="#cb21-20" tabindex="-1" aria-label="code-block-21-20"></a>mwp_year <span class="op">=</span> mwp.sel(time<span class="op">=</span><span class="bu">slice</span>(<span class="st">"2020-01-01"</span>, <span class="st">"2020-12-31"</span>))</span>
-<span id="cb21-21"><a href="#cb21-21" tabindex="-1" aria-label="code-block-21-21"></a></span>
-<span id="cb21-22"><a href="#cb21-22" tabindex="-1" aria-label="code-block-21-22"></a><span class="co"># Global mean time series</span></span>
-<span id="cb21-23"><a href="#cb21-23" tabindex="-1" aria-label="code-block-21-23"></a>global_ts <span class="op">=</span> mwp_year.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb21-24"><a href="#cb21-24" tabindex="-1" aria-label="code-block-21-24"></a><span class="bu">print</span>(global_ts)</span>
-<span id="cb21-25"><a href="#cb21-25" tabindex="-1" aria-label="code-block-21-25"></a></span>
-<span id="cb21-26"><a href="#cb21-26" tabindex="-1" aria-label="code-block-21-26"></a><span class="co"># Spatial map at a single time step (e.g. first time step of the year)</span></span>
-<span id="cb21-27"><a href="#cb21-27" tabindex="-1" aria-label="code-block-21-27"></a>one_time <span class="op">=</span> mwp_year.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb21-28"><a href="#cb21-28" tabindex="-1" aria-label="code-block-21-28"></a>one_time.plot()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a>cdsapi_key <span class="op">=</span> <span class="st">"&lt;INSERT-CDS-API-KEY-HERE&gt;"</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="co"># Open the ERA5 dataset</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>era5 <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a>    <span class="st">"https://arco.datastores.ecmwf.int/cadl-arco-time-003/arco/reanalysis_era5_single_levels/wav/timeChunked.zarr"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a>    storage_options<span class="op">=</span>{<span class="st">"headers"</span>: {<span class="st">"Authorization"</span>: <span class="ss">f"Bearer </span><span class="sc">{</span>cdsapi_key<span class="sc">}</span><span class="ss">"</span>}}</span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a>)</span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1" aria-label="code-block-22-10"></a></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1" aria-label="code-block-22-11"></a><span class="co"># Inspect dimensions, data variables, and coordinates</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1" aria-label="code-block-22-12"></a><span class="bu">print</span>(era5.dims)</span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1" aria-label="code-block-22-13"></a><span class="bu">print</span>(era5.data_vars)</span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1" aria-label="code-block-22-14"></a><span class="bu">print</span>(era5.coords)</span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1" aria-label="code-block-22-15"></a></span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1" aria-label="code-block-22-16"></a><span class="co"># Select a variable (e.g. mean wave period)</span></span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1" aria-label="code-block-22-17"></a>mwp <span class="op">=</span> era5[<span class="st">"mwp"</span>]  <span class="co"># adjust to match the dataset variable names</span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1" aria-label="code-block-22-18"></a></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1" aria-label="code-block-22-19"></a><span class="co"># Subset to a specific time range (e.g. one year)</span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1" aria-label="code-block-22-20"></a>mwp_year <span class="op">=</span> mwp.sel(time<span class="op">=</span><span class="bu">slice</span>(<span class="st">"2020-01-01"</span>, <span class="st">"2020-12-31"</span>))</span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1" aria-label="code-block-22-21"></a></span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1" aria-label="code-block-22-22"></a><span class="co"># Global mean time series</span></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1" aria-label="code-block-22-23"></a>global_ts <span class="op">=</span> mwp_year.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb22-24"><a href="#cb22-24" tabindex="-1" aria-label="code-block-22-24"></a><span class="bu">print</span>(global_ts)</span>
+<span id="cb22-25"><a href="#cb22-25" tabindex="-1" aria-label="code-block-22-25"></a></span>
+<span id="cb22-26"><a href="#cb22-26" tabindex="-1" aria-label="code-block-22-26"></a><span class="co"># Spatial map at a single time step (e.g. first time step of the year)</span></span>
+<span id="cb22-27"><a href="#cb22-27" tabindex="-1" aria-label="code-block-22-27"></a>one_time <span class="op">=</span> mwp_year.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-28"><a href="#cb22-28" tabindex="-1" aria-label="code-block-22-28"></a>one_time.plot()</span></code></pre>
 </div>
 </div>
 </div>
@@ -1053,38 +1059,38 @@ similar) and extract its time series:</li>
 </button>
 <div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb22">
+<div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a></span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a><span class="co"># Open the Sofar Spotter drifter dataset</span></span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a>s3_uri <span class="op">=</span> <span class="st">"https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"</span></span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>ds_spot <span class="op">=</span> xr.open_zarr(s3_uri)</span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a><span class="co"># Inspect dimensions, coordinates, and data variables</span></span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="bu">print</span>(ds_spot.dims)</span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a><span class="bu">print</span>(ds_spot.coords)</span>
-<span id="cb22-10"><a href="#cb22-10" tabindex="-1" aria-label="code-block-22-10"></a><span class="bu">print</span>(ds_spot.data_vars)</span>
-<span id="cb22-11"><a href="#cb22-11" tabindex="-1" aria-label="code-block-22-11"></a></span>
-<span id="cb22-12"><a href="#cb22-12" tabindex="-1" aria-label="code-block-22-12"></a><span class="co"># Identify the ragged structure</span></span>
-<span id="cb22-13"><a href="#cb22-13" tabindex="-1" aria-label="code-block-22-13"></a><span class="co"># 'trajectory' dimension represents different drifters, 'index' represents sample indices</span></span>
-<span id="cb22-14"><a href="#cb22-14" tabindex="-1" aria-label="code-block-22-14"></a><span class="co"># Choose one trajectory and extract its time series</span></span>
-<span id="cb22-15"><a href="#cb22-15" tabindex="-1" aria-label="code-block-22-15"></a>spotter_id <span class="op">=</span> <span class="st">"SPOT-010001"</span></span>
-<span id="cb22-16"><a href="#cb22-16" tabindex="-1" aria-label="code-block-22-16"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds_spot.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb22-17"><a href="#cb22-17" tabindex="-1" aria-label="code-block-22-17"></a>j <span class="op">=</span> np.where(ds_spot.trajectory <span class="op">==</span> spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
-<span id="cb22-18"><a href="#cb22-18" tabindex="-1" aria-label="code-block-22-18"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j <span class="op">+</span> <span class="dv">1</span>])</span>
-<span id="cb22-19"><a href="#cb22-19" tabindex="-1" aria-label="code-block-22-19"></a></span>
-<span id="cb22-20"><a href="#cb22-20" tabindex="-1" aria-label="code-block-22-20"></a><span class="co"># Plot a time series of significant wave height for that trajectory</span></span>
-<span id="cb22-21"><a href="#cb22-21" tabindex="-1" aria-label="code-block-22-21"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb22-22"><a href="#cb22-22" tabindex="-1" aria-label="code-block-22-22"></a></span>
-<span id="cb22-23"><a href="#cb22-23" tabindex="-1" aria-label="code-block-22-23"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb22-24"><a href="#cb22-24" tabindex="-1" aria-label="code-block-22-24"></a>plt.plot(ds_spot.time[sli], ds_spot.significantWaveHeight[sli])</span>
-<span id="cb22-25"><a href="#cb22-25" tabindex="-1" aria-label="code-block-22-25"></a>plt.title(<span class="ss">f"Significant Wave Height for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb22-26"><a href="#cb22-26" tabindex="-1" aria-label="code-block-22-26"></a>plt.xlabel(<span class="st">"Time"</span>)</span>
-<span id="cb22-27"><a href="#cb22-27" tabindex="-1" aria-label="code-block-22-27"></a>plt.ylabel(<span class="st">"Significant Wave Height (m)"</span>)</span>
-<span id="cb22-28"><a href="#cb22-28" tabindex="-1" aria-label="code-block-22-28"></a>plt.grid()</span>
-<span id="cb22-29"><a href="#cb22-29" tabindex="-1" aria-label="code-block-22-29"></a>plt.show()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a><span class="co"># Open the Sofar Spotter drifter dataset</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a>s3_uri <span class="op">=</span> <span class="st">"https://sofar-spotter-archive.s3.amazonaws.com/spotter_data_bulk_zarr"</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>ds_spot <span class="op">=</span> xr.open_zarr(s3_uri)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a><span class="co"># Inspect dimensions, coordinates, and data variables</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a><span class="bu">print</span>(ds_spot.dims)</span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1" aria-label="code-block-23-9"></a><span class="bu">print</span>(ds_spot.coords)</span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1" aria-label="code-block-23-10"></a><span class="bu">print</span>(ds_spot.data_vars)</span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1" aria-label="code-block-23-11"></a></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1" aria-label="code-block-23-12"></a><span class="co"># Identify the ragged structure</span></span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1" aria-label="code-block-23-13"></a><span class="co"># 'trajectory' dimension represents different drifters, 'index' represents sample indices</span></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1" aria-label="code-block-23-14"></a><span class="co"># Choose one trajectory and extract its time series</span></span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1" aria-label="code-block-23-15"></a>spotter_id <span class="op">=</span> <span class="st">"SPOT-010001"</span></span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1" aria-label="code-block-23-16"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds_spot.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" tabindex="-1" aria-label="code-block-23-17"></a>j <span class="op">=</span> np.where(ds_spot.trajectory <span class="op">==</span> spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb23-18"><a href="#cb23-18" tabindex="-1" aria-label="code-block-23-18"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j <span class="op">+</span> <span class="dv">1</span>])</span>
+<span id="cb23-19"><a href="#cb23-19" tabindex="-1" aria-label="code-block-23-19"></a></span>
+<span id="cb23-20"><a href="#cb23-20" tabindex="-1" aria-label="code-block-23-20"></a><span class="co"># Plot a time series of significant wave height for that trajectory</span></span>
+<span id="cb23-21"><a href="#cb23-21" tabindex="-1" aria-label="code-block-23-21"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb23-22"><a href="#cb23-22" tabindex="-1" aria-label="code-block-23-22"></a></span>
+<span id="cb23-23"><a href="#cb23-23" tabindex="-1" aria-label="code-block-23-23"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb23-24"><a href="#cb23-24" tabindex="-1" aria-label="code-block-23-24"></a>plt.plot(ds_spot.time[sli], ds_spot.significantWaveHeight[sli])</span>
+<span id="cb23-25"><a href="#cb23-25" tabindex="-1" aria-label="code-block-23-25"></a>plt.title(<span class="ss">f"Significant Wave Height for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb23-26"><a href="#cb23-26" tabindex="-1" aria-label="code-block-23-26"></a>plt.xlabel(<span class="st">"Time"</span>)</span>
+<span id="cb23-27"><a href="#cb23-27" tabindex="-1" aria-label="code-block-23-27"></a>plt.ylabel(<span class="st">"Significant Wave Height (m)"</span>)</span>
+<span id="cb23-28"><a href="#cb23-28" tabindex="-1" aria-label="code-block-23-28"></a>plt.grid()</span>
+<span id="cb23-29"><a href="#cb23-29" tabindex="-1" aria-label="code-block-23-29"></a>plt.show()</span></code></pre>
 </div>
 </div>
 </div>
@@ -1118,16 +1124,17 @@ near-present-day simulations.</li>
 </ul></div>
 </div>
 </div>
-<div id="exercise-4---build-your-own-mini-project" class="callout discussion">
+<div id="exercise-4-optional---build-your-own-mini-project" class="callout discussion">
 <div class="callout-square">
 <i class="callout-icon" data-feather="message-circle"></i>
 </div>
 <span class="callout-header">Discussion</span>
-<div id="exercise-4---build-your-own-mini-project" class="callout-inner">
-<h3 class="callout-title">Exercise 4 - Build your own mini project</h3>
+<div id="exercise-4-optional---build-your-own-mini-project" class="callout-inner">
+<h3 class="callout-title">Exercise 4 (Optional) - Build your own mini
+project</h3>
 <div class="callout-content">
-<p>Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, or another
-Zarr dataset you know) and design a mini project:</p>
+<p>Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, NEMO, or
+another Zarr dataset you know) and design a mini project:</p>
 <ol style="list-style-type: decimal"><li>Define a question you want to answer (e.g. “How has near‑surface
 temperature changed in a region over a given period?” or “What is the
 distribution of wave heights across the Spotter network?”).</li>
@@ -1159,9 +1166,8 @@ discuss different approaches.</p>
 <ul><li>“Many open Zarr datasets are available for oceanography, climate,
 and meteorology, including ERA5 ARCO, Sofar Spotter drifters, ECMWF IFS
 ensemble forecasts, CMIP6, and marine products.”</li>
-<li>“Python tools like xarray, zarr, fsspec, and clouddrift make it
-straightforward to open and explore Zarr datasets hosted on cloud object
-storage.”</li>
+<li>“Python tools like xarray, zarr, and fsspec make it straightforward
+to open and explore Zarr datasets hosted on cloud object storage.”</li>
 <li>“Real-world Zarr datasets illustrate regular grids, ragged arrays,
 ensemble dimensions, and more, providing rich practice for accessing,
 analysing, and understanding chunked data.”</li>
@@ -1236,8 +1242,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/08-handson-zarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/08-handson-zarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-28",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

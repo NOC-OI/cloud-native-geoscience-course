@@ -212,7 +212,6 @@
         <ul><li><a href="#why-formats-and-metadata-matter">Why formats and metadata matter</a></li>
 <li><a href="#common-data-formats-in-oceanography-and-meteorology">Common data formats in oceanography and meteorology</a></li>
 <li><a href="#what-is-metadata">What is metadata?</a></li>
-<li><a href="#controlled-vocabularies-and-vocabulary-services">Controlled vocabularies and vocabulary services</a></li>
 <li><a href="#key-standards-you-should-know">Key standards you should know</a></li>
 <li><a href="#why-following-standards-is-so-important">Why following standards is so important</a></li>
         </ul></div><!--/div.accordion-body-->
@@ -414,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Introduction to Data Formats, Metadata, and Vocabulary</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/01-intro.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -493,7 +492,7 @@ ourselves.</p>
 focus on those most relevant to gridded, multidimensional ocean and
 atmosphere data, and then briefly note other formats that appear around
 them in modern workflows.</p>
-<div class="section level3">
+<figure><img src="fig/file_formats.png" alt="Common file formats in environmental data, including NetCDF, HDF5, Zarr, GRIB, BUFR, GeoTIFF, GeoJSON, Shapefile, Parquet/GeoParquet, and CSV." class="figure mx-auto d-block"></figure><div class="section level3">
 <h3 id="selfdescribing-array-formats">Self‑describing array formats<a class="anchor" aria-label="anchor" href="#selfdescribing-array-formats"></a></h3>
 <p>These formats store both array data and structural metadata
 (dimensions, variables, units, coordinate systems) in the same file or
@@ -512,7 +511,7 @@ internal structure. It is used for satellite products, model output and
 other multidimensional data.</li>
 <li>
 <a href="https://zarr.dev/" class="external-link"><strong>Zarr</strong></a> is a newer,
-cloud‑native format for chunked, N‑dimensional arrays; the GeoZarr
+cloud‑native format for chunked, N‑dimensional arrays. The GeoZarr
 standard describes how to represent geospatial datasets in Zarr using
 concepts from the Unidata Common Data Model, including dimensions,
 coordinate variables, attributes and metadata style.</li>
@@ -607,7 +606,7 @@ Shapefile/GeoJSON workflows in logistics, urban planning, mobility,
 environmental monitoring, remote sensing, and national‑scale GIS
 platforms, because they are compact, fast to scan, and integrate
 directly with analytics engines like Spark, DuckDB, BigQuery, Snowflake
-and modern GIS tools [^clement].</p>
+and modern GIS tools.</p>
 <p>In this course, we mention Parquet/GeoParquet as part of the broader
 cloud‑native ecosystem, but our main focus is on self‑describing array
 formats (NetCDF, HDF5, Zarr and GeoZarr) for multidimensional ocean and
@@ -633,9 +632,12 @@ geographic information define sets of metadata elements covering
 identification, extent, quality, spatial and temporal schema, reference
 systems and distribution. These are used in catalogues and portals to
 support dataset discovery and evaluation.</p>
-</section><section><h2 class="section-heading" id="controlled-vocabularies-and-vocabulary-services">Controlled vocabularies and vocabulary services<a class="anchor" aria-label="anchor" href="#controlled-vocabularies-and-vocabulary-services"></a></h2>
-<hr class="half-width"><p>Free‑text metadata can be ambiguous (“temp”, “T”, “temperature”) and
-hard to search; controlled vocabularies fix this by providing curated
+<figure><img src="fig/metadata_words.png" alt="Word cloud of common metadata elements, including title, abstract, keywords, contact, spatial extent, temporal extent, units, standard_name, cell_methods, coordinates, bounds, grid_mapping, quality flags, provenance." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://www.seadatanet.org/Standards" class="external-link uri">https://www.seadatanet.org/Standards</a>
+</div>
+</figure><div class="section level3">
+<h3 id="controlled-vocabularies-and-vocabulary-services">Controlled vocabularies and vocabulary services<a class="anchor" aria-label="anchor" href="#controlled-vocabularies-and-vocabulary-services"></a></h3>
+<p>Free‑text metadata can be ambiguous (“temp”, “T”, “temperature”) and
+hard to search. Controlled vocabularies fix this by providing curated
 lists of standard terms and identifiers.</p>
 <p>The <a href="https://vocab.nerc.ac.uk/" class="external-link">NERC Vocabulary Server
 (NVS)</a>, operated by the <a href="https://www.bodc.ac.uk/" class="external-link">British
@@ -672,8 +674,8 @@ datasets.</p>
 might be described by a P01 code in NVS that encodes the phenomenon,
 medium, vertical position and statistical operation in a single,
 standardised label. Using that code in your metadata ensures different
-datasets use *&amp;<strong>exactly</strong> the same concept when they
-mean the same thing.</p>
+datasets use exactly the same concept when they mean the same thing.</p>
+</div>
 </div>
 </div>
 </div>
@@ -738,17 +740,17 @@ datasets and support cloud‑native discovery workflows.</p>
 </div>
 <div class="section level3">
 <h3 id="metadata-inside-data-files-vs-discovery-metadata">Metadata inside data files vs discovery metadata<a class="anchor" aria-label="anchor" href="#metadata-inside-data-files-vs-discovery-metadata"></a></h3>
-<ul><li>In formats like NetCDF, metadata lives “inside” the file as
+<p>In formats like NetCDF, metadata lives “inside” the file as
 attributes attached to variables and dimensions
 (e.g. <code>units</code>, <code>standard_name</code>,
 <code>long_name</code>, <code>history</code>). Normally, this metadata
 is structured according to the CF conventions, which allow software
-tools to interpret the data correctly.</li>
-<li>Discovery metadata standards (MEDIN, GEMINI, INSPIRE, ISO 19115,
+tools to interpret the data correctly.</p>
+<p>Discovery metadata standards (MEDIN, GEMINI, INSPIRE, ISO 19115,
 STAC) describe datasets at a higher level, typically as XML or JSON
 records in catalogues, including title, abstract, keywords, contact,
-spatial/temporal extent, and links to data services.</li>
-</ul><p>Both layers are needed: internal metadata lets analysis tools
+spatial/temporal extent, and links to data services.</p>
+<p>Both layers are needed: internal metadata lets analysis tools
 interpret arrays correctly, while discovery metadata lets users and
 catalogues know the dataset exists and decide whether it is suitable for
 their purpose.</p>
@@ -776,12 +778,11 @@ answers.</p>
 <div id="accordionSolution1" class="accordion challenge-accordion accordion-flush">
 <div class="accordion-item">
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
-  <h4 class="accordion-header" id="headingSolution1">
-  Solution (example answers)
-  </h4>
+  <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
+<p>Example answers:</p>
 <ol style="list-style-type: decimal"><li>NetCDF (or cloud‑native Zarr) with CF conventions for internal
 metadata, plus an ISO 19115/INSPIRE‑compliant discovery metadata record
 using the relevant national profile (e.g. MEDIN Discovery Metadata in
@@ -825,8 +826,8 @@ over the data lifecycle.</li>
 </ul><p>For cloud‑native data, standards are what allow us to move from
 traditional files to object storage and APIs without losing meaning:
 GeoZarr’s alignment with CF and NetCDF, and catalogue metadata aligned
-with ISO/INSPIRE, make Zarr‑based datasets interoperable with both
-scientific and geospatial ecosystems.</p>
+with STAC, make Zarr‑based datasets interoperable with both scientific
+and geospatial ecosystems.</p>
 <div id="exercise-2---spot-the-missing-metadata" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -855,16 +856,15 @@ the situation?</li>
 <div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
 <div class="accordion-item">
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
-  <h4 class="accordion-header" id="headingSolution2">
-  Solution (example points)
-  </h4>
+  <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
+<p>Example answers:</p>
 <ol style="list-style-type: decimal"><li>Without <code>units</code>, users cannot be sure whether
-<code>temp</code> is in Kelvin, Celsius, or something else; without
+<code>temp</code> is in Kelvin, Celsius, or something else. Without
 <code>standard_name</code>, automated tools cannot recognise the
-variable as sea surface temperature; ambiguous time coordinates make it
+variable as sea surface temperature. Ambiguous time coordinates make it
 hard to align with other datasets or interpret the temporal
 coverage.</li>
 <li>At minimum, add CF attributes:
@@ -977,8 +977,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/01-intro.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/01-intro.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

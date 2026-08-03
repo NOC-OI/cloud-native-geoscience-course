@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">10%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 11%" aria-valuenow="11" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">11%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -227,10 +227,7 @@
 
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
-        <ul><li><a href="#hey-lets-not-download-the-whole-file-every-time.-cheipesh-2018">“Hey, let’s not download the whole file every time.” (Cheipesh,
-2018)</a></li>
-<li><a href="#from-files-to-cloud-objects">From files to cloud objects</a></li>
-<li><a href="#what-makes-a-format-cloud-native">What makes a format cloud-native?</a></li>
+        <ul><li><a href="#hey-lets-not-download-the-whole-file-every-time.cheipesh2018">“Hey, let’s not download the whole file every time.”</a><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
 <li><a href="#key-formats-and-approaches-in-earth-science">Key formats and approaches in Earth science</a></li>
 <li><a href="#why-not-rely-only-on-traditional-formats">Why not rely only on traditional formats?</a></li>
 <li><a href="#how-this-changes-workflows">How this changes workflows</a></li>
@@ -416,13 +413,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>What Are Cloud-Native Formats?</h1>
-        <p>Last updated on 2026-07-20 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/03-cloudnative-formats.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 20 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 25 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -464,8 +461,8 @@ sharing, and analysis.”</li>
 </div>
 </div>
 </div>
-<section><h2 class="section-heading" id="hey-lets-not-download-the-whole-file-every-time--cheipesh-2018">“Hey, let’s not download the whole file every time.” (Cheipesh,
-2018)<a class="anchor" aria-label="anchor" href="#hey-lets-not-download-the-whole-file-every-time--cheipesh-2018"></a></h2>
+<section><h2 class="section-heading" id="hey-lets-not-download-the-whole-file-every-time-cheipesh2018">“Hey, let’s not download the whole file every time.”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+<a class="anchor" aria-label="anchor" href="#hey-lets-not-download-the-whole-file-every-time-cheipesh2018"></a></h2>
 <hr class="half-width"><p>Environmental data is growing rapidly in size and complexity, and
 traditional approaches based on downloading files are becoming
 increasingly impractical for scientific work. Users often cannot
@@ -476,8 +473,9 @@ access to the parts of a dataset we actually need, without requiring
 complete file downloads first. This matters in oceanography, climate,
 and meteorology, where datasets are often large, multidimensional, and
 shared by many users.</p>
-</section><section><h2 class="section-heading" id="from-files-to-cloud-objects">From files to cloud objects<a class="anchor" aria-label="anchor" href="#from-files-to-cloud-objects"></a></h2>
-<hr class="half-width"><p>Traditional scientific formats such as NetCDF, GRIB, and HDF5 were
+<div class="section level3">
+<h3 id="from-files-to-cloud-objects">From files to cloud objects<a class="anchor" aria-label="anchor" href="#from-files-to-cloud-objects"></a></h3>
+<p>Traditional scientific formats such as NetCDF, GRIB, and HDF5 were
 designed mainly for file-based storage systems: local disks, shared
 servers, and HPC filesystems. In that world, the standard workflow is
 often “download the file, open the file, analyse the file”.</p>
@@ -487,10 +485,12 @@ over HTTP or S3-style APIs. In this setting, performance depends not
 just on how data is encoded, but also on how many requests are needed,
 where metadata lives, and whether small subsets can be fetched
 efficiently.</p>
-</section><section><h2 class="section-heading" id="what-makes-a-format-cloud-native">What makes a format cloud-native?<a class="anchor" aria-label="anchor" href="#what-makes-a-format-cloud-native"></a></h2>
-<hr class="half-width"><p>A useful community description from the Cloud-Native Geospatial
-Formats Guide is that cloud-optimized formats follow a common
-pattern:</p>
+</div>
+<div class="section level3">
+<h3 id="what-makes-a-format-cloud-native">What makes a format cloud-native?<a class="anchor" aria-label="anchor" href="#what-makes-a-format-cloud-native"></a></h3>
+<p>A useful community description from the Cloud-Native Geospatial
+Formats Guide<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> is that cloud-optimized formats follow a
+common pattern:</p>
 <ul><li>Metadata provides addresses for data blocks.</li>
 <li>Metadata is stored in a consistent format and location.</li>
 <li>All metadata can be loaded with a small number of reads, ideally
@@ -521,6 +521,7 @@ cloud storage as if it were just another disk.</p>
 </div>
 </div>
 </div>
+</div>
 </section><section><h2 class="section-heading" id="key-formats-and-approaches-in-earth-science">Key formats and approaches in Earth science<a class="anchor" aria-label="anchor" href="#key-formats-and-approaches-in-earth-science"></a></h2>
 <hr class="half-width"><p>There is no single cloud-native solution for all environmental data,
 and the community guide explicitly notes that there is no
@@ -541,6 +542,11 @@ project for creating cloud-optimized virtual Zarr stores from existing
 scientific data, exposing non-Zarr data through a Zarr-like
 interface.</li>
 <li>
+<a href="https://www.cogeo.org/" class="external-link">Cloud-optimized Geotiff (COG)</a>:
+a format for geospatial raster data that allows efficient access to
+subsets of large images over HTTP or Object Storage, using internal
+tiling and metadata.</li>
+<li>
 <a href="https://www.geoparquet.org/" class="external-link">GeoParquet</a>: a
 cloud-friendly columnar format for geospatial vector data, built on
 Apache Parquet.</li>
@@ -548,11 +554,6 @@ Apache Parquet.</li>
 <a href="https://flatgeobuf.org/" class="external-link">FlatGeobuf</a>: a binary
 geospatial vector format designed for efficient streaming and spatially
 indexed access, including over HTTP range requests.</li>
-<li>
-<a href="https://tiledb.com/" class="external-link">TileDB</a> and similar array
-databases: systems that represent large collections of NetCDF-like data
-as cloud-friendly arrays with indexing and cataloguing layers, enabling
-geoscience data to be stored and queried efficiently in the cloud.</li>
 </ul><p>In practice, these approaches support different needs. Some workflows
 rewrite data into a new cloud-native layout such as Zarr, while others
 keep legacy files and expose them through references for cloud-friendly
@@ -659,8 +660,11 @@ copies.</p>
 <div id="exercise-2---thinking-in-chunks" class="callout-inner">
 <h3 class="callout-title">Exercise 2 - Thinking in chunks</h3>
 <div class="callout-content">
-<p>Imagine a global sea surface temperature dataset stored as a Zarr
-archive.</p>
+<p>One of the main ideas behind Zarr is that data is divided into many
+smaller chunks. Instead of reading an entire dataset, software can load
+only the chunks needed for a particular operation.</p>
+<p>Now, imagine a global sea surface temperature dataset stored as a
+Zarr archive.</p>
 <p>For each task below, discuss which part of the dataset you would
 expect to read:</p>
 <ol style="list-style-type: decimal"><li>Plot sea surface temperature for one day over the whole world.</li>
@@ -683,9 +687,6 @@ different tasks?</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
-<p>One of the main ideas behind Zarr is that data is divided into many
-smaller chunks. Instead of reading an entire dataset, software can load
-only the chunks needed for a particular operation.</p>
 <p>For example:</p>
 <ul><li>A global map for one day mainly needs chunks covering that single
 time step.</li>
@@ -725,7 +726,14 @@ and support scalable analysis of large environmental datasets.”</li>
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
-</section></div> <!-- / div.lesson-content -->
+</section><div class="footnotes footnotes-end-of-document">
+<hr><ol><li id="fn1"><p>Cheipesh, E. 2018. Available at: <a href="https://pt.slideshare.net/slideshow/cloud-optimized-geottiffs-enabling-efficient-cloud-workflows/97510557" class="external-link uri">https://pt.slideshare.net/slideshow/cloud-optimized-geottiffs-enabling-efficient-cloud-workflows/97510557</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Cloud-Native Geospatial Formats Guide. Available at: <a href="https://guide.cloudnativegeo.org/" class="external-link uri">https://guide.cloudnativegeo.org/</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol></div>
+
+
+
+      </div> <!-- / div.lesson-content -->
     </main><!-- / main#main-content.main-content --><nav class="bottom-pagination mx-md-4" aria-label="Previous and Next Chapter Bottom"><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link" href="../instructor/02-ndata-challenges.html"><i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>Previous</a>
         <a class="chapter-link float-end" href="../instructor/04-zarr.html">Next<i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
@@ -785,8 +793,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-20",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

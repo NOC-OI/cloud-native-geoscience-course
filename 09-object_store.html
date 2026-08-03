@@ -118,7 +118,7 @@
     <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress data">
-    <div class="progress-bar data" role="progressbar" style="width: 44%" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">44%</div>
+    <div class="progress-bar data" role="progressbar" style="width: 49%" aria-valuenow="49" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">49%</div>
   </div>
 </aside><div class="container">
       <div class="row">
@@ -282,10 +282,9 @@
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
         <ul><li><a href="#what-is-object-storage">What is object storage?</a></li>
-<li><a href="#object-storage-and-traditional-servers">Object storage and traditional servers</a></li>
 <li><a href="#advantages-of-object-storage">Advantages of object storage</a></li>
 <li><a href="#accessing-cloud-object-storage-from-python">Accessing cloud object storage from Python</a></li>
-<li><a href="#self-hosted-object-storage-for-institutions">Self-hosted object storage for institutions</a></li>
+<li><a href="#self-hosted-object-storage">Self-hosted object storage</a></li>
 <li><a href="#organising-data-in-buckets-and-objects">Organising data in buckets and objects</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
@@ -414,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Object Storage - Concepts, Remote Access, and Data Organization in the Cloud</h1>
-        <p>Last updated on 2026-07-28 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/09-object_store.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -462,11 +461,11 @@ using Docker.”</li>
 </div>
 </div>
 <section><h2 class="section-heading" id="what-is-object-storage">What is object storage?<a class="anchor" aria-label="anchor" href="#what-is-object-storage"></a></h2>
-<hr class="half-width"><p>Object storage stores data as <code>objects</code> in a flat address
-space, usually inside <code>buckets</code>. Each object contains binary
-data and metadata (such as content type or custom tags) and is
-identified by a unique key within a bucket, rather than by a path in a
-nested directory tree.</p>
+<hr class="half-width"><p>Object storage stores data as <strong>objects</strong> in a flat
+address space, usually inside <strong>buckets</strong>. Each object
+contains binary data and metadata (such as content type or custom tags)
+and is identified by a unique key within a bucket, rather than by a path
+in a nested directory tree.</p>
 <p>Unlike traditional storage systems:</p>
 <ul><li>
 <strong>File storage</strong> (POSIX filesystems) organises data
@@ -478,8 +477,9 @@ operating system and is commonly used for disks and databases.</li>
 independent objects that are accessed through APIs such as HTTP or S3.
 This architecture enables systems to scale across many disks and nodes
 while providing high durability.</p>
-</section><section><h2 class="section-heading" id="object-storage-and-traditional-servers">Object storage and traditional servers<a class="anchor" aria-label="anchor" href="#object-storage-and-traditional-servers"></a></h2>
-<hr class="half-width"><p>Traditional scientific workflows often store data on local or network
+<div class="section level3">
+<h3 id="object-storage-and-traditional-servers">Object storage and traditional servers<a class="anchor" aria-label="anchor" href="#object-storage-and-traditional-servers"></a></h3>
+<p>Traditional scientific workflows often store data on local or network
 filesystems:</p>
 <ul><li>Data are stored in directories on one server or a small
 cluster.</li>
@@ -489,17 +489,19 @@ hardware.</li>
 </ul><p>Object storage takes a different approach:</p>
 <ul><li>Data are distributed across many disks and nodes, often spanning
 multiple availability zones or data centres.</li>
-<li>Applications access data through a standard API, such as Amazon S3,
+<li>Applications access data through standard APIs, such as Amazon S3,
 Google Cloud Storage (GCS), or Azure Blob Storage.</li>
 <li>Storage systems can grow incrementally by adding new nodes rather
 than replacing existing hardware.</li>
 </ul><p>For scientific datasets, this makes it practical to store millions of
-independent objects, such as NetCDF files, image tiles, or Zarr chunks,
-while allowing applications running on HPC systems, cloud platforms, or
-local infrastructure to access the same data.</p>
+independent objects, such as NetCDF files, image tiles, or Zarr chunks.
+Because each object can be accessed independently, applications running
+on HPC systems, cloud platforms, or local infrastructure can efficiently
+process data in parallel while accessing the same shared dataset.</p>
 <figure><img src="fig/file_object.png" alt="File vs Object Storage." class="figure mx-auto d-block"><div class="figcaption">File vs Object Storage. Source: <a href="https://www.datacore.com/blog/file-object-storage-differences/" class="external-link uri">https://www.datacore.com/blog/file-object-storage-differences/</a>
 </div>
-</figure></section><section><h2 class="section-heading" id="advantages-of-object-storage">Advantages of object storage<a class="anchor" aria-label="anchor" href="#advantages-of-object-storage"></a></h2>
+</figure></div>
+</section><section><h2 class="section-heading" id="advantages-of-object-storage">Advantages of object storage<a class="anchor" aria-label="anchor" href="#advantages-of-object-storage"></a></h2>
 <hr class="half-width"><div class="section level3">
 <h3 id="sharing-and-durability">Sharing and durability<a class="anchor" aria-label="anchor" href="#sharing-and-durability"></a></h3>
 <p>Object storage is well suited for sharing and long-term preservation
@@ -509,10 +511,9 @@ because it provides:</p>
 lists (ACLs), identity management, or signed URLs.</li>
 <li>High durability through replication or erasure coding across
 multiple disks and nodes.</li>
-</ul><p>Most object storage services—including AWS S3, Google Cloud Storage,
-Azure Blob Storage, and S3-compatible platforms—also support per-object
-metadata, versioning, and public or private buckets.</p>
-<figure><img src="fig/cloud_os_architecture.png" alt="Cloud Object Storage Architecture." class="figure mx-auto d-block"><div class="figcaption">Cloud Object Storage Architecture</div>
+<li>Support for per-object metadata, versioning, and public or private
+buckets.</li>
+</ul><figure><img src="fig/cloud_os_architecture.png" alt="Cloud Object Storage Architecture." class="figure mx-auto d-block"><div class="figcaption">Cloud Object Storage Architecture</div>
 </figure></div>
 <div class="section level3">
 <h3 id="security-and-access-control">Security and access control<a class="anchor" aria-label="anchor" href="#security-and-access-control"></a></h3>
@@ -546,12 +547,15 @@ commonly paired with object storage.</p>
 <h3 id="cost-and-storage-classes">Cost and storage classes<a class="anchor" aria-label="anchor" href="#cost-and-storage-classes"></a></h3>
 <p>Cloud providers typically offer multiple storage classes for
 different access patterns:</p>
-<ul><li>Frequent access: higher performance for data that are accessed
-regularly.</li>
-<li>Infrequent access: lower storage cost with higher retrieval
-charges.</li>
-<li>Archive (cold storage): lowest storage cost, but higher retrieval
-latency and fees.</li>
+<ul><li>
+<strong>Frequent access:</strong> higher performance for data that
+are accessed regularly.</li>
+<li>
+<strong>Infrequent access:</strong> lower storage cost with higher
+retrieval charges.</li>
+<li>
+<strong>Archive (cold storage):</strong> lowest storage cost, but
+higher retrieval latency and fees.</li>
 </ul><p>Selecting the appropriate storage class helps balance cost and
 performance according to how often the data are used.</p>
 <div id="deployment-trade-offs" class="callout">
@@ -588,7 +592,7 @@ scientific data workflows, especially when combined with chunked formats
 like Zarr. The ability to store many independent objects, access them in
 parallel, and manage them through APIs allows researchers to build
 scalable, reproducible, and shareable data systems.</p>
-<figure><img src="fig/traditional_vs_new_workflows.png" alt="Traditional workflows vs New workflows." class="figure mx-auto d-block"><div class="figcaption">Traditional workflows vs New workflows</div>
+<figure><img src="fig/traditional_vs_cloud_native.png" alt="Traditional workflows vs New workflows." class="figure mx-auto d-block"><div class="figcaption">Traditional workflows vs New workflows</div>
 </figure><div id="exercise-1---compare-storage-options-for-a-workflow" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -624,7 +628,7 @@ often by several researchers.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>The answer will depend on the specific context of the group and their
 requirements. For example: - If the dataset is accessed frequently by
@@ -672,8 +676,10 @@ JASMIN and other HPC/cloud platforms use for object storage.</p>
 (for xarray and Zarr).</p>
 <p>First, let’s see how to list objects in a public bucket using
 <code>boto3</code> in a public cloud object store. For this example, we
-will use the NOAA GOES-18 public bucket, which does not require
-credentials for reading objects.</p>
+will use the <a href="https://registry.opendata.aws/noaa-goes/" class="external-link">NOAA
+GOES-18 public bucket</a>, which has data from the GOES-18 satellite.
+This bucket is public, which does not require credentials for reading
+objects.</p>
 <p>The first step is to create the client.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -684,7 +690,7 @@ credentials for reading objects.</p>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>s3 <span class="op">=</span> boto3.client(</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>    <span class="st">"s3"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>    config<span class="op">=</span>Config(signature_version<span class="op">=</span>UNSIGNED),</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>    config<span class="op">=</span>Config(signature_version<span class="op">=</span>UNSIGNED), <span class="co"># UNSIGNED allows public access without credentials</span></span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a>)</span></code></pre>
 </div>
 <p>After creating the client, we can list objects in a bucket. For
@@ -728,12 +734,9 @@ using <code>boto3</code> with credentials:</p>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1" aria-label="code-block-3-14"></a><span class="cf">for</span> obj <span class="kw">in</span> response.get(<span class="st">"Contents"</span>, []):</span>
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1" aria-label="code-block-3-15"></a>    <span class="bu">print</span>(obj[<span class="st">"Key"</span>], obj[<span class="st">"Size"</span>])</span></code></pre>
 </div>
-<p>If the bucket is private, the access key and secret key must be valid
-for that bucket. Once authenticated, you can list objects, inspect
-prefixes, and open Zarr stores if they are present. These patterns
-generalise: once you know the bucket and object path, you can connect
-via the appropriate filesystem adapter and pass a mapper or URL to
-xarray or zarr.</p>
+<p>Once authenticated, you can list objects, inspect prefixes, and
+identify Zarr stores that you want to open later with xarray or
+zarr.</p>
 <div id="bucket-policy" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
@@ -743,13 +746,10 @@ xarray or zarr.</p>
 <h3 class="callout-title">Bucket policy</h3>
 <div class="callout-content">
 <p>The bucket used in this workshop allows public read access to
-objects, so files can be accessed without AWS credentials. However,
-listing the contents of the bucket (ListBucket) requires valid
-credentials.</p>
-<p>For the workshop, we provide credentials that grant participants
-read-only access to the bucket. This allows you to browse the bucket
-contents, list available objects, and access datasets such as Zarr
-stores, while preventing any modifications.</p>
+objects, so files can be opened without AWS credentials if you already
+know the object path. For discovery and bucket listing, however, the
+workshop provides read-only credentials so participants can browse the
+bucket contents without being able to modify anything.</p>
 <p>The bucket is configured with a policy similar to the example
 below:</p>
 <div class="codewrapper sourceCode" id="cb4">
@@ -808,7 +808,7 @@ a filesystem?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>To access the course bucket, you can use the following Python code
 snippet. Make sure to replace <code>"your-access-key"</code> and
@@ -841,58 +841,57 @@ organisation of the data, such as by variable, time, or dataset.</p>
 </div>
 <div class="section level3">
 <h3 id="using-xarray-with-a-bucket">Using xarray with a bucket<a class="anchor" aria-label="anchor" href="#using-xarray-with-a-bucket"></a></h3>
-<p>With the bucket and object path, you can open a Zarr store directly
-with xarray:</p>
+<p>Assuming the credentials are already set, you can open a Zarr store
+directly with xarray once you know the bucket and object path:</p>
 <div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>] <span class="op">=</span> <span class="st">"your-access-key"</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>] <span class="op">=</span> <span class="st">"your-secret-key"</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>storage_options <span class="op">=</span> {</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>}</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>ds <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>    <span class="st">"s3://cloud-native-geoscience-course/ocean_temperature.zarr"</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>    storage_options<span class="op">=</span>storage_options,</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>)</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a><span class="bu">print</span>(ds)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> os</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a>    <span class="co"># these are JASMIN-specific options to avoid checksum errors on some datasets</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a>    },</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>}</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>ds <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a>    <span class="st">"s3://cloud-native-geoscience-course/ocean_temperature.zarr"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a>    storage_options<span class="op">=</span>storage_options,</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1" aria-label="code-block-6-18"></a>)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1" aria-label="code-block-6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1" aria-label="code-block-6-20"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
-<p>These patterns generalise: once you know the bucket and object path,
-you can connect through the appropriate filesystem adapter and pass the
-URL or mapper to xarray or zarr.</p>
+<p>Once you know the bucket and object path, you can use the same
+pattern for other remote stores.</p>
 <p>Because this bucket is public, you can also open the Zarr store
-without credentials:</p>
+without credentials (using the public endpoint) as follows:</p>
 <div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature.zarr"</span>)</span></code></pre>
 </div>
-<p>But listing the contents of the bucket requires valid
-credentials.</p>
-<div id="exercise-3---access-the-course-bucket-with-credentials" class="callout challenge">
+<p>Listing the bucket contents still requires the read-only credentials
+described above.</p>
+<div id="exercise-3---open-a-zarr-store-from-the-course-bucket" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-3---access-the-course-bucket-with-credentials" class="callout-inner">
-<h3 class="callout-title">Exercise 3 - Access the course bucket with
-credentials</h3>
+<div id="exercise-3---open-a-zarr-store-from-the-course-bucket" class="callout-inner">
+<h3 class="callout-title">Exercise 3 - Open a Zarr store from the course
+bucket</h3>
 <div class="callout-content">
-<p>In the same object store that we listed in the previous exercise, we
-will now open a Zarr store with xarray and inspect its contents. Try to
-list the objects in the bucket and find a zarr dataset different from
-<code>ocean_temperature.zarr</code>. Then, open that Zarr store with
-xarray and inspect its dimensions, variables, and metadata.</p>
-<p>This is a public object store and we can access it without
-credentials, but in a real-world scenario, you would need to provide
-valid credentials to access private buckets.</p>
+<p>In the same object store that you explored in the previous exercise,
+now open a Zarr store with xarray and inspect its contents. Reuse the
+bucket listing from Exercise 2 to find a Zarr dataset different from
+<code>ocean_temperature.zarr</code>, then open that store and inspect
+its dimensions, variables, and metadata.</p>
 </div>
 </div>
 </div>
@@ -901,55 +900,44 @@ valid credentials to access private buckets.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
-<p>List the objects in the bucket using <code>boto3</code>:</p>
+<p>Reuse the bucket listing from Exercise 2 to identify a Zarr store,
+for example <code>glorys_202605.zarr</code>. Then open it with
+xarray:</p>
 <div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">import</span> boto3</span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a><span class="im">import</span> os</span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>] <span class="op">=</span> <span class="st">"your-access-key"</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>] <span class="op">=</span> <span class="st">"your-secret-key"</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>s3 <span class="op">=</span> boto3.client(<span class="st">"s3"</span>, endpoint_url<span class="op">=</span><span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>bucket_name <span class="op">=</span> <span class="st">"cloud-native-geoscience-course"</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a>response <span class="op">=</span> s3.list_objects_v2(Bucket<span class="op">=</span>bucket_name, MaxKeys<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1" aria-label="code-block-8-12"></a><span class="cf">for</span> obj <span class="kw">in</span> response.get(<span class="st">"Contents"</span>, []):</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1" aria-label="code-block-8-13"></a>    <span class="bu">print</span>(obj[<span class="st">"Key"</span>], obj[<span class="st">"Size"</span>])</span></code></pre>
-</div>
-<p>Choose a Zarr store from the listed objects, for example
-<code>glorys_202605.zarr</code>, and open it with xarray:</p>
-<div class="codewrapper sourceCode" id="cb9">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a>storage_options <span class="op">=</span> {</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a>}</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1" aria-label="code-block-9-8"></a></span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1" aria-label="code-block-9-9"></a>ds <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1" aria-label="code-block-9-10"></a>    <span class="st">"s3://cloud-native-geoscience-course/glorys_202605.zarr"</span>,</span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1" aria-label="code-block-9-11"></a>    storage_options<span class="op">=</span>storage_options,</span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1" aria-label="code-block-9-12"></a>)</span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1" aria-label="code-block-9-13"></a></span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1" aria-label="code-block-9-14"></a><span class="bu">print</span>(ds)</span></code></pre>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a>    },</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1" aria-label="code-block-8-12"></a>}</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1" aria-label="code-block-8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1" aria-label="code-block-8-14"></a>ds <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1" aria-label="code-block-8-15"></a>    <span class="st">"s3://cloud-native-geoscience-course/glorys_202605.zarr"</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1" aria-label="code-block-8-16"></a>    storage_options<span class="op">=</span>storage_options,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1" aria-label="code-block-8-17"></a>)</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1" aria-label="code-block-8-18"></a></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1" aria-label="code-block-8-19"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 <p>In this example, you will see the variables, dimensions, and shapes
-of the Zarr store. You can explore the dataset further by accessing
-specific variables or performing computations on the data.</p>
+of the Zarr store. The key point is that object storage discovery and
+dataset analysis are separate steps: first find the store, then open it
+with xarray.</p>
 </div>
 </div>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="self-hosted-object-storage-for-institutions">Self-hosted object storage for institutions<a class="anchor" aria-label="anchor" href="#self-hosted-object-storage-for-institutions"></a></h2>
+</section><section><h2 class="section-heading" id="self-hosted-object-storage">Self-hosted object storage<a class="anchor" aria-label="anchor" href="#self-hosted-object-storage"></a></h2>
 <hr class="half-width"><p>Some institutions cannot or do not want to place all data in a
 commercial cloud. Common reasons include data sovereignty, procurement
 rules, local security requirements, network bandwidth constraints, and
@@ -961,16 +949,6 @@ keeping the data inside your own infrastructure. This is especially
 useful for universities, research institutes, and government
 organisations that already run their own servers, storage, and
 clusters.</p>
-<div class="section level3">
-<h3 id="why-institutions-choose-this-approach">Why institutions choose this approach<a class="anchor" aria-label="anchor" href="#why-institutions-choose-this-approach"></a></h3>
-<ul><li>Keep sensitive or regulated data on-premises.</li>
-<li>Avoid moving large volumes of data over the public internet.</li>
-<li>Integrate object storage directly with local HPC or campus
-compute.</li>
-<li>Reuse existing procurement, monitoring, backup, and identity
-systems.</li>
-<li>Control costs by using hardware the institution already owns.</li>
-</ul></div>
 <div class="section level3">
 <h3 id="what-infrastructure-is-needed-locally">What infrastructure is needed locally?<a class="anchor" aria-label="anchor" href="#what-infrastructure-is-needed-locally"></a></h3>
 <p>A production-ready object store is more than “just a server with a
@@ -996,35 +974,35 @@ management.</li>
 Compose</h3>
 <div class="callout-content">
 <p>In class, we will not expect you to run these commands yourself.
-Instead, I will show how a self-hosted S3-compatible service such as
+Instead, we will show how a self-hosted S3-compatible service such as
 MinIO could be deployed inside an institution’s own infrastructure, so
 that you can see how the same tools and APIs work on-prem as well as in
 the cloud.</p>
 <p>On a Linux server with Docker and Docker Compose installed:</p>
 <p>Create a directory and a <code>docker-compose.yml</code>:</p>
-<div class="codewrapper sourceCode" id="cb10">
+<div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">YAML<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode yaml" tabindex="0"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="fu">services</span><span class="kw">:</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="at">  </span><span class="fu">minio</span><span class="kw">:</span></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> minio/minio:latest</span></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a><span class="at">    </span><span class="fu">container_name</span><span class="kw">:</span><span class="at"> minio</span></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"9000:9000"</span><span class="co">  # S3 API</span></span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"9001:9001"</span><span class="co">  # Web UI</span></span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a><span class="at">      </span><span class="fu">MINIO_ROOT_USER</span><span class="kw">:</span><span class="at"> minioadmin</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1" aria-label="code-block-10-10"></a><span class="at">      </span><span class="fu">MINIO_ROOT_PASSWORD</span><span class="kw">:</span><span class="at"> minioadmin123</span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1" aria-label="code-block-10-11"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1" aria-label="code-block-10-12"></a><span class="at">      </span><span class="kw">-</span><span class="at"> /data:/data</span><span class="co">   # bind mount for data</span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1" aria-label="code-block-10-13"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> server /data --console-address ":9001"</span></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1" aria-label="code-block-10-14"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> unless-stopped</span></span></code></pre>
+<pre class="sourceCode yaml" tabindex="0"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="fu">services</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a><span class="at">  </span><span class="fu">minio</span><span class="kw">:</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> minio/minio:latest</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a><span class="at">    </span><span class="fu">container_name</span><span class="kw">:</span><span class="at"> minio</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"9000:9000"</span><span class="co">  # S3 API</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"9001:9001"</span><span class="co">  # Web UI</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1" aria-label="code-block-9-8"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1" aria-label="code-block-9-9"></a><span class="at">      </span><span class="fu">MINIO_ROOT_USER</span><span class="kw">:</span><span class="at"> minioadmin</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1" aria-label="code-block-9-10"></a><span class="at">      </span><span class="fu">MINIO_ROOT_PASSWORD</span><span class="kw">:</span><span class="at"> minioadmin123</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1" aria-label="code-block-9-11"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1" aria-label="code-block-9-12"></a><span class="at">      </span><span class="kw">-</span><span class="at"> /data:/data</span><span class="co">   # bind mount for data</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1" aria-label="code-block-9-13"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> server /data --console-address ":9001"</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1" aria-label="code-block-9-14"></a><span class="at">    </span><span class="fu">restart</span><span class="kw">:</span><span class="at"> unless-stopped</span></span></code></pre>
 </div>
 <p>Start MinIO:</p>
-<div class="codewrapper sourceCode" id="cb11">
+<div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span></span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span></span></code></pre>
 </div>
 <p>Then:</p>
 <ul><li>Open the web console at <code>http://localhost:9001</code>.</li>
@@ -1032,11 +1010,10 @@ the cloud.</p>
 (change these in production!).</li>
 <li>Create a bucket (e.g. <code>example-bucket</code>).</li>
 <li>Upload a test file.</li>
-</ul><p>You now have a self-hosted S3-compatible object store.</p>
-<p>You can use standard S3 tools (e.g. AWS CLI, <code>boto3</code>,
-<code>mc</code> MinIO client) to interact with this bucket, just
-pointing them at your MinIO endpoint
-(<code>http://localhost:9000</code>).</p>
+</ul><p>You now have a self-hosted S3-compatible object store. You can use
+standard S3 tools (e.g. AWS CLI, <code>boto3</code>, <code>mc</code>
+MinIO client) to interact with this bucket, just pointing them at your
+MinIO endpoint (<code>http://localhost:9000</code>).</p>
 </div>
 </div>
 </div>
@@ -1058,7 +1035,7 @@ range.</li>
 <li>Align prefixes with common queries
 (e.g. <code>model/experiment</code> for CMIP6;
 <code>instrument/trajectory</code> for drifters).</li>
-<li>Avoid excessively deep or inconsistent naming; object storage does
+<li>Avoid excessively deep or inconsistent naming. Object storage does
 not require directories, but prefixes mimic them.</li>
 </ul><p>For Zarr stores:</p>
 <ul><li>Each store typically resides under a single prefix
@@ -1066,13 +1043,13 @@ not require directories, but prefixes mimic them.</li>
 data chunk objects.</li>
 <li>You may create separate stores for different variables, domains, or
 time ranges depending on data volumes and workflows.</li>
-</ul><div id="exercise-3---design-a-bucket-layout" class="callout challenge">
+</ul><div id="exercise-4---design-a-bucket-layout" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-3---design-a-bucket-layout" class="callout-inner">
-<h3 class="callout-title">Exercise 3 - Design a bucket layout</h3>
+<div id="exercise-4---design-a-bucket-layout" class="callout-inner">
+<h3 class="callout-title">Exercise 4 - Design a bucket layout</h3>
 <div class="callout-content">
 <p>Imagine you are responsible for storing:</p>
 <ul><li>A global reanalysis (regular grid).</li>
@@ -1094,7 +1071,7 @@ share it with the group.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
 <p>We can propose a bucket layout that reflects the structure of the
 datasets and their access patterns. Here are some example layouts:</p>
@@ -1201,8 +1178,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/09-object_store.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/09-object_store.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-28",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

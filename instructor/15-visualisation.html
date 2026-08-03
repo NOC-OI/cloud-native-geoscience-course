@@ -337,7 +337,7 @@
       <div class="accordion-body">
         <ul><li><a href="#introduction">Introduction</a></li>
 <li><a href="#chunking-matters-for-visualisation">Chunking matters for visualisation</a></li>
-<li><a href="#multiscale-pyramids-and-cloud-optimized-geotiffs">Multiscale pyramids and Cloud-Optimized GeoTIFFs</a></li>
+<li><a href="#multiscale-pyramids">Multiscale pyramids</a></li>
 <li><a href="#geozarr-geospatial-conventions-for-zarr">GeoZarr: geospatial conventions for Zarr</a></li>
 <li><a href="#topozarr-creating-multiscale-zarr-for-visualisation">Topozarr: creating multiscale Zarr for visualisation</a></li>
 <li><a href="#browser-based-visualisation-server-and-client-options">Browser-based visualisation: server and client options</a></li>
@@ -414,13 +414,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Visualization - Multiscale Zarr and GeoZarr</h1>
-        <p>Last updated on 2026-07-13 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/15-visualisation.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 40 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 55 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -472,15 +472,14 @@ analysis. Because the data are stored in chunks, browsers or servers can
 fetch only the pieces needed for the current map view instead of loading
 the full dataset.</p>
 <p>There are two main patterns. In a <strong>server-based</strong>
-workflow, a backend reads the Zarr store and serves tiles or images; in
+workflow, a backend reads the Zarr store and serves tiles or images. In
 a <strong>client-side</strong> workflow, the browser reads chunks
-directly from object storage and renders them with WebGL or similar
-tools.</p>
+directly from object storage and renders them with <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API" class="external-link">WebGL</a>+GPU
+or similar tools.</p>
 <p>We will see now how to prepare a Zarr dataset for interactive
-visualisation, and how to explore it in a browser using GeoZarr
-conventions and simple HTML/JS clients. And we understand why chunking,
-multiscale pyramids and GeoZarr metadata are important for performance
-and user experience.</p>
+visualisation, and how to explore it in a browser using <a href="https://geozarr.org" class="external-link">GeoZarr</a> conventions and simple HTML/JS
+clients. And we understand why chunking, multiscale pyramids, and
+GeoZarr metadata are important for performance and user experience.</p>
 </section><section><h2 class="section-heading" id="chunking-matters-for-visualisation">Chunking matters for visualisation<a class="anchor" aria-label="anchor" href="#chunking-matters-for-visualisation"></a></h2>
 <hr class="half-width"><p>Zarr stores multidimensional arrays as many small chunks. For large
 geospatial datasets (e.g. global grids, satellite imagery), interactive
@@ -488,59 +487,54 @@ visualisation often means:</p>
 <ul><li>Looking at relatively small windows (map viewports) at a time.</li>
 <li>Zooming and panning, which changes which subset of data is
 needed.</li>
-</ul><p>Good chunking:</p>
-<ul><li>Aligns chunks with typical viewports or tiles (e.g. 256×256 or
-512×512 pixels).</li>
-<li>Keeps chunks small enough for fast transfer (tens or hundreds of
-kilobytes) but large enough to avoid too many separate HTTP
-requests.</li>
-</ul><p>Poor chunking (e.g. huge chunks or misaligned shapes):</p>
-<ul><li>Forces the viewer to load far more data than needed for each map
-view.</li>
-<li>Can cause slow interaction, high bandwidth usage, and poor user
-experience.</li>
-</ul><p>For geospatial visualisation, we typically prefer <strong>chunking
-along spatial dimensions</strong> (x, y) and possibly band/time, with
-chunk sizes chosen to balance latency and throughput.</p>
-</section><section><h2 class="section-heading" id="multiscale-pyramids-and-cloud-optimized-geotiffs">Multiscale pyramids and Cloud-Optimized GeoTIFFs<a class="anchor" aria-label="anchor" href="#multiscale-pyramids-and-cloud-optimized-geotiffs"></a></h2>
-<hr class="half-width"><p>Cloud-Optimized GeoTIFF (COG) is a widely used format for imagery
-that:</p>
-<ul><li>Stores multiple resolutions (overview levels) inside a single
-file.</li>
-<li>Organises data so that HTTP range requests can retrieve just the
-tiles needed for a given viewport and zoom level.</li>
-</ul><p>Multiscale pyramids in Zarr follow the same idea:</p>
+</ul><p>Because of that, a good chunking should align with the typical
+viewports, zoom levels and tiles (e.g. 256×256 or 512×512 pixels) so
+that the viewer can fetch only the chunks needed for the current view.
+Another consideration is that the chunks should be small enough for fast
+transfer (tens or hundreds of kilobytes) but large enough to avoid too
+many separate HTTP requests.</p>
+<p>Inefficient chunking (e.g. huge chunks or misaligned shapes) can lead
+to the forced loading of much more data than needed for each map view,
+potentially resulting in sluggish interactions, high bandwidth
+consumption, and a poor user experience.</p>
+<p>For geospatial visualisation, we typically prefer chunking along
+spatial dimensions (x, y) and possibly band/time, with chunk sizes
+chosen to balance latency and throughput.</p>
+</section><section><h2 class="section-heading" id="multiscale-pyramids">Multiscale pyramids<a class="anchor" aria-label="anchor" href="#multiscale-pyramids"></a></h2>
+<hr class="half-width"><p>The idea of multiscale pyramids comes from the concept of
+Cloud-Optimized GeoTIFFs (COGs), which are widely used for imagery. COGs
+store multiple resolutions of the same data in a single file, allowing
+clients to request only the resolution needed for the current zoom
+level, improving performance and reducing bandwidth.</p>
+<p>Following the same idea, we can create <strong>multiscale
+pyramids</strong> in Zarr. Each level of the pyramid is a downsampled
+version of the original data, allowing viewers to fetch coarse data for
+low zoom levels and fine data for high zoom levels. Normally, the
+pyramid is structured as follows:</p>
 <ul><li>Level 0: full-resolution grid.</li>
 <li>Level 1: downsampled (e.g. 2× coarser) version.</li>
 <li>Level 2: further downsampled, and so on.</li>
-</ul><p>Benefits:</p>
-<ul><li>At low zoom (whole world), we display coarse data (few tiles,
-faster).</li>
-<li>At high zoom (local detail), we display fine data (more tiles, but
-only for a small area).</li>
-</ul><p>GeoZarr’s <strong>multiscales</strong> convention formalises how to
-store and describe these pyramids in Zarr.</p>
-<figure><img src="../fig/geozarr_multiscale.png" alt="Multiscale pyramid example" class="figure mx-auto d-block"><div class="figcaption">Multiscale pyramid example</div>
+</ul><p>As benefits, this allows for efficient visualisation at different
+zoom levels without overwhelming the client with unnecessary data. For
+example, a global map view can use a low-resolution overview, while a
+local zoom can fetch high-resolution tiles only for the area of
+interest.</p>
+<p>GeoZarr’s multiscales convention formalises how to store and describe
+these pyramids in Zarr.</p>
+<figure><img src="../fig/geozarr_multiscale.png" alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://www.earthmover.io/blog/multiscales-in-al/" class="external-link uri">https://www.earthmover.io/blog/multiscales-in-al/</a>
+</div>
 </figure></section><section><h2 class="section-heading" id="geozarr-geospatial-conventions-for-zarr">GeoZarr: geospatial conventions for Zarr<a class="anchor" aria-label="anchor" href="#geozarr-geospatial-conventions-for-zarr"></a></h2>
 <hr class="half-width"><p>GeoZarr is a set of modular conventions for encoding geospatial
-datasets in Zarr.</p>
-<p>Core conventions include:</p>
-<ul><li>
-<strong><code>proj</code></strong> - describes the coordinate
-reference system (CRS) using EPSG codes, WKT2, or PROJJSON.</li>
-<li>
-<strong><code>spatial</code></strong> - defines affine transforms
-between array indices and coordinates (e.g. pixel to lat/lon).</li>
-<li>
-<strong><code>multiscales</code></strong> - describes multiscale
-pyramid structures (resolution levels, layouts).</li>
-</ul><p>These conventions are registered via a <code>zarr_conventions</code>
+datasets in Zarr. The core conventions include <code>proj</code>,
+<code>spatial</code>, and <code>multiscales</code>, which describe the
+coordinate reference system, spatial transforms, and multiscale pyramid
+structure, respectively.</p>
+<p>These conventions are registered via a <code>zarr_conventions</code>
 metadata attribute and use namespaced attributes like
 <code>proj:code</code>, <code>spatial:transform</code>, and
-<code>multiscales</code>.</p>
-<p>GeoZarr is being developed as an OGC standard that builds upon the
-Unidata Common Data Model and CF conventions, and aims to bridge
-scientific and geospatial communities.</p>
+<code>multiscales</code>. GeoZarr is being developed as an OGC standard
+that builds upon the Unidata Common Data Model and CF conventions, and
+aims to bridge scientific and geospatial communities.</p>
 <p>Useful references:</p>
 <ul><li>GeoZarr overview: <a href="https://geozarr.org" class="external-link uri">https://geozarr.org</a>
 </li>
@@ -556,7 +550,12 @@ scientific and geospatial communities.</p>
 <div id="exercise-1---design-a-multiscale-strategy" class="callout-inner">
 <h3 class="callout-title">Exercise 1 - Design a multiscale strategy</h3>
 <div class="callout-content">
-<p>Before writing code:</p>
+<p>Creating a multiscale Zarr store requires some design decisions.
+Before implementing it, think about your dataset and how you want to
+visualise it. Because it can be resource-intensive to create multiple
+levels, we are going to use a small example dataset for this exercise,
+the <code>data/ocean_temperature.zarr</code>, related to the ERA5
+reanalysis dataset.</p>
 <ol style="list-style-type: decimal"><li>Look at your example Zarr dataset (dimensions, spatial resolution,
 domain).</li>
 <li>Propose:
@@ -568,7 +567,7 @@ domain).</li>
 <ul><li>How your choices affect visualisation at different zoom levels.</li>
 <li>How they might impact performance and storage.</li>
 </ul></li>
-</ol><p>Write down your multiscale plan; you’ll implement it with Topozarr in
+</ol><p>Write down your multiscale plan. You’ll implement it with Topozarr in
 the next exercise.</p>
 </div>
 </div>
@@ -578,75 +577,106 @@ the next exercise.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
-<p>Learners should think about how many overview levels they need and
-how chunk sizes map to typical map tiles. They will connect multiscale
-design decisions to performance and user experience.</p>
+<p>The multiscale strategy will depend on the dataset’s spatial
+resolution and the desired zoom levels for visualisation. For example,
+if the original dataset has a resolution of 0.1 degrees, you might
+choose: - Levels: 4 (0.1°, 0.2°, 0.4°, 0.8°) - Downsampling: mean (to
+preserve average values) - Chunk size: (256, 256) for spatial
+dimensions</p>
 </div>
 </div>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="topozarr-creating-multiscale-zarr-for-visualisation">Topozarr: creating multiscale Zarr for visualisation<a class="anchor" aria-label="anchor" href="#topozarr-creating-multiscale-zarr-for-visualisation"></a></h2>
 <hr class="half-width"><p><a href="https://github.com/carbonplan/topozarr" class="external-link">Topozarr</a> is a
-Python library from CarbonPlan that helps create multiscale Zarr stores
-for visualisation.</p>
-<p>Typical workflow:</p>
-<ol style="list-style-type: decimal"><li>Start with an existing Zarr dataset (e.g. your example dataset
-stored in an object store).</li>
-<li>Use Topozarr to generate multiple resolution levels (pyramid).</li>
-<li>Save the multiscale Zarr store with appropriate GeoZarr multiscales
-metadata.</li>
-</ol><p>Conceptually, for your existing Zarr dataset
-(e.g. <code>s3://my-bucket/converted.zarr</code>):</p>
+Python library from <a href="https://carbonplan.org" class="external-link">CarbonPlan</a> that
+helps create multiscale Zarr stores for visualisation, following the
+GeoZarr conventions. It can take an existing Zarr dataset and generate
+multiple resolution levels (pyramid) with appropriate metadata.</p>
+<p>First, load the zarr dataset using xarray:</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="im">import</span> zarr</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a><span class="im">import</span> topozarr</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="co"># 1. Open the original Zarr dataset</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/converted.zarr"</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a>ds <span class="op">=</span> xr.open_zarr(store_url, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="co"># 2. Choose a variable to visualise (e.g. 'temperature')</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a>var <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span></code></pre>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/ocean_temperature.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
 </div>
-<p>And then create the multiscale pyramid:</p>
+<p>Now, you can choose a variable to visualise (e.g. <code>ssh</code>)
+and use Topozarr to build the multiscale pyramid.</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>    var,  <span class="co"># or dataset</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>    levels<span class="op">=</span><span class="dv">4</span>,              <span class="co"># number of resolution levels</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,   <span class="co"># or 'nearest', etc.</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)  <span class="co"># spatial chunking</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> topozarr</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>var <span class="op">=</span> ds[<span class="st">"ssh"</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>    var,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>    levels<span class="op">=</span><span class="dv">4</span>,              <span class="co"># number of resolution levels</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,   <span class="co"># or 'nearest', etc.</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)  <span class="co"># spatial chunking</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a><span class="bu">print</span>(pyramid)</span></code></pre>
 </div>
-<p>Now, you can inspect the pyramid structure, which will have multiple
-levels, each with its own group in the Zarr hierarchy. Each level will
-contain downsampled versions of the original data, suitable for
-different zoom levels in a map viewer.</p>
+<p>The pyramid object is a datatree that contains multiple levels of
+downsampled data, each with its own group in the Zarr hierarchy. Each
+level can be accessed and visualised separately, and the pyramid can be
+saved to a new Zarr store for use in browser-based visualisation
+tools.</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="cf">for</span> level <span class="kw">in</span> pyramid.levels:</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>    <span class="bu">print</span>(<span class="ss">f"Level </span><span class="sc">{</span>level<span class="sc">.</span>level<span class="sc">}</span><span class="ss">: shape=</span><span class="sc">{</span>level<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, chunks=</span><span class="sc">{</span>level<span class="sc">.</span>chunks<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
 </div>
-<p>You can see that it is not a normal xarray dataset, but a xarray
-datatree that contains multiple levels of downsampled data. Each level
-can be accessed and visualised separately, and the pyramid can be saved
-to a new Zarr store for use in browser-based visualisation tools.</p>
-<p>Instead of saving each level separately, Topozarr can save the entire
-pyramid to a single multiscale Zarr store, which is compatible with
-GeoZarr conventions. And, we will save the data directly to an object
-store (e.g. S3) for browser access:</p>
+<p>Instead of saving each pyramid level as a separate dataset, TopoZarr
+can write the entire pyramid to a single multiscale Zarr store that
+follows the GeoZarr conventions. In this example, we will save the
+multiscale dataset directly to an object store so that it can be
+accessed efficiently from a web browser:</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>mapper <span class="op">=</span> zarr.storage.FSStore(<span class="st">"s3://my-bucket/converted_multiscale.zarr"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a>pyramid.to_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="im">import</span> fsspec</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a><span class="im">import</span> os</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>store_url <span class="op">=</span> <span class="st">"s3://cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1" aria-label="code-block-4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1" aria-label="code-block-4-7"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1" aria-label="code-block-4-8"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1" aria-label="code-block-4-9"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1" aria-label="code-block-4-10"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1" aria-label="code-block-4-11"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1" aria-label="code-block-4-12"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1" aria-label="code-block-4-13"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1" aria-label="code-block-4-14"></a>    },</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1" aria-label="code-block-4-15"></a>}</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1" aria-label="code-block-4-16"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1" aria-label="code-block-4-17"></a><span class="co"># Create a mapper for the object store</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1" aria-label="code-block-4-18"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1" aria-label="code-block-4-19"></a>    store_url,</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1" aria-label="code-block-4-20"></a>    <span class="op">**</span>storage_options,</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1" aria-label="code-block-4-21"></a>)</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1" aria-label="code-block-4-22"></a></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1" aria-label="code-block-4-23"></a><span class="co"># Write the dataset directly to the object store</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1" aria-label="code-block-4-24"></a>pyramid.to_zarr(</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1" aria-label="code-block-4-25"></a>    mapper,</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1" aria-label="code-block-4-26"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1" aria-label="code-block-4-27"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1" aria-label="code-block-4-28"></a>)</span></code></pre>
+</div>
+<p>Now, you can inspect the Zarr hierarchy in the object store to see
+how the multiscale levels are organised and check for metadata related
+to multiscales. Because it is a datatree, you need to use the
+<code>xr.open_datatree</code> function to open the multiscale Zarr
+store:</p>
+<div class="codewrapper sourceCode" id="cb5">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds_pyramid <span class="op">=</span> xr.open_datatree(url, engine<span class="op">=</span><span class="st">"zarr"</span>) <span class="co"># remember to use the correct engine for datatree</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds_pyramid)</span></code></pre>
 </div>
 <div id="exercise-2---build-and-save-a-multiscale-zarr-store" class="callout challenge">
 <div class="callout-square">
@@ -657,15 +687,10 @@ store (e.g. S3) for browser access:</p>
 <h3 class="callout-title">Exercise 2 - Build and save a multiscale Zarr
 store</h3>
 <div class="callout-content">
-<p>Using your example dataset and Topozarr:</p>
-<ol style="list-style-type: decimal"><li>Implement your multiscale strategy with Topozarr and write a new
-Zarr store (in the object store).</li>
-<li>Inspect the Zarr hierarchy:
-<ul><li>Check how levels are organised (e.g. groups for each resolution
-level).</li>
-<li>Check metadata related to multiscales if available.</li>
-</ul></li>
-</ol><p>Questions:</p>
+<p>Using the multiscale strategy you designed in Exercise 1, implement
+it with Topozarr and save the resulting multiscale Zarr store to an
+object store. Then, inspect the Zarr hierarchy and metadata.</p>
+<p>Questions:</p>
 <ul><li>How does the multiscale structure look compared to the original
 single-resolution dataset?</li>
 <li>How might different levels be used by a viewer when zooming in and
@@ -678,33 +703,33 @@ out?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a><span class="im">import</span> zarr</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a><span class="im">import</span> topozarr</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="co"># Open the original Zarr dataset</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/converted.zarr"</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>ds <span class="op">=</span> xr.open_zarr(store_url, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a><span class="co"># Choose a variable to visualise</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a>var <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1" aria-label="code-block-5-11"></a></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1" aria-label="code-block-5-12"></a><span class="co"># Build the multiscale pyramid</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1" aria-label="code-block-5-13"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1" aria-label="code-block-5-14"></a>    var,</span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1" aria-label="code-block-5-15"></a>    levels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1" aria-label="code-block-5-16"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1" aria-label="code-block-5-17"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1" aria-label="code-block-5-18"></a>)</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1" aria-label="code-block-5-19"></a></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1" aria-label="code-block-5-20"></a><span class="co"># Save the multiscale Zarr store</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1" aria-label="code-block-5-21"></a>mapper <span class="op">=</span> zarr.storage.FSStore(<span class="st">"s3://my-bucket/converted_multiscale.zarr"</span>)</span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1" aria-label="code-block-5-22"></a>pyramid.to_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="im">import</span> zarr</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a><span class="im">import</span> topozarr</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a><span class="co"># Open the original Zarr dataset</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/converted.zarr"</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>ds <span class="op">=</span> xr.open_zarr(store_url, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a><span class="co"># Choose a variable to visualise</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>var <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a><span class="co"># Build the multiscale pyramid</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>    var,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>    levels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1" aria-label="code-block-6-18"></a>)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1" aria-label="code-block-6-19"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1" aria-label="code-block-6-20"></a><span class="co"># Save the multiscale Zarr store</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1" aria-label="code-block-6-21"></a>mapper <span class="op">=</span> <span class="st">"CREATE THE MAPPER"</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1" aria-label="code-block-6-22"></a>pyramid.to_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
 </div>
 </div>
 </div>
@@ -716,20 +741,29 @@ visualise it in the browser in two main ways: with a
 <strong>server</strong> that serves tiles, or with a
 <strong>client</strong> that reads Zarr directly from object
 storage.</p>
+<p>Server-side tools read the data on the backend, process it into
+tiles, and send those tiles to the browser. Client-side tools skip that
+backend step: they fetch the Zarr chunks directly, choose the right
+multiscale level, and render in the browser using WebGL.</p>
+<p>In both cases, multiscale metadata is important because it tells the
+viewer which resolution level to use at each zoom level. Good chunking
+also matters, because viewers work best when the chunks line up
+reasonably well with the data they need to display.</p>
 <div class="section level3">
 <h3 id="server-side-visualisation">Server-side visualisation<a class="anchor" aria-label="anchor" href="#server-side-visualisation"></a></h3>
 <p>In the server-side approach, a Python service reads the Zarr data and
 turns it into map tiles on demand. This is the familiar web-mapping
 model: the browser asks for tiles, and the server returns
-ready-to-display images for the current zoom and extent.</p>
-<p>Common options include:</p>
+ready-to-display images for the current zoom and extent. There are two
+main options for this:</p>
 <ul><li>
-<strong>TiTiler</strong> / <strong>titiler-multidim</strong>:
+<a href="https://developmentseed.org/titiler/" class="external-link"><strong>TiTiler</strong></a>:
 dynamic tile services that can render Zarr and other xarray-readable
 datasets.</li>
 <li>
-<strong>xpublish-tiles</strong>: a tile router for xpublish that can
-serve tiles from xarray/Zarr-backed data.</li>
+<a href="https://github.com/earth-mover/xpublish-tiles" class="external-link"><strong>xpublish-tiles</strong></a>:
+a tile router for xpublish that can serve tiles from xarray/Zarr-backed
+data.</li>
 </ul><p>This approach is useful when you need server-side control over
 styling, reprojection, access control, or heavy processing. It also
 works well when you want the browser to stay simple and just consume
@@ -742,10 +776,6 @@ from object storage and renders them itself. This removes the need for a
 dedicated tile server, but it means the browser has to do more work.</p>
 <p>Examples include:</p>
 <ul><li>
-<a href="https://github.com/spacebel/geozarr-openlayers" class="external-link"><strong>GeoZarr in
-OpenLayers</strong></a>: OpenLayers can read GeoZarr sources directly
-and render multiscale data in the browser.</li>
-<li>
 <a href="https://github.com/noc-oi/zarr-maps" class="external-link"><strong>zarr-maps</strong></a>:
 a client-side layer for Leaflet and OpenLayers-style web maps.</li>
 <li>
@@ -754,36 +784,23 @@ client-side visualisation for 2D and 3D in CesiumJS.</li>
 <li>
 <a href="https://github.com/carbonplan/zarr-layer" class="external-link"><strong>zarr-layer</strong></a>
 / <a href="https://github.com/developmentseed/deck.gl-raster" class="external-link"><strong>deck.gl-raster</strong></a>:
-browser rendering built around Zarr chunk loading and GPU display.</li>
-</ul><p>These tools usually rely on a JavaScript reader such as <a href="https://zarrita.dev/" class="external-link"><strong>Zarrita</strong></a> to fetch chunk
+browser rendering built around Zarr chunk loading and GPU display. For
+Mapbox and Maplibre.</li>
+</ul><p>These tools usually rely on a Zarr JavaScript reader such as <a href="https://zarrita.dev/" class="external-link"><strong>Zarrita</strong></a> to fetch chunk
 data from object storage. The browser then combines that data with <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API" class="external-link"><strong>WebGL</strong></a>
 and the <strong>GPU</strong> to render images, surfaces, or map tiles
 efficiently.</p>
 </div>
 <div class="section level3">
-<h3 id="how-the-two-approaches-work">How the two approaches work<a class="anchor" aria-label="anchor" href="#how-the-two-approaches-work"></a></h3>
-<p>Server-side tools read the data on the backend, process it into
-tiles, and send those tiles to the browser. Client-side tools skip that
-backend step: they fetch the Zarr chunks directly, choose the right
-multiscale level, and render in the browser using WebGL.</p>
-<p>In both cases, multiscale metadata is important because it tells the
-viewer which resolution level to use at each zoom level. Good chunking
-also matters, because viewers work best when the chunks line up
-reasonably well with the data they need to display.</p>
-<p>In this lesson, we will not go deep into front-end code, but we will
-show a simple browser example that learners can run locally and point at
-their own multiscale Zarr store.</p>
-</div>
-<div class="section level3">
 <h3 id="simple-html-example">Simple HTML example<a class="anchor" aria-label="anchor" href="#simple-html-example"></a></h3>
-<p>In the <a href="../files/zarr-maps-openlayers.html">zarr-maps-openlayers.html</a>
-file, we provide a minimal HTML page that uses
-<strong>zarr-maps</strong> with <strong>OpenLayers</strong> to visualise
-a multiscale zarr dataset in the browser. It follows the documented
-<code>ZarrLayer</code> options from the zarr-maps getting-started guide
-and can be served as a static HTML page.</p>
-<p>The lesson renders the same example inline below so learners can
-inspect it directly in the page:</p>
+<p>In this lesson, we will not go deep into front-end code, but we will
+show a simple browser example that you can run locally and point at
+their own multiscale Zarr store. It is the <a href="../files/zarr-maps-openlayers.html">zarr-maps-openlayers.html</a>,
+which is a minimal HTML page that uses <strong>zarr-maps</strong> with
+<strong>OpenLayers</strong> to visualise a multiscale zarr dataset in
+the browser.</p>
+<p>The lesson renders the same example inline below so you can inspect
+it directly in the page:</p>
 <iframe src="files/zarr-maps-openlayers.html" title="Zarr-maps OpenLayers example" style="width: 100%; height: 800px; border: 1px solid #d0d7de; border-radius: 0.75rem;" loading="lazy">
 </iframe>
 <div id="exercise-3---explore-your-multiscale-zarr-in-the-browser" class="callout challenge">
@@ -795,21 +812,18 @@ inspect it directly in the page:</p>
 <h3 class="callout-title">Exercise 3 - Explore your multiscale Zarr in
 the browser</h3>
 <div class="callout-content">
-<ol style="list-style-type: decimal"><li><p>Upload your multiscale Zarr store to an object store and make it
-accessible via HTTPS (or serve it locally with an appropriate static
-server).</p></li>
-<li><p>In the page above, edit the <code>zarrUrl</code> and
-<code>variable</code>, add your multiscale zarr dataset. You can edit it
-directly in the browser, or you can get the <a href="../files/zarr-maps-openlayers.html">HTML file</a> and edit it to
-point to your multiscale Zarr store and the variable you want to
-visualise.</p></li>
+<ol style="list-style-type: decimal"><li><p>In the page above, edit the <code>zarrUrl</code> and
+<code>variable</code>, add your multiscale zarr dataset.</p></li>
+<li><p>Edit the <a href="../files/zarr-maps-openlayers.html">HTML file
+<code>zarr-maps-openlayers.html</code></a> to point to your multiscale
+Zarr store and the variable you want to visualise.</p></li>
 <li>
-<p>Run a local web server in the directory containing
-<code>zarr-maps-openlayers.html</code>:</p>
-<div class="codewrapper sourceCode" id="cb6">
+<p>Run a local web server in the directory containing the HTML
+file:</p>
+<div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
 </div>
 <p>Then open
 <code>http://localhost:8000/zarr-maps-openlayers.html</code> in your
@@ -830,7 +844,7 @@ size) to improve performance?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>You should experience direct browser-based visualisation of your
 multiscale Zarr data. You will see how multiscale pyramids and chunking
@@ -855,6 +869,9 @@ name, band selection).</p>
 <p>Try to play a little with the controls, zooming and panning around
 the globe. Observe how the data loads and renders at different zoom
 levels.</p>
+<p>Try to play with one of the Zarr-Cube and Zarr-Cube-Velocity
+examples, which are designed for 3D visualisation of multiscale Zarr
+datasets.</p>
 </div>
 </div>
 </div>
@@ -863,14 +880,51 @@ levels.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
-<p>Learners should experience direct browser-based visualisation of
-their multiscale Zarr data. They will see how multiscale pyramids and
+<p>You should experience direct browser-based visualisation of your
+multiscale Zarr data in 3D. You will see how multiscale pyramids and
 chunking decisions affect the responsiveness and smoothness of
-interaction.</p>
+interaction, especially when rotating and zooming around the globe.</p>
+<p>The integration of WebGL and GPU acceleration allows for efficient
+rendering of large datasets without a dedicated tiling server.</p>
 </div>
 </div>
+</div>
+</div>
+<div id="pipeline-for-dataset-conversion-and-visualisation" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<span class="callout-header">Callout</span>
+<div id="pipeline-for-dataset-conversion-and-visualisation" class="callout-inner">
+<h3 class="callout-title">Pipeline for dataset conversion and
+visualisation</h3>
+<div class="callout-content">
+<p>In <a href="./10-conversion-workflow.html">Lesson 10</a>, we
+converted a NetCDF dataset into Zarr. In this lesson, we built on that
+workflow by generating a multiscale Zarr pyramid with TopoZarr and
+visualising it in a web browser using the GeoZarr conventions.</p>
+<p>This extends the original conversion pipeline with an additional
+multiscale processing step before visualisation.</p>
+<p>For datasets on regular grids, the workflow is relatively
+straightforward. However, many geoscience datasets use irregular or
+curvilinear grids, where the relationship between Zarr chunks and map
+tiles is not direct. In these cases, it is often necessary to reproject
+or resample the data onto a regular grid before generating the
+multiscale pyramid.</p>
+<p>Several Python libraries can help with this preprocessing step,
+including <a href="https://corteva.github.io/rioxarray/stable/" class="external-link">rioxarray</a>, <a href="https://xesmf.readthedocs.io/en/latest/" class="external-link">xESMF</a>, and <a href="https://rasterio.readthedocs.io/en/latest/" class="external-link">rasterio</a>. For a
+detailed discussion of the available approaches and their performance,
+see the <a href="https://developmentseed.org/" class="external-link">Development Seed</a>
+report, <a href="https://developmentseed.org/warp-resample-profiling/" class="external-link"><em>Reprojecting
+and Resampling Geospatial Data with Python</em></a>. These tools can
+help prepare datasets for efficient multiscale visualisation,
+particularly when working with irregular grids or non-standard map
+projections.</p>
+<p>You can see below a diagram of the full pipeline, from NetCDF to
+multiscale Zarr pyramid, ready for browser-based visualisation.</p>
+<figure><img src="../fig/nc_to_zarr_pyramid.png" alt="Pipeline diagram showing the conversion of a NetCDF dataset to a multiscale Zarr pyramid using Topozarr." class="figure mx-auto d-block"></figure></div>
 </div>
 </div>
 <div id="keypoints1" class="callout keypoints">
@@ -962,8 +1016,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/15-visualisation.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/15-visualisation.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-13",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>

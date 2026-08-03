@@ -219,10 +219,6 @@
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
         <ul><li><a href="#why-n-dimensional-data-is-hard">Why n-dimensional data is hard</a></li>
-<li><a href="#netcdf-self-describing-arrays">NetCDF: self-describing arrays</a></li>
-<li><a href="#grib-compact-operational-exchange">GRIB: compact operational exchange</a></li>
-<li><a href="#hdf5-a-general-high-performance-container">HDF5: a general high-performance container</a></li>
-<li><a href="#thirty-years-of-growing-data-volumes">Thirty years of growing data volumes</a></li>
 <li><a href="#typical-access-patterns-today">Typical access patterns today</a></li>
 <li><a href="#sharing-data-and-accessing-subsets">Sharing data and accessing subsets</a></li>
 <li><a href="#summary-format-scale-and-access-as-core-challenges">Summary: format, scale, and access as core challenges</a></li>
@@ -416,13 +412,13 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Challenges of N-dimensional Data</h1>
-        <p>Last updated on 2026-07-20 |
+        <p>Last updated on 2026-08-03 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/02-ndata-challenges.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 30 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 45 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -484,8 +480,9 @@ reach terabytes or petabytes.</p>
 into limitations: they did not treat multidimensional arrays as
 first-class objects and performed poorly on large scientific datasets,
 motivating specialised formats like NetCDF and GRIB.</p>
-</section><section><h2 class="section-heading" id="netcdf-self-describing-arrays">NetCDF: self-describing arrays<a class="anchor" aria-label="anchor" href="#netcdf-self-describing-arrays"></a></h2>
-<hr class="half-width"><p>NetCDF was designed in the late 1980s as a portable, self-describing
+<div class="section level3">
+<h3 id="netcdf-self-describing-arrays">NetCDF: self-describing arrays<a class="anchor" aria-label="anchor" href="#netcdf-self-describing-arrays"></a></h3>
+<p>NetCDF was designed in the late 1980s as a portable, self-describing
 file format and data model for array-oriented scientific data such as
 climate and ocean model output. A NetCDF file stores variables (arrays),
 dimensions (e.g. <code>time</code>, <code>lat</code>, <code>lon</code>,
@@ -496,11 +493,13 @@ relying on separate documentation.</p>
 builds on HDF5 as a storage layer, adding features such as groups and
 support for very large arrays and complex hierarchies. From the user’s
 point of view, NetCDF provides an intuitive way to represent
-n-dimensional fields; but as datasets grow, organisational choices
+n-dimensional fields. But as datasets grow, organisational choices
 (e.g. which dimensions to include, how to structure variables and files)
 strongly affect how easy they are to work with.</p>
-</section><section><h2 class="section-heading" id="grib-compact-operational-exchange">GRIB: compact operational exchange<a class="anchor" aria-label="anchor" href="#grib-compact-operational-exchange"></a></h2>
-<hr class="half-width"><p>GRIB (GRIdded Binary) is a World Meteorological Organization format
+</div>
+<div class="section level3">
+<h3 id="grib-compact-operational-exchange">GRIB: compact operational exchange<a class="anchor" aria-label="anchor" href="#grib-compact-operational-exchange"></a></h3>
+<p>GRIB (GRIdded Binary) is a World Meteorological Organization format
 designed for efficient transmission and storage of gridded
 meteorological fields, especially numerical weather prediction outputs.
 It uses many “messages”, each containing a field plus encoded metadata,
@@ -513,8 +512,10 @@ This message-based structure is highly compact and well suited to
 operational workflows, but it can be more difficult to treat GRIB files
 as simple n-dimensional arrays, and heterogeneous messages may need to
 be filtered or regrouped before analysis.</p>
-</section><section><h2 class="section-heading" id="hdf5-a-general-high-performance-container">HDF5: a general high-performance container<a class="anchor" aria-label="anchor" href="#hdf5-a-general-high-performance-container"></a></h2>
-<hr class="half-width"><p>HDF5 is a general hierarchical data format that supports large,
+</div>
+<div class="section level3">
+<h3 id="hdf5-a-general-high-performance-container">HDF5: a general high-performance container<a class="anchor" aria-label="anchor" href="#hdf5-a-general-high-performance-container"></a></h3>
+<p>HDF5 is a general hierarchical data format that supports large,
 complex datasets, and underpins NetCDF-4’s storage layer. It provides
 groups, datasets, and rich metadata, allowing complex scientific data
 structures to be represented in a single file, and has been widely
@@ -526,8 +527,10 @@ attributes rather than low-level storage details. However, the ability
 to represent large hierarchical datasets efficiently is one reason
 NetCDF-4/HDF5 has become a backbone for many modern environmental
 archives.</p>
-</section><section><h2 class="section-heading" id="thirty-years-of-growing-data-volumes">Thirty years of growing data volumes<a class="anchor" aria-label="anchor" href="#thirty-years-of-growing-data-volumes"></a></h2>
-<hr class="half-width"><p>Over roughly the last 30 years, several trends have driven data
+</div>
+<div class="section level3">
+<h3 id="thirty-years-of-growing-data-volumes">Thirty years of growing data volumes<a class="anchor" aria-label="anchor" href="#thirty-years-of-growing-data-volumes"></a></h3>
+<p>Over roughly the last 30 years, several trends have driven data
 growth in meteorology and oceanography:</p>
 <ul><li>Higher spatial resolution in models and reanalyses, moving from
 coarse global grids to kilometre-scale domains.</li>
@@ -539,13 +542,13 @@ detailed vertical structure.</li>
 decades.</li>
 <li>Ensembles of forecasts and climate simulations, multiplying data
 volume by the number of members.</li>
-</ul><figure><img src="../fig/data_size_trends.png" alt="The volume of worldwide climate data is expanding rapidly " class="figure mx-auto d-block"><div class="figcaption">The volume of worldwide climate data is
+</ul><p>These trends have pushed archives from simple files to huge
+collections, requiring careful selection of formats, file organisation
+strategies, and access tools.</p>
+<figure><img src="../fig/data_size_trends.png" alt="Chart showing the growth of climate data volumes over time, with a steep increase in the last decades." class="figure mx-auto d-block"><div class="figcaption">The volume of worldwide climate data is
 expanding rapidly <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </div>
-</figure><p>As NetCDF documentation and developer resources emphasise, these
-trends have pushed archives from simple files to huge collections,
-requiring careful selection of formats, file organisation strategies,
-and access tools.</p>
+</figure></div>
 </section><section><h2 class="section-heading" id="typical-access-patterns-today">Typical access patterns today<a class="anchor" aria-label="anchor" href="#typical-access-patterns-today"></a></h2>
 <hr class="half-width"><p>In many workflows, meteorology and oceanography practitioners:</p>
 <ul><li>Use NetCDF (NetCDF-3 or NetCDF-4/HDF5) for archival and analysis of
@@ -570,7 +573,9 @@ structures we are working with.</p>
 NetCDF file</h3>
 <div class="callout-content">
 <p>The example NetCDF file <code>data/ocean_temperature.nc</code>
-contains monthly 3D temperature fields:</p>
+contains a subset of the ERA5 Reanalysis, consisting of 2D sea surface
+temperature fields (latitude and longitude) recorded every 2 hours
+during the first five days of 2025.</p>
 <ol style="list-style-type: decimal"><li>Use xarray to open the dataset.</li>
 <li>Inspect dimensions, coordinates, and attributes.</li>
 <li>Discuss how the organisation (variables, dimensions, attributes)
@@ -601,15 +606,15 @@ complex?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>This dataset has dimensions for “time” (<code>valid_time</code>),
-“lat” (<code>latitude</code>), and <code>lon</code>
-(<code>longitude</code>), with corresponding coordinate variables.
-Attributes provide metadata about the dataset, such as the source,
-institution, and conventions used. Adding ensemble members or more
-levels would introduce additional dimensions, increasing the size of the
-dataset and potentially complicating access patterns.</p>
+“lat” (<code>latitude</code>), and “lon” (<code>longitude</code>), with
+corresponding coordinate variables. Attributes provide metadata about
+the dataset, such as the source, institution, and conventions used.
+Adding ensemble members or more levels would introduce additional
+dimensions, increasing the size of the dataset and potentially
+complicating access patterns.</p>
 </div>
 </div>
 </div>
@@ -632,8 +637,8 @@ with xarray.</li>
 with xarray using the <code>cfgrib</code> engine.</li>
 <li>Compare what <code>print(ds)</code> shows for each: dimensions, data
 variables, coordinates, and attributes.</li>
-</ol><p>To open a GRIB file, you may need to use engine=“cfgrib” in
-<code>xr.open_dataset()</code>:</p>
+</ol><p>To open a GRIB file, you may need to use <code>engine="cfgrib"</code>
+in <code>xr.open_dataset()</code>:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -660,7 +665,7 @@ originating centre, parameter names)?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>Both files expose a very similar data model when opened with xarray.
 They contain the same spatial grid (721 × 1440), 120 time steps, and a
@@ -693,7 +698,7 @@ that:</p>
 <li>We add more time steps to cover a 30‑year period.</li>
 <li>Several colleagues also need to analyse this dataset, possibly from
 different institutions.</li>
-</ul><p>Discuss in small groups:</p>
+</ul><p>Discuss:</p>
 <ol style="list-style-type: decimal"><li>How would this change the dimensions of your dataset
 (e.g. <code>lat</code>, <code>lon</code>, <code>time</code>,
 <code>depth</code>)?</li>
@@ -701,10 +706,9 @@ different institutions.</li>
 archive?</li>
 <li>What practical challenges might you face when trying to open and
 inspect such datasets with the same tools?</li>
-<li>How would you <strong>share</strong> this growing dataset today
-(local copies, shared server, remote service), and what problems might
-that create?</li>
-</ol><p>You do not need to implement anything; focus on reasoning about
+<li>How would you share this growing dataset today (local copies, shared
+server, remote service), and what problems might that create?</li>
+</ol><p>You do not need to implement anything. Focus on reasoning about
 dimensions, size, organisation, and sharing.</p>
 </div>
 </div>
@@ -714,7 +718,7 @@ dimensions, size, organisation, and sharing.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <p>Doubling the horizontal resolution would increase the number of
 latitude and longitude points, giving about four times more grid cells
@@ -757,6 +761,26 @@ treated as a single object: clients ultimately have to read data from
 that file (locally or via a server) to do any calculation, and classical
 NetCDF/HDF5 are optimised for POSIX‑style file systems rather than
 direct object‑store access.</p>
+<div id="posix-file-systems-and-object-storage" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<span class="callout-header">Callout</span>
+<div id="posix-file-systems-and-object-storage" class="callout-inner">
+<h3 class="callout-title">POSIX file systems and object storage</h3>
+<div class="callout-content">
+<p>A <strong>POSIX file system</strong> is a traditional file-system
+model with directories, files, and paths that are accessed through a
+local or mounted storage interface. It is commonly used for shared
+filesystems and local disks.</p>
+<p>An <strong>object-store file system</strong> is a storage interface
+that exposes object storage through filesystem-like operations, often
+used in cloud workflows. It is different from a traditional POSIX
+filesystem because data are accessed through object APIs rather than a
+normal directory tree.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="serverside-subsetting-and-remote-access">Server‑side subsetting and remote access<a class="anchor" aria-label="anchor" href="#serverside-subsetting-and-remote-access"></a></h3>
@@ -831,7 +855,7 @@ performance, scalability, memory, and storage cost. Server‑side
 subsetting and chunked storage help, but classical file‑based formats
 are still built around single files and shared file systems. The rest of
 the course will show how cloud‑native formats and workflows build on
-these ideas—especially chunking and object storage—to make large
+these ideas, especially chunking and object storage, to make large
 n‑dimensional data more manageable.</p>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
@@ -936,8 +960,8 @@ Data Management.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/02-ndata-challenges.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/02-ndata-challenges.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-07-20",
-  "datePublished": "2026-07-28"
+  "dateModified": "2026-08-03",
+  "datePublished": "2026-08-03"
 }
 
   </script><script>
