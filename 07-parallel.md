@@ -1,24 +1,24 @@
 ---
 title: Parallel Processing for Zarr
-teaching: 25
-exercises: 15
+teaching: 35
+exercises: 30
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- Explain why parallel processing matters for large Zarr datasets.
-- Use Dask with xarray and Zarr to parallelise common array computations.
-- Understand how chunking, lazy loading, and task graphs work together.
-- Recognise a few other Python parallelism patterns that are sometimes used with Zarr workflows.
+- "Explain why parallel processing matters for large Zarr datasets."
+- "Use Dask with xarray and Zarr to parallelise common array computations."
+- "Understand how chunking, lazy loading, and task graphs work together."
+- "Recognise a few other Python parallelism patterns that are sometimes used with Zarr workflows."
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- Why do we need parallel processing for large Zarr datasets?
-- How does Dask parallelise xarray and Zarr computations?
-- How do chunking and lazy loading support parallel work?
-- What other parallelism tools do Python users sometimes combine with Zarr?
+- "Why do we need parallel processing for large Zarr datasets?"
+- "How does Dask parallelise xarray and Zarr computations?"
+- "How do chunking and lazy loading support parallel work?"
+- "What other parallelism tools do Python users sometimes combine with Zarr?"
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -29,9 +29,9 @@ Large environmental datasets can be too slow or too large to process on a single
 
 Processing such data on a single core or in a single process can be:
 
-- **Slow** - long runtimes for even simple operations.
-- **Memory-limited** - datasets or intermediate results may not fit into RAM.
-- **I/O-bound** - reading and writing data dominates computation time, especially from disks or across networks.
+- Slow: long runtimes for even simple operations.
+- Memory-limited: datasets or intermediate results may not fit into RAM.
+- I/O-bound: reading and writing data dominates computation time, especially from disks or across networks.
 
 Parallel processing helps when your workflow needs to:
 
@@ -46,18 +46,17 @@ In practice, parallelism works best when both the compute layer and the data lay
 
 ## Dask: distributed processing for Python
 
-Dask is a Distributed processing library for Python. It enables parallel processing of Python code across multiple cores on the same computer or across multiple computers. It can be
-used behind the scenes by Xarray with minimal modification to code. JASMIN users can make use of a Dask gateway that allows their Dask code submitted from the Jupyter notebook interface
-to run on the LOTUS HPC cluster. Dask has two broad categories of features, high level data structures which behave in a similar way to common Python data structures but with the
-ability to perform operations in parallel and low level task scheduling to run any Python code in parallel.
+Dask is a distributed processing library for Python. It enables parallel processing of Python code across multiple cores on the same computer or across multiple computers. It can be used behind the scenes by Xarray with minimal modification to code.
 
-Key ideas:
+JASMIN users can make use of a Dask gateway that allows their Dask code submitted from the Jupyter notebook interface to run on the HPC cluster. Dask has two broad categories of features: high level data structures which behave in a similar way to common Python data structures but with the ability to perform operations in parallel and low level task scheduling to run any Python code in parallel.
+
+The keys to understanding Dask are:
 
 - **Task graph**: Dask builds a graph of tasks and dependencies when you write code, but does not execute immediately.
 - **Lazy evaluation**: computations are only executed when you call `.compute()` or similar methods.
-- **Cluster**: a set of workers managed by a scheduler; can be local (one machine) or remote (HPC cluster, Kubernetes, etc.).
+- **Cluster**: a set of workers managed by a scheduler. Can be local (one machine) or remote (HPC cluster, Kubernetes, etc.).
 
-Basic setup on a local machine:
+To create a basic Dask cluster on your local machine, you can use the following code snippet:
 
 ```python
 from dask.distributed import Client, progress
@@ -74,11 +73,12 @@ cluster.
 
 ### Using the Dask dashboard
 
-In the information about the Dask cluster is a link to a Dashboard webpage. From the Dashboard we can monitor our Dask cluster and see how busy it is, view a graph of task dependencies, memory usage and the status of the Dask workers. This can be really useful when checking if our Dask cluster is behaving correctly and working out how optimially our code is making use of Dask's parallelism. Note that it is not possible (or at least not without significant additional complexity) to access the Dask dashboard when running on the JASMIN notebook service.
+In the information about the Dask cluster is a link to a Dashboard webpage. From the Dashboard we can monitor our Dask cluster and see how busy it is, view a graph of task dependencies, memory usage and the status of the Dask workers. This can be really useful when checking if our Dask cluster is behaving correctly and working out how optimally our code is making use of Dask's parallelism. Note that it is not possible (or at least not without significant additional complexity) to access the Dask dashboard when running on the JASMIN notebook service.
 
 ![Dask dashboard graph view](fig/dask_dashboard.png){alt="Dask dashboard showing task progress and worker status."}
 
-![Dask dashboard task view](fig/dask_status.png)
+
+![Dask dashboard task view](fig/dask_status.png){alt="Dask dashboard showing task progress and worker status."}
 
 ### Using the JASMIN Dask gateway
 
@@ -97,11 +97,10 @@ options = gw.cluster_options()
 options.worker_cores = 1
 options.scheduler_cores = 1
 options.account = "workshop"
-options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience'
+options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'
 ```
 
-Finally we can check if we already had a cluster running and reuse that if we do and then get a `client` object from the cluster that will behave
-the same way as the local Dask client did.
+Finally we can check if we already had a cluster running and reuse that if we do and then get a `client` object from the cluster that will behave the same way as the local Dask client did.
 
 ```python
 clusters = gw.list_clusters()
@@ -114,7 +113,7 @@ client = cluster.get_client()
 client
 ```
 
-Now that we have a running cluster we can allow it to adapt and scale up and down as we demand it. This will translate to jobs being launched on the JASMIN cluster itself. JASMIN allows users to spawn up to 16 jobs in the Dask queue, but one of these will be taken by the scheduler so the we can only launch a maximum of 15 workers.
+Now that we have a running cluster we can allow it to adapt and scale up and down as we demand it. This will translate to jobs being launched on the JASMIN cluster itself. JASMIN allows users to spawn up to 16 jobs in the Dask queue, but one of these will be taken by the scheduler so we can only launch a maximum of 15 workers.
 
 ```python
 cluster.adapt(minimum=1, maximum=15)
@@ -125,6 +124,8 @@ Once we are done with Dask we can shutdown the cluster by calling its shutdown f
 ```python
 cluster.shutdown()
 ```
+
+With a Dask cluster running using dask_gateway you can now see the dashboard by clicking on the link in the `client` object.
 
 ### Dask arrays and lazy computation
 
@@ -165,7 +166,7 @@ type(result)
 Important points:
 
 - Creating `x` and `y` defines a Dask array with specified chunking, but no data is computed until needed.
-- Operations build a task graph; `.compute()` runs the tasks.
+- Operations build a task graph. `.compute()` runs the tasks.
 - Chunking lets Dask process different blocks in parallel and only load chunks into memory when required.
 
 ::::::::::::::::::::::::::::::::::::::: challenge
@@ -192,6 +193,8 @@ npx_mean = npx.mean()
 
 Which went faster overall? Why do you think you got the result you did? Try making the dataset a little larger, going much beyond 25000x25000 might use too much memory. Try running the top command in a terminal while your notebook is running, look at the CPU % when running the Numpy and Dask versions and compare them. Try changing the number of Dask threads and see what effect this has on the CPU %.
 
+To see the CPU % in a terminal you can use the command `top` or `htop`.
+
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :::::::::::::::::::::::::::::::::::::::::: callout
@@ -217,8 +220,7 @@ When you open a Zarr dataset with xarray, the data are not read into memory. The
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
-### Dask with Zarr via xarray
+## Dask with Zarr via xarray
 
 The most common pattern in this workshop is to open a Zarr store with xarray and ask xarray to use Dask-backed chunks. Xarray then keeps the data lazy until you compute something.
 
@@ -249,7 +251,6 @@ If you are using a netCDF dataset, to integrate Dask you would need to specify t
 ```python
 ds = xr.open_dataset("data/ocean_temperature.nc", chunks={"time": 10, "latitude": 100, "longitude": 100})
 ```
-
 
 ### A simple parallel computation
 
@@ -343,6 +344,7 @@ dask.visualize(global_mean, filename='task_graph.png')
 
 This will create a PNG file showing the task graph for the computation. You can also use `global_mean.visualize()` to see the graph directly in a Jupyter notebook.
 
+![Dask task graph](fig/task_graph.png){alt="Dask task graph showing the dependencies of tasks for performing calculations in a variable."}
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 

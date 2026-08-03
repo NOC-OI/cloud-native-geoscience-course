@@ -1,7 +1,7 @@
 ---
 title: Visualization - Multiscale Zarr and GeoZarr
 teaching: 25
-exercises: 15
+exercises: 30
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -27,10 +27,9 @@ exercises: 15
 
 Zarr can be used for web visualisation as well as scientific analysis. Because the data are stored in chunks, browsers or servers can fetch only the pieces needed for the current map view instead of loading the full dataset.
 
-There are two main patterns. In a **server-based** workflow, a backend reads the Zarr store and serves tiles or images; in a **client-side** workflow, the browser reads chunks directly from object storage and renders them with WebGL or similar tools.
+There are two main patterns. In a **server-based** workflow, a backend reads the Zarr store and serves tiles or images. In a **client-side** workflow, the browser reads chunks directly from object storage and renders them with [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)+GPU or similar tools.
 
-We will see now how to prepare a Zarr dataset for interactive visualisation, and how to explore it in a browser using GeoZarr conventions and simple HTML/JS clients. And we understand why chunking, multiscale pyramids and GeoZarr metadata are important for performance and user experience.
-
+We will see now how to prepare a Zarr dataset for interactive visualisation, and how to explore it in a browser using [GeoZarr](https://geozarr.org) conventions and simple HTML/JS clients. And we understand why chunking, multiscale pyramids, and GeoZarr metadata are important for performance and user experience.
 
 ## Chunking matters for visualisation
 
@@ -39,54 +38,33 @@ Zarr stores multidimensional arrays as many small chunks. For large geospatial d
 - Looking at relatively small windows (map viewports) at a time.
 - Zooming and panning, which changes which subset of data is needed.
 
-Good chunking:
+Because of that, a good chunking should align with the typical viewports, zoom levels and tiles (e.g. 256×256 or 512×512 pixels) so that the viewer can fetch only the chunks needed for the current view. Another consideration is that the chunks should be small enough for fast transfer (tens or hundreds of kilobytes) but large enough to avoid too many separate HTTP requests.
 
-- Aligns chunks with typical viewports or tiles (e.g. 256×256 or 512×512 pixels).
-- Keeps chunks small enough for fast transfer (tens or hundreds of kilobytes) but large enough to avoid too many separate HTTP requests.
+Inefficient chunking (e.g. huge chunks or misaligned shapes) can lead to the forced loading of much more data than needed for each map view, potentially resulting in sluggish interactions, high bandwidth consumption, and a poor user experience.
 
-Poor chunking (e.g. huge chunks or misaligned shapes):
+For geospatial visualisation, we typically prefer chunking along spatial dimensions (x, y) and possibly band/time, with chunk sizes chosen to balance latency and throughput.
 
-- Forces the viewer to load far more data than needed for each map view.
-- Can cause slow interaction, high bandwidth usage, and poor user experience.
+## Multiscale pyramids
 
-For geospatial visualisation, we typically prefer **chunking along spatial dimensions** (x, y) and possibly band/time, with chunk sizes chosen to balance latency and throughput.
+The idea of multiscale pyramids comes from the concept of Cloud-Optimized GeoTIFFs (COGs), which are widely used for imagery. COGs store multiple resolutions of the same data in a single file, allowing clients to request only the resolution needed for the current zoom level, improving performance and reducing bandwidth.
 
-
-## Multiscale pyramids and Cloud-Optimized GeoTIFFs
-
-Cloud-Optimized GeoTIFF (COG) is a widely used format for imagery that:
-
-- Stores multiple resolutions (overview levels) inside a single file.
-- Organises data so that HTTP range requests can retrieve just the tiles needed for a given viewport and zoom level.
-
-Multiscale pyramids in Zarr follow the same idea:
+Following the same idea, we can create **multiscale pyramids** in Zarr. Each level of the pyramid is a downsampled version of the original data, allowing viewers to fetch coarse data for low zoom levels and fine data for high zoom levels. Normally, the pyramid is structured as follows:
 
 - Level 0: full-resolution grid.
 - Level 1: downsampled (e.g. 2× coarser) version.
 - Level 2: further downsampled, and so on.
 
-Benefits:
+As benefits, this allows for efficient visualisation at different zoom levels without overwhelming the client with unnecessary data. For example, a global map view can use a low-resolution overview, while a local zoom can fetch high-resolution tiles only for the area of interest.
 
-- At low zoom (whole world), we display coarse data (few tiles, faster).
-- At high zoom (local detail), we display fine data (more tiles, but only for a small area).
+GeoZarr's multiscales convention formalises how to store and describe these pyramids in Zarr.
 
-GeoZarr's **multiscales** convention formalises how to store and describe these pyramids in Zarr.
-
-![Multiscale pyramid example](fig/geozarr_multiscale.png)
+![Source: https://www.earthmover.io/blog/multiscales-in-al/](fig/geozarr_multiscale.png){alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy."}
 
 ## GeoZarr: geospatial conventions for Zarr
 
-GeoZarr is a set of modular conventions for encoding geospatial datasets in Zarr.
+GeoZarr is a set of modular conventions for encoding geospatial datasets in Zarr. The core conventions include `proj`, `spatial`, and `multiscales`, which describe the coordinate reference system, spatial transforms, and multiscale pyramid structure, respectively.
 
-Core conventions include:
-
-- **`proj`** - describes the coordinate reference system (CRS) using EPSG codes, WKT2, or PROJJSON.
-- **`spatial`** - defines affine transforms between array indices and coordinates (e.g. pixel to lat/lon).
-- **`multiscales`** - describes multiscale pyramid structures (resolution levels, layouts).
-
-These conventions are registered via a `zarr_conventions` metadata attribute and use namespaced attributes like `proj:code`, `spatial:transform`, and `multiscales`.
-
-GeoZarr is being developed as an OGC standard that builds upon the Unidata Common Data Model and CF conventions, and aims to bridge scientific and geospatial communities.
+These conventions are registered via a `zarr_conventions` metadata attribute and use namespaced attributes like `proj:code`, `spatial:transform`, and `multiscales`. GeoZarr is being developed as an OGC standard that builds upon the Unidata Common Data Model and CF conventions, and aims to bridge scientific and geospatial communities.
 
 Useful references:
 
@@ -99,24 +77,25 @@ Useful references:
 
 ## Exercise 1 - Design a multiscale strategy
 
-Before writing code:
+Creating a multiscale Zarr store requires some design decisions. Before implementing it, think about your dataset and how you want to visualise it. Because it can be resource-intensive to create multiple levels, we are going to use a small example dataset for this exercise, the `data/ocean_temperature.zarr`, related to the ERA5 reanalysis dataset.
 
 1. Look at your example Zarr dataset (dimensions, spatial resolution, domain).
 2. Propose:
    - Number of levels (e.g. 3-5).
    - Downsampling method (e.g. mean, min, max, nearest).
    - Spatial chunk size (e.g. 256×256 or 512×512).
-
 3. Discuss with a neighbour:
    - How your choices affect visualisation at different zoom levels.
    - How they might impact performance and storage.
 
-Write down your multiscale plan; you'll implement it with Topozarr in the next exercise.
+Write down your multiscale plan. You'll implement it with Topozarr in the next exercise.
 
 ::::::::::::::: solution
 
-Learners should think about how many overview levels they need and how chunk sizes map to typical map tiles.
-They will connect multiscale design decisions to performance and user experience.
+The multiscale strategy will depend on the dataset's spatial resolution and the desired zoom levels for visualisation. For example, if the original dataset has a resolution of 0.1 degrees, you might choose:
+- Levels: 4 (0.1°, 0.2°, 0.4°, 0.8°)
+- Downsampling: mean (to preserve average values)
+- Chunk size: (256, 256) for spatial dimensions
 
 :::::::::::::::::::::::::
 
@@ -124,66 +103,82 @@ They will connect multiscale design decisions to performance and user experience
 
 ## Topozarr: creating multiscale Zarr for visualisation
 
-[Topozarr](https://github.com/carbonplan/topozarr) is a Python library from CarbonPlan that helps create multiscale Zarr stores for visualisation.
+[Topozarr](https://github.com/carbonplan/topozarr) is a Python library from [CarbonPlan](https://carbonplan.org) that helps create multiscale Zarr stores for visualisation, following the GeoZarr conventions. It can take an existing Zarr dataset and generate multiple resolution levels (pyramid) with appropriate metadata.
 
-Typical workflow:
-
-1. Start with an existing Zarr dataset (e.g. your example dataset stored in an object store).
-2. Use Topozarr to generate multiple resolution levels (pyramid).
-3. Save the multiscale Zarr store with appropriate GeoZarr multiscales metadata.
-
-
-Conceptually, for your existing Zarr dataset (e.g. `s3://my-bucket/converted.zarr`):
+First, load the zarr dataset using xarray:
 
 ```python
 import xarray as xr
-import zarr
-import topozarr
-
-# 1. Open the original Zarr dataset
-store_url = "s3://my-bucket/converted.zarr"
-ds = xr.open_zarr(store_url, consolidated=True)
-
-# 2. Choose a variable to visualise (e.g. 'temperature')
-var = ds["temperature"]
+ds = xr.open_zarr("data/ocean_temperature.zarr", consolidated=True)
 ```
-And then create the multiscale pyramid:
+
+Now, you can choose a variable to visualise (e.g. `ssh`) and use Topozarr to build the multiscale pyramid.
 
 ```python
+import topozarr
+var = ds["ssh"]
 pyramid = topozarr.build_pyramid(
-    var,  # or dataset
+    var,
     levels=4,              # number of resolution levels
     downsampling="mean",   # or 'nearest', etc.
     chunk_size=(256, 256)  # spatial chunking
 )
+print(pyramid)
 ```
-
-Now, you can inspect the pyramid structure, which will have multiple levels, each with its own group in the Zarr hierarchy. Each level will contain downsampled versions of the original data, suitable for different zoom levels in a map viewer.
+The pyramid object is a datatree that contains multiple levels of downsampled data, each with its own group in the Zarr hierarchy. Each level can be accessed and visualised separately, and the pyramid can be saved to a new Zarr store for use in browser-based visualisation tools.
 
 ```python
 for level in pyramid.levels:
     print(f"Level {level.level}: shape={level.shape}, chunks={level.chunks}")
 ```
 
-You can see that it is not a normal xarray dataset, but a xarray datatree that contains multiple levels of downsampled data. Each level can be accessed and visualised separately, and the pyramid can be saved to a new Zarr store for use in browser-based visualisation tools.
-
-Instead of saving each level separately, Topozarr can save the entire pyramid to a single multiscale Zarr store, which is compatible with GeoZarr conventions. And, we will save the data directly to an object store (e.g. S3) for browser access:
+Instead of saving each pyramid level as a separate dataset, TopoZarr can write the entire pyramid to a single multiscale Zarr store that follows the GeoZarr conventions. In this example, we will save the multiscale dataset directly to an object store so that it can be accessed efficiently from a web browser:
 
 ```python
-mapper = zarr.storage.FSStore("s3://my-bucket/converted_multiscale.zarr")
-pyramid.to_zarr(mapper, consolidated=True)
+import xarray as xr
+import fsspec
+import os
+
+store_url = "s3://cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"
+
+storage_options = {
+    "key": os.environ["AWS_ACCESS_KEY_ID"],
+    "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
+    "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    "config_kwargs": {
+        "request_checksum_calculation": "when_required",
+        "response_checksum_validation": "when_required",
+    },
+}
+
+# Create a mapper for the object store
+mapper = fsspec.get_mapper(
+    store_url,
+    **storage_options,
+)
+
+# Write the dataset directly to the object store
+pyramid.to_zarr(
+    mapper,
+    mode="w",
+    consolidated=True,
+)
+```
+
+Now, you can inspect the Zarr hierarchy in the object store to see how the multiscale levels are organised and check for metadata related to multiscales. Because it is a datatree, you need to use the `xr.open_datatree` function to open the multiscale Zarr store:
+
+```python
+import xarray as xr
+url = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"
+ds_pyramid = xr.open_datatree(url, engine="zarr") # remember to use the correct engine for datatree
+print(ds_pyramid)
 ```
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 2 - Build and save a multiscale Zarr store
 
-Using your example dataset and Topozarr:
-
-1. Implement your multiscale strategy with Topozarr and write a new Zarr store (in the object store).
-2. Inspect the Zarr hierarchy:
-   - Check how levels are organised (e.g. groups for each resolution level).
-   - Check metadata related to multiscales if available.
+Using the multiscale strategy you designed in Exercise 1, implement it with Topozarr and save the resulting multiscale Zarr store to an object store. Then, inspect the Zarr hierarchy and metadata.
 
 Questions:
 
@@ -213,7 +208,7 @@ pyramid = topozarr.build_pyramid(
 )
 
 # Save the multiscale Zarr store
-mapper = zarr.storage.FSStore("s3://my-bucket/converted_multiscale.zarr")
+mapper = "CREATE THE MAPPER"
 pyramid.to_zarr(mapper, consolidated=True)
 ```
 
@@ -225,14 +220,16 @@ pyramid.to_zarr(mapper, consolidated=True)
 
 Once you have a multiscale GeoZarr-compliant Zarr store, you can visualise it in the browser in two main ways: with a **server** that serves tiles, or with a **client** that reads Zarr directly from object storage.
 
+Server-side tools read the data on the backend, process it into tiles, and send those tiles to the browser. Client-side tools skip that backend step: they fetch the Zarr chunks directly, choose the right multiscale level, and render in the browser using WebGL.
+
+In both cases, multiscale metadata is important because it tells the viewer which resolution level to use at each zoom level. Good chunking also matters, because viewers work best when the chunks line up reasonably well with the data they need to display.
+
 ### Server-side visualisation
 
-In the server-side approach, a Python service reads the Zarr data and turns it into map tiles on demand. This is the familiar web-mapping model: the browser asks for tiles, and the server returns ready-to-display images for the current zoom and extent.
+In the server-side approach, a Python service reads the Zarr data and turns it into map tiles on demand. This is the familiar web-mapping model: the browser asks for tiles, and the server returns ready-to-display images for the current zoom and extent. There are two main options for this:
 
-Common options include:
-
-- **TiTiler** / **titiler-multidim**: dynamic tile services that can render Zarr and other xarray-readable datasets.
-- **xpublish-tiles**: a tile router for xpublish that can serve tiles from xarray/Zarr-backed data.
+- [**TiTiler**](https://developmentseed.org/titiler/): dynamic tile services that can render Zarr and other xarray-readable datasets.
+- [**xpublish-tiles**](https://github.com/earth-mover/xpublish-tiles): a tile router for xpublish that can serve tiles from xarray/Zarr-backed data.
 
 This approach is useful when you need server-side control over styling, reprojection, access control, or heavy processing. It also works well when you want the browser to stay simple and just consume tiles.
 
@@ -242,26 +239,17 @@ In the client-side approach, the browser reads Zarr chunks directly from object 
 
 Examples include:
 
-- [**GeoZarr in OpenLayers**](https://github.com/spacebel/geozarr-openlayers): OpenLayers can read GeoZarr sources directly and render multiscale data in the browser.
 - [**zarr-maps**](https://github.com/noc-oi/zarr-maps): a client-side layer for Leaflet and OpenLayers-style web maps.
 - [**zarr-cesium**](https://github.com/noc-oi/zarr-cesium): client-side visualisation for 2D and 3D in CesiumJS.
-- [**zarr-layer**](https://github.com/carbonplan/zarr-layer) / [**deck.gl-raster**](https://github.com/developmentseed/deck.gl-raster): browser rendering built around Zarr chunk loading and GPU display.
+- [**zarr-layer**](https://github.com/carbonplan/zarr-layer) / [**deck.gl-raster**](https://github.com/developmentseed/deck.gl-raster): browser rendering built around Zarr chunk loading and GPU display. For Mapbox and Maplibre.
 
-These tools usually rely on a JavaScript reader such as [**Zarrita**](https://zarrita.dev/) to fetch chunk data from object storage. The browser then combines that data with [**WebGL**](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) and the **GPU** to render images, surfaces, or map tiles efficiently.
-
-### How the two approaches work
-
-Server-side tools read the data on the backend, process it into tiles, and send those tiles to the browser. Client-side tools skip that backend step: they fetch the Zarr chunks directly, choose the right multiscale level, and render in the browser using WebGL.
-
-In both cases, multiscale metadata is important because it tells the viewer which resolution level to use at each zoom level. Good chunking also matters, because viewers work best when the chunks line up reasonably well with the data they need to display.
-
-In this lesson, we will not go deep into front-end code, but we will show a simple browser example that learners can run locally and point at their own multiscale Zarr store.
+These tools usually rely on a Zarr JavaScript reader such as [**Zarrita**](https://zarrita.dev/) to fetch chunk data from object storage. The browser then combines that data with [**WebGL**](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) and the **GPU** to render images, surfaces, or map tiles efficiently.
 
 ### Simple HTML example
 
-In the [zarr-maps-openlayers.html](files/zarr-maps-openlayers.html) file, we provide a minimal HTML page that uses **zarr-maps** with **OpenLayers** to visualise a multiscale zarr dataset in the browser. It follows the documented `ZarrLayer` options from the zarr-maps getting-started guide and can be served as a static HTML page.
+In this lesson, we will not go deep into front-end code, but we will show a simple browser example that you can run locally and point at their own multiscale Zarr store. It is the [zarr-maps-openlayers.html](files/zarr-maps-openlayers.html), which is a minimal HTML page that uses **zarr-maps** with **OpenLayers** to visualise a multiscale zarr dataset in the browser.
 
-The lesson renders the same example inline below so learners can inspect it directly in the page:
+The lesson renders the same example inline below so you can inspect it directly in the page:
 
 <iframe
   src="files/zarr-maps-openlayers.html"
@@ -274,9 +262,9 @@ The lesson renders the same example inline below so learners can inspect it dire
 
 ## Exercise 3 - Explore your multiscale Zarr in the browser
 
-1. Upload your multiscale Zarr store to an object store and make it accessible via HTTPS (or serve it locally with an appropriate static server).
-2. In the page above, edit the `zarrUrl` and `variable`, add your multiscale zarr dataset. You can edit it directly in the browser, or you can get the [HTML file](files/zarr-maps-openlayers.html) and edit it to point to your multiscale Zarr store and the variable you want to visualise.
-4. Run a local web server in the directory containing `zarr-maps-openlayers.html`:
+1. In the page above, edit the `zarrUrl` and `variable`, add your multiscale zarr dataset.
+2. Edit the [HTML file `zarr-maps-openlayers.html`](files/zarr-maps-openlayers.html) to point to your multiscale Zarr store and the variable you want to visualise.
+3. Run a local web server in the directory containing the HTML file:
 
    ```bash
    python -m http.server 8000
@@ -284,7 +272,7 @@ The lesson renders the same example inline below so learners can inspect it dire
 
    Then open `http://localhost:8000/zarr-maps-openlayers.html` in your browser.
 
-5. Pan and zoom the map, observing how data loads and renders at different scales.
+4. Pan and zoom the map, observing how data loads and renders at different scales.
 
 Questions:
 
@@ -309,14 +297,37 @@ Open the https://noc-oi.github.io/zarr-cesium/ and enter the URL of your multisc
 
 Try to play a little with the controls, zooming and panning around the globe. Observe how the data loads and renders at different zoom levels.
 
+Try to play with one of the Zarr-Cube and Zarr-Cube-Velocity examples, which are designed for 3D visualisation of multiscale Zarr datasets.
+
 ::::::::::::::: solution
 
-Learners should experience direct browser-based visualisation of their multiscale Zarr data.
-They will see how multiscale pyramids and chunking decisions affect the responsiveness and smoothness of interaction.
+You should experience direct browser-based visualisation of your multiscale Zarr data in 3D. You will see how multiscale pyramids and chunking decisions affect the responsiveness and smoothness of interaction, especially when rotating and zooming around the globe.
+
+The integration of WebGL and GPU acceleration allows for efficient rendering of large datasets without a dedicated tiling server.
 
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## Pipeline for dataset conversion and visualisation
+
+In [Lesson 10](./10-conversion-workflow.html), we converted a NetCDF dataset into Zarr. In this lesson, we built on that workflow by generating a multiscale Zarr pyramid with TopoZarr and visualising it in a web browser using the GeoZarr conventions.
+
+This extends the original conversion pipeline with an additional multiscale processing step before visualisation.
+
+For datasets on regular grids, the workflow is relatively straightforward. However, many geoscience datasets use irregular or curvilinear grids, where the relationship between Zarr chunks and map tiles is not direct. In these cases, it is often necessary to reproject or resample the data onto a regular grid before generating the multiscale pyramid.
+
+Several Python libraries can help with this preprocessing step, including [rioxarray](https://corteva.github.io/rioxarray/stable/), [xESMF](https://xesmf.readthedocs.io/en/latest/), and [rasterio](https://rasterio.readthedocs.io/en/latest/). For a detailed discussion of the available approaches and their performance, see the [Development Seed](https://developmentseed.org/) report, [*Reprojecting and Resampling Geospatial Data with Python*](https://developmentseed.org/warp-resample-profiling/). These tools can help prepare datasets for efficient multiscale visualisation, particularly when working with irregular grids or non-standard map projections.
+
+You can see below a diagram of the full pipeline, from NetCDF to multiscale Zarr pyramid, ready for browser-based visualisation.
+
+![](fig/nc_to_zarr_pyramid.png){alt="Pipeline diagram showing the conversion of a NetCDF dataset to a multiscale Zarr pyramid using Topozarr."}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 

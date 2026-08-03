@@ -1,7 +1,7 @@
 ---
 title: Object Storage - Concepts, Remote Access, and Data Organization in the Cloud
-teaching: 25
-exercises: 15
+teaching: 30
+exercises: 25
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -24,7 +24,7 @@ exercises: 15
 
 ## What is object storage?
 
-Object storage stores data as `objects` in a flat address space, usually inside `buckets`. Each object contains binary data and metadata (such as content type or custom tags) and is identified by a unique key within a bucket, rather than by a path in a nested directory tree.
+Object storage stores data as **objects** in a flat address space, usually inside **buckets**. Each object contains binary data and metadata (such as content type or custom tags) and is identified by a unique key within a bucket, rather than by a path in a nested directory tree.
 
 Unlike traditional storage systems:
 
@@ -33,7 +33,7 @@ Unlike traditional storage systems:
 
 Object storage is designed for storing large collections of independent objects that are accessed through APIs such as HTTP or S3. This architecture enables systems to scale across many disks and nodes while providing high durability.
 
-## Object storage and traditional servers
+### Object storage and traditional servers
 
 Traditional scientific workflows often store data on local or network filesystems:
 
@@ -44,10 +44,10 @@ Traditional scientific workflows often store data on local or network filesystem
 Object storage takes a different approach:
 
 - Data are distributed across many disks and nodes, often spanning multiple availability zones or data centres.
-- Applications access data through a standard API, such as Amazon S3, Google Cloud Storage (GCS), or Azure Blob Storage.
+- Applications access data through standard APIs, such as Amazon S3, Google Cloud Storage (GCS), or Azure Blob Storage.
 - Storage systems can grow incrementally by adding new nodes rather than replacing existing hardware.
 
-For scientific datasets, this makes it practical to store millions of independent objects, such as NetCDF files, image tiles, or Zarr chunks, while allowing applications running on HPC systems, cloud platforms, or local infrastructure to access the same data.
+For scientific datasets, this makes it practical to store millions of independent objects, such as NetCDF files, image tiles, or Zarr chunks. Because each object can be accessed independently, applications running on HPC systems, cloud platforms, or local infrastructure can efficiently process data in parallel while accessing the same shared dataset.
 
 ![File vs Object Storage. Source: https://www.datacore.com/blog/file-object-storage-differences/](fig/file_object.png){alt="File vs Object Storage."}
 
@@ -60,8 +60,7 @@ Object storage is well suited for sharing and long-term preservation because it 
 - Global access through URLs or API endpoints.
 - Fine-grained access control using bucket policies, access control lists (ACLs), identity management, or signed URLs.
 - High durability through replication or erasure coding across multiple disks and nodes.
-
-Most object storage services—including AWS S3, Google Cloud Storage, Azure Blob Storage, and S3-compatible platforms—also support per-object metadata, versioning, and public or private buckets.
+- Support for per-object metadata, versioning, and public or private buckets.
 
 ![Cloud Object Storage Architecture](fig/cloud_os_architecture.png){alt="Cloud Object Storage Architecture."}
 
@@ -77,9 +76,9 @@ Object stores provide several layers of security:
 
 Each object in an object store can be accessed independently. As a result:
 
-* Multiple clients can read and write different objects simultaneously.
-* Large datasets composed of many objects (such as Zarr chunks) can be processed in parallel.
-* Requests are distributed across many servers and disks, increasing aggregate throughput.
+- Multiple clients can read and write different objects simultaneously.
+- Large datasets composed of many objects (such as Zarr chunks) can be processed in parallel.
+- Requests are distributed across many servers and disks, increasing aggregate throughput.
 
 Frameworks such as Dask, Spark, and Apache Beam take advantage of this model by assigning different objects or chunks to different workers. This is one reason why cloud-native formats such as Zarr are commonly paired with object storage.
 
@@ -87,12 +86,11 @@ Frameworks such as Dask, Spark, and Apache Beam take advantage of this model by 
 
 Cloud providers typically offer multiple storage classes for different access patterns:
 
-- Frequent access: higher performance for data that are accessed regularly.
-- Infrequent access: lower storage cost with higher retrieval charges.
-- Archive (cold storage): lowest storage cost, but higher retrieval latency and fees.
+- **Frequent access:** higher performance for data that are accessed regularly.
+- **Infrequent access:** lower storage cost with higher retrieval charges.
+- **Archive (cold storage):** lowest storage cost, but higher retrieval latency and fees.
 
 Selecting the appropriate storage class helps balance cost and performance according to how often the data are used.
-
 
 :::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -106,13 +104,13 @@ There are several ways to deploy object storage:
 
 The best choice depends on factors such as dataset size, access patterns, operational expertise, and budget.
 
-For large scientific archives, the key question is not only “what is cheapest per terabyte?”, but also “what is cheapest and safest over the full life of the data?”
+For large scientific archives, the key question is not only "what is cheapest per terabyte?", but also "what is cheapest and safest over the full life of the data?"
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 All the advantages of object storage make it a good fit for scientific data workflows, especially when combined with chunked formats like Zarr. The ability to store many independent objects, access them in parallel, and manage them through APIs allows researchers to build scalable, reproducible, and shareable data systems.
 
-![Traditional workflows vs New workflows](fig/traditional_vs_new_workflows.png){alt="Traditional workflows vs New workflows."}
+![Traditional workflows vs New workflows](fig/traditional_vs_cloud_native.png){alt="Traditional workflows vs New workflows."}
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
@@ -165,7 +163,7 @@ In this lesson, we focus on S3-style access because it is widely supported and w
 
 For listing data in the object store, we will focus on `boto3` (AWS S3) and `fsspec`/`s3fs` (for xarray and Zarr).
 
-First, let's see how to list objects in a public bucket using `boto3` in a public cloud object store. For this example, we will use the NOAA GOES-18 public bucket, which does not require credentials for reading objects.
+First, let's see how to list objects in a public bucket using `boto3` in a public cloud object store. For this example, we will use the [NOAA GOES-18 public bucket](https://registry.opendata.aws/noaa-goes/), which has data from the GOES-18 satellite. This bucket is public, which does not require credentials for reading objects.
 
 The first step is to create the client.
 
@@ -176,7 +174,7 @@ from botocore.config import Config
 
 s3 = boto3.client(
     "s3",
-    config=Config(signature_version=UNSIGNED),
+    config=Config(signature_version=UNSIGNED), # UNSIGNED allows public access without credentials
 )
 ```
 
@@ -215,15 +213,13 @@ for obj in response.get("Contents", []):
     print(obj["Key"], obj["Size"])
 ```
 
-If the bucket is private, the access key and secret key must be valid for that bucket. Once authenticated, you can list objects, inspect prefixes, and open Zarr stores if they are present. These patterns generalise: once you know the bucket and object path, you can connect via the appropriate filesystem adapter and pass a mapper or URL to xarray or zarr.
+Once authenticated, you can list objects, inspect prefixes, and identify Zarr stores that you want to open later with xarray or zarr.
 
 :::::::::::::::::::::::::::::::::::::::::: callout
 
 ## Bucket policy
 
-The bucket used in this workshop allows public read access to objects, so files can be accessed without AWS credentials. However, listing the contents of the bucket (ListBucket) requires valid credentials.
-
-For the workshop, we provide credentials that grant participants read-only access to the bucket. This allows you to browse the bucket contents, list available objects, and access datasets such as Zarr stores, while preventing any modifications.
+The bucket used in this workshop allows public read access to objects, so files can be opened without AWS credentials if you already know the object path. For discovery and bucket listing, however, the workshop provides read-only credentials so participants can browse the bucket contents without being able to modify anything.
 
 The bucket is configured with a policy similar to the example below:
 
@@ -294,18 +290,21 @@ Authenticated access to object storage is straightforward in Python once the cre
 
 ### Using xarray with a bucket
 
-With the bucket and object path, you can open a Zarr store directly with xarray:
+Assuming the credentials are already set, you can open a Zarr store directly with xarray once you know the bucket and object path:
 
 ```python
+import os
 import xarray as xr
-
-os.environ["AWS_ACCESS_KEY_ID"] = "your-access-key"
-os.environ["AWS_SECRET_ACCESS_KEY"] = "your-secret-key"
 
 storage_options = {
     "key": os.environ["AWS_ACCESS_KEY_ID"],
     "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
     "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    # these are JASMIN-specific options to avoid checksum errors on some datasets
+    "config_kwargs": {
+        "request_checksum_calculation": "when_required",
+        "response_checksum_validation": "when_required",
+    },
 }
 
 ds = xr.open_zarr(
@@ -316,54 +315,39 @@ ds = xr.open_zarr(
 print(ds)
 ```
 
-These patterns generalise: once you know the bucket and object path, you can connect through the appropriate filesystem adapter and pass the URL or mapper to xarray or zarr.
+Once you know the bucket and object path, you can use the same pattern for other remote stores.
 
-Because this bucket is public, you can also open the Zarr store without credentials:
+Because this bucket is public, you can also open the Zarr store without credentials (using the public endpoint) as follows:
 
 ```python
 ds = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature.zarr")
 ```
 
-But listing the contents of the bucket requires valid credentials.
+Listing the bucket contents still requires the read-only credentials described above.
 
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 3 - Access the course bucket with credentials
+## Exercise 3 - Open a Zarr store from the course bucket
 
-In the same object store that we listed in the previous exercise, we will now open a Zarr store with xarray and inspect its contents. Try to list the objects in the bucket and find a zarr dataset different from `ocean_temperature.zarr`. Then, open that Zarr store with xarray and inspect its dimensions, variables, and metadata.
-
-This is a public object store and we can access it without credentials, but in a real-world scenario, you would need to provide valid credentials to access private buckets.
+In the same object store that you explored in the previous exercise, now open a Zarr store with xarray and inspect its contents. Reuse the bucket listing from Exercise 2 to find a Zarr dataset different from `ocean_temperature.zarr`, then open that store and inspect its dimensions, variables, and metadata.
 
 ::::::::::::::: solution
 
-List the objects in the bucket using `boto3`:
-
-```python
-import boto3
-import os
-
-os.environ["AWS_ACCESS_KEY_ID"] = "your-access-key"
-os.environ["AWS_SECRET_ACCESS_KEY"] = "your-secret-key"
-
-s3 = boto3.client("s3", endpoint_url="https://atlantis-vis-o.s3-ext.jc.rl.ac.uk")
-
-bucket_name = "cloud-native-geoscience-course"
-response = s3.list_objects_v2(Bucket=bucket_name, MaxKeys=10)
-
-for obj in response.get("Contents", []):
-    print(obj["Key"], obj["Size"])
-```
-
-Choose a Zarr store from the listed objects, for example `glorys_202605.zarr`, and open it with xarray:
+Reuse the bucket listing from Exercise 2 to identify a Zarr store, for example `glorys_202605.zarr`. Then open it with xarray:
 
 ```python
 import xarray as xr
+import os
 
 storage_options = {
     "key": os.environ["AWS_ACCESS_KEY_ID"],
     "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
     "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    "config_kwargs": {
+        "request_checksum_calculation": "when_required",
+        "response_checksum_validation": "when_required",
+    },
 }
 
 ds = xr.open_zarr(
@@ -374,29 +358,21 @@ ds = xr.open_zarr(
 print(ds)
 ```
 
-In this example, you will see the variables, dimensions, and shapes of the Zarr store. You can explore the dataset further by accessing specific variables or performing computations on the data.
+In this example, you will see the variables, dimensions, and shapes of the Zarr store. The key point is that object storage discovery and dataset analysis are separate steps: first find the store, then open it with xarray.
 
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## Self-hosted object storage for institutions
+## Self-hosted object storage
 
 Some institutions cannot or do not want to place all data in a commercial cloud. Common reasons include data sovereignty, procurement rules, local security requirements, network bandwidth constraints, and the desire to keep very large datasets close to on-premise compute systems.
 
 In those settings, self-hosted object storage can be a strong option. It gives you the S3-style API that modern scientific tools expect, while keeping the data inside your own infrastructure. This is especially useful for universities, research institutes, and government organisations that already run their own servers, storage, and clusters.
 
-### Why institutions choose this approach
-
-- Keep sensitive or regulated data on-premises.
-- Avoid moving large volumes of data over the public internet.
-- Integrate object storage directly with local HPC or campus compute.
-- Reuse existing procurement, monitoring, backup, and identity systems.
-- Control costs by using hardware the institution already owns.
-
 ### What infrastructure is needed locally?
 
-A production-ready object store is more than “just a server with a disk”. For a high-speed and reliable deployment, institutions usually need:
+A production-ready object store is more than "just a server with a disk". For a high-speed and reliable deployment, institutions usually need:
 
 - Multiple storage nodes, not a single machine.
 - Fast networking, ideally 10/25/100 GbE depending on scale.
@@ -410,7 +386,7 @@ A production-ready object store is more than “just a server with a disk”. Fo
 
 ### Minimal MinIO deployment with Docker Compose
 
-In class, we will not expect you to run these commands yourself. Instead, I will show how a self-hosted S3-compatible service such as MinIO could be deployed inside an institution's own infrastructure, so that you can see how the same tools and APIs work on-prem as well as in the cloud.
+In class, we will not expect you to run these commands yourself. Instead, we will show how a self-hosted S3-compatible service such as MinIO could be deployed inside an institution's own infrastructure, so that you can see how the same tools and APIs work on-prem as well as in the cloud.
 
 On a Linux server with Docker and Docker Compose installed:
 
@@ -446,9 +422,7 @@ Then:
 - Create a bucket (e.g. `example-bucket`).
 - Upload a test file.
 
-You now have a self-hosted S3-compatible object store.
-
-You can use standard S3 tools (e.g. AWS CLI, `boto3`, `mc` MinIO client) to interact with this bucket, just pointing them at your MinIO endpoint (`http://localhost:9000`).
+You now have a self-hosted S3-compatible object store. You can use standard S3 tools (e.g. AWS CLI, `boto3`, `mc` MinIO client) to interact with this bucket, just pointing them at your MinIO endpoint (`http://localhost:9000`).
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -466,7 +440,7 @@ Design considerations:
 
 - Make it easy to list all data for a given variable or time range.
 - Align prefixes with common queries (e.g. `model/experiment` for CMIP6; `instrument/trajectory` for drifters).
-- Avoid excessively deep or inconsistent naming; object storage does not require directories, but prefixes mimic them.
+- Avoid excessively deep or inconsistent naming. Object storage does not require directories, but prefixes mimic them.
 
 For Zarr stores:
 
@@ -475,7 +449,7 @@ For Zarr stores:
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 3 - Design a bucket layout
+## Exercise 4 - Design a bucket layout
 
 Imagine you are responsible for storing:
 

@@ -1,13 +1,13 @@
 ---
 title: Hands-On with Open Zarr Datasets Using Python
-teaching: 25
-exercises: 20
+teaching: 30
+exercises: 35
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
 - "Discover several open Zarr datasets for oceanography, climate, and meteorology."
-- "Use Python tools (xarray, zarr, fsspec, clouddrift) to open and explore Zarr datasets hosted in the cloud."
+- "Use Python tools (xarray, zarr, fsspec) to open and explore Zarr datasets hosted in the cloud."
 - "Inspect dimensions, coordinates, and chunk layouts in real-world Zarr stores."
 - "Practice basic analysis and think about how chunking and storage affect performance."
 
@@ -29,8 +29,8 @@ In this lesson, we work hands‑on with several open Zarr datasets:
 
 - [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS (I will explain later what Icechunk is and how it relates to Zarr).
 - [**ERA5 ARCO**](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) reanalysis in Zarr on Climate Data Store - global atmospheric data ready for analysis.
-- [**Sofar Spotter drifters**](https://registry.opendata.aws/sofar-spotter-archive/) - ragged array buoy data in Zarr, accessible via `clouddrift`.
-- **Additional examples** such as CMIP6, downscaled climate, or Copernicus marine Zarr data, depending on your interests.
+- [**Sofar Spotter drifters**](https://registry.opendata.aws/sofar-spotter-archive/) - global Spotter wave drifter buoys from 2019-2023 stored as ragged array in Zarr.
+- **Additional examples** such as CMIP6, CarbonPlan datasets, Earthmover Marketplace and NEMO Near-Present-Day, depending on your interests.
 
 Each dataset illustrates different aspects:
 
@@ -39,13 +39,13 @@ Each dataset illustrates different aspects:
 - Non-regular or irregular grids.
 - Ensembles with `member` dimensions.
 
-All these datasets are hosted in cloud object storage (Google Cloud, AWS S3, or HTTPS) and can be accessed programmatically with Python tools like `xarray`, `zarr`, and `fsspec`. I will explain later what object storage is and how it differs from traditional file systems.
+All these datasets are hosted in cloud object storage (Google Cloud, AWS S3, or HTTPS) and can be accessed programmatically with Python tools like `xarray` and `zarr`. I will explain later what object storage is and how it differs from traditional file systems.
 
-These datasets can be several terabytes in size. DO NOT DOWNLOAD THEM LOCALLY.
+These datasets can be several terabytes in size. **DO NOT DOWNLOAD THEM LOCALLY.**
 
 ## Ensemble forecasts - ECMWF AIFS ENS Icechunk/Zarr
 
-Dynamical.org hosts ECMWF AIFS single and ensemble forecasts (ENS) in Icechunk/Zarr format on AWS S3. It is possible to access the data using dynamical.org API or directly via the S3 url.
+Dynamical.org hosts ECMWF AIFS single and ensemble forecasts (ENS) in Icechunk/Zarr format on AWS S3. It is possible to access the data using the `dynamical.org` API or directly via the S3 url.
 
 For example, the ECMWF AIFS SINGLE are accessible this way:
 
@@ -82,7 +82,7 @@ This subset is much smaller, but no data has been loaded yet. If we explore furt
 print(temperature_2m)
 ```
 
-To convert this into a standard Xarray DataArray we can call .compute on the temperature_2m. Note that only now will the data be loaded into memory. This is a good example of lazy loading, where the data is not actually read until we explicitly ask for it.
+To convert this into a standard Xarray DataArray we can call `.compute()` on the temperature_2m. Note that only now will the data be loaded into memory. This is a good example of lazy loading, where the data is not actually read until we explicitly ask for it.
 
 ```python
 temperature_2m_local = temperature_2m.compute()
@@ -93,13 +93,20 @@ We can now plot this by selecting the data for the first lead time and then plot
 ```python
 temperature_2m_local.isel(init_time=0, lead_time=0).plot()
 ```
+
+![](fig/dynamical_temperature_map_plot.png){alt="Temperature at 2 meters above the surface from ECMWF AIFS SINGLE dataset."}
+
 Or access some of the data:
 
 ```python
 temperature_2m_local[0,0,0,0].values
 ```
 
-If you want to slice the data by the latitude and longitude coordinates you can use sel instead of isel:
+```output
+array(0.15820312, dtype=float32)
+```
+
+If you want to slice the data by the latitude and longitude coordinates you can use `sel` instead of `isel`:
 
 ```python
 temperature_2m_slice = ds['temperature_2m'].sel(latitude=slice(50, 60), longitude=slice(-10, 0))
@@ -108,9 +115,7 @@ temperature_2m_slice
 
 ### Exploring more datasets and examples
 
-If you want to have access to more datasets, you can explore the dynamical.org catalog for other ECMWF datasets in Icechunk/Zarr format.
-
-You can also find some examples of how to access and manipulate these datasets in the [dynamical.org documentation](https://dynamical.org/docs/).
+If you want to have access to more datasets, you can explore the [dynamical.org catalog](https://dynamical.org/catalog/) for other ECMWF datasets in Icechunk/Zarr format. You can also find some examples of how to access and manipulate these datasets in the [dynamical.org documentation](https://dynamical.org/docs/).
 
 :::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -151,7 +156,7 @@ plt.show()
 
 ## ERA5 ARCO - global reanalysis in Zarr
 
-A subset of the ERA5 single-levels dataset is available in analysis-ready, cloud-optimised (ARCO) Zarr stores. The ARCO data is a repackaged version of the original ERA5 data. It allows direct programmatic access to a selection of the surface and wave variables (see below) without downloading individual files, enabling efficient and scalable data access and retrieval.
+A subset of the ERA5 single-levels dataset is available in analysis-ready, cloud-optimised (ARCO) Zarr stores in the [Copernicus Climate Data Store (CDS)](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data). The ARCO data is a repackaged version of the original ERA5 data. It allows direct programmatic access to a selection of the surface and wave variables (see below) without downloading individual files, enabling efficient and scalable data access and retrieval.
 
 ### Create a CDS account and get an API key
 
@@ -270,12 +275,11 @@ To see a full list of available datasets and examples, you can explore the [Cope
 
 ## Sofar Spotter drifters - ragged arrays
 
-The Sofar Spotter Archive provides historical wave and inferred wind data from a global network of Spotter buoys, in both NetCDF and Zarr formats. A Spotter is a small, solar-powered drifter buoy that measures wave height, period, and direction, as well as GPS location. The Sofar company has deployed thousands of Spotters worldwide, and some of the data is made available for research and analysis.
+The [Sofar Spotter Archive](https://registry.opendata.aws/sofar-spotter-archive/) provides historical wave and inferred wind data from a global network of Spotter buoys, in both NetCDF and Zarr formats. A Spotter is a small, solar-powered drifter buoy that measures wave height, period, and direction, as well as GPS location. The [Sofar Ocean company](https://www.sofarocean.com/) has deployed thousands of Spotters worldwide, and some of the data is made available for research and analysis.
 
 ![Sofar Spotter drifters deployed by Brazilian Navy and INPE, in partnership with Sofar Ocean](fig/mb_drifters.png){alt="Sofar Spotter drifters deployed by Brazilian Navy and INPE, in partnership with Sofar Ocean"}
 
 ![Array of spotter buoys](fig/spotter_buoys.png){alt="Array of spotter buoys"}
-
 
 First, let's open the Zarr dataset from the Sofar Spotter Archive using xarray. The dataset is hosted on AWS S3 and can be accessed directly via its URL:
 
@@ -317,15 +321,13 @@ Attributes:
 
 ### Dataset structure
 
-This dataset was designed to follow the conventions used by NOAA for a similar dataset: Global Drifter Program (GDP) Drifter data. The explanation below was extracted and adapted from the [OHW 2024 Tutorials - collocating_noaa_gfs_sofar_spotter_during_hurricane](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane).
+This dataset was designed to follow the conventions used by NOAA for a similar dataset: [Global Drifter Program (GDP)](https://www.aoml.noaa.gov/global-drifter-program/) Drifter data. The explanation below about this dataset was extracted and adapted from the [OHW 2024 Tutorials - collocating_noaa_gfs_sofar_spotter_during_hurricane](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane).
 
 Each Spotter buoy records a different number of observations because of factors such as deployment time, reporting frequency, instrument lifetime, and missing measurements. One way to represent these observations is as an incomplete multidimensional array, where each column corresponds to a Spotter:
 
 ![incomplete Array representation](fig/incomplete_array.png){alt="incomplete Array representation"}
 
-Although this representation is intuitive, it requires padding shorter time series with missing values. For large datasets, these unused values can occupy a substantial amount of storage.
-
-To avoid this overhead, the GDP and Sofar Spotter Archive use a contiguous ragged array representation:
+Although this representation is intuitive, it requires padding shorter time series with missing values. For large datasets, these unused values can occupy a substantial amount of storage. To avoid this overhead, the GDP and Sofar Spotter Archive use a contiguous ragged array representation:
 
 ![Ragged array structure](fig/ragged_array.png){alt="Ragged array structure"}
 
@@ -557,9 +559,9 @@ You can broaden the lesson with other open Zarr datasets:
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 4 - Build your own mini project
+## Exercise 4 (Optional) - Build your own mini project
 
-Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, or another Zarr dataset you know) and design a mini project:
+Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, NEMO, or another Zarr dataset you know) and design a mini project:
 
 1. Define a question you want to answer (e.g. "How has near‑surface temperature changed in a region over a given period?" or "What is the distribution of wave heights across the Spotter network?").
 2. Write code to:
@@ -579,7 +581,7 @@ You can share your mini projects with the class or colleagues and discuss differ
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
 - "Many open Zarr datasets are available for oceanography, climate, and meteorology, including ERA5 ARCO, Sofar Spotter drifters, ECMWF IFS ensemble forecasts, CMIP6, and marine products."
-- "Python tools like xarray, zarr, fsspec, and clouddrift make it straightforward to open and explore Zarr datasets hosted on cloud object storage."
+- "Python tools like xarray, zarr, and fsspec make it straightforward to open and explore Zarr datasets hosted on cloud object storage."
 - "Real-world Zarr datasets illustrate regular grids, ragged arrays, ensemble dimensions, and more, providing rich practice for accessing, analysing, and understanding chunked data."
 - "Working hands-on with open Zarr datasets helps learners build intuition about data structures, performance, and best practices for cloud-native scientific workflows."
 

@@ -1,7 +1,7 @@
 ---
 title: Conversion Workflow of Traditional Formats to Zarr
-teaching: 25
-exercises: 25
+teaching: 30
+exercises: 40
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -34,13 +34,15 @@ However, as datasets grow and we move to cloud and parallel computing, Zarr offe
 
 Converting NetCDF to Zarr does not change the scientific content, but it changes how data is organised and accessed, enabling cloud-native workflows and more efficient analysis at scale.
 
+![](fig/nc_to_zarr.png){alt="NetCDF needs to be converted to Zarr for cloud-native workflows."}
+
 ### Converting from NetCDF to Zarr with xarray
 
 To convert NetCDF to Zarr, we typically use xarray's `to_zarr` method, optionally with Dask for parallelism. The main steps are:
 
 1. Inspect the NetCDF dataset(s) to understand variables, dimensions, coordinates, and existing chunking.
 
-We will use a simple example NetCDF dataset to illustrate the conversion workflow.
+We will use a simple example NetCDF dataset (`data/ocean_temperature.nc`) to illustrate the conversion workflow.
 
 ```python
 import xarray as xr
@@ -59,6 +61,7 @@ The chunking scheme should match the way the data will be used later. A simple e
 
 ```python
 ds_zarr = ds_nc.chunk({"valid_time": 10, "latitude": 100, "longitude": 100})
+print(ds_zarr.chunks)
 ```
 
 3. Write the Zarr store
@@ -106,11 +109,13 @@ Typical steps:
 
 We'll walk through these steps conceptually and via exercises. For the example below and the exercises, we will use a subset of the ERA5 reanalysis dataset related to significant wave height (`swh`). The data is located in the `data/daily_swh` directory and is provided as multiple NetCDF files, one per day. The goal is to convert this collection of NetCDF files into a single Zarr store that can be accessed efficiently in parallel.
 
+![NetCDF-to-Zarr conversion should include chunk design, validation, and publishing checkpoints.](fig/netcdf_to_zarr_pipeline.png){alt="Pipeline diagram from NetCDF ingest to chunking, Zarr writing, validation, and cloud publication."}
+
 ## Step 1 - Inspect NetCDF inputs
 
 Before converting, inspect the NetCDF file(s) you plan to convert.
 
-Example:
+Example of opening a single NetCDF file:
 
 ```python
 import xarray as xr
@@ -130,7 +135,7 @@ Questions to answer:
 - Are variables chunked already, and if so, how?
 - Are all files consistent in terms of variables and coordinates if you plan to use `open_mfdataset`?
 
-For multiple NetCDF files:
+Because we have multiple NetCDF files, we can use `open_mfdataset` to open them all at once:
 
 ```python
 ds_nc_multi = xr.open_mfdataset(
@@ -150,7 +155,7 @@ Consider:
 
 - Dimensions: which ones correspond to time, space, depth, ensemble member?
 - Workloads: time series at points, spatial means, regional subsets, ensemble statistics.
-- Storage: local HPC disk vs object store; network bandwidth; parallel framework (Dask).
+- Storage: local HPC disk vs object store, network bandwidth, parallel framework (Dask).
 
 Example chunk strategy for a dataset with dimensions `(time, latitude, longitude)`:
 
@@ -161,22 +166,29 @@ You can experiment with different chunk shapes and use Dask's dashboard and perf
 
 ## Step 3 - Convert NetCDF to Zarr with xarray and Dask
 
-Once chunking decisions are made, you can use xarray's `to_zarr` method to write out the dataset. This can be done serially or in parallel using Dask.
+Once chunking decisions are made, you can use xarray's `to_zarr` method to write out the dataset. This can be done serially or in parallel using Dask. For large datasets, parallel writing is often necessary to avoid long runtimes.
 
-Parallel conversion with Dask:
+First, create a Dask client to manage parallelism:
 
 ```python
 from dask.distributed import Client
 import xarray as xr
 
 client = Client(n_workers=2, threads_per_worker=2)
+```
 
+Then, open the NetCDF dataset and apply chunking:
+
+```python
 ds_nc = xr.open_mfdataset("data/daily_swh/swh_*.nc", combine="by_coords")
 
 # Choose chunking
 ds_chunked = ds_nc.chunk({"time": 12, "latitude": 100, "longitude": 100})
+```
 
-# Write to Zarr; use consolidated metadata if desired
+Now you can write the chunked dataset to Zarr. You can choose to consolidate metadata for faster reads later:
+
+```python
 ds_chunked.to_zarr("data/era5_swh.zarr", mode="w", consolidated=True)
 ```
 
@@ -184,7 +196,7 @@ ds_chunked.to_zarr("data/era5_swh.zarr", mode="w", consolidated=True)
 
 ## Consolidated metadata
 
-When writing a Zarr store, you can choose to consolidate metadata. This means the store writes a single metadata index file, usually called `.zmetadata`, that collects the metadata for all arrays and attributes in one place.
+When writing a Zarr store, you can choose to consolidate metadata. This means the store writes a single metadata index file, that collects the metadata for all arrays and attributes in one place.
 
 This is useful because opening the dataset can be faster, especially when the store has many variables or many chunks. Instead of reading lots of small metadata files one by one, xarray can read the consolidated metadata in a single step.
 
@@ -228,13 +240,7 @@ In this example:
 - `shuffle=2` usually improves compression for many numerical datasets.
 - The same compressor is applied to each data variable through the `encoding` dictionary.
 
-For scientific data, moderate compression is often a good default because:
-
-- It reduces storage size.
-- It can lower network transfer costs.
-- It usually keeps reads and writes fast enough for practical use.
-
-Very aggressive compression can save more space, but it may slow down writing and reading. For large workflows, that trade-off is often not worth it.
+For scientific data, moderate compression is often a good default because it reduces storage size, lower network transfer costs, and keeps read/write speeds reasonable. Very aggressive compression can save more space, but it may slow down writing and reading. For large workflows, that trade-off is often not worth it.
 
 ::::::::::::::::::::::::::::::::::::::::::
 
@@ -243,28 +249,35 @@ Very aggressive compression can save more space, but it may slow down writing an
 
 After successfully writing Zarr locally, you can upload the Zarr directory store to an object store (AWS S3, GCS, MinIO, etc.).
 
-Examples for s3cmd (using CLI tools):
+Examples for [s3cmd](https://s3tools.org/s3cmd) (using CLI tools):
 
 ```bash
+# Create a bucket (if it doesn't exist)
 s3cmd mb s3://my-bucket
+
+# Upload the Zarr store recursively
 s3cmd put -r data/era5_swh.zarr s3://my-bucket/era5_swh.zarr
 ```
 
 Once uploaded, you can access the Zarr store directly from the object store using xarray and filesystem adapters, as in previous lessons.
 
-In our lesson here, instead of generating the zarr dataset locally and upload then later to the object store, we will directly write the zarr dataset to the object store using fsspec. This is a more efficient approach and avoids unnecessary local storage usage.
+In our lesson here, instead of generating the zarr dataset locally and upload then later to the object store, we will directly write the zarr dataset to the object store using fsspec. This is a more efficient approach and avoids unnecessary local storage usage. In the code below, remember to replace `my-bucket` with the actual bucket name you have access to (please ask the instructor for the bucket name and credentials).
 
 ```python
 import xarray as xr
 import fsspec
+import os
 
 store_url = "s3://my-bucket/era5_swh.zarr"
 
 storage_options = {
-    "key": "your-access-key",
-    "secret": "your-secret-key",
-    "client_kwargs": {
-        "endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk",
+    "key": os.environ["AWS_ACCESS_KEY_ID"],
+    "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
+    "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    # The `config_kwargs` is required for JASMIN S3 object store.
+    "config_kwargs": {
+        "request_checksum_calculation": "when_required",
+        "response_checksum_validation": "when_required",
     },
 }
 
@@ -284,19 +297,18 @@ ds_chunked.to_zarr(
 
 ## Step 5 - Verify with a simple analysis
 
-To verify that the converted Zarr dataset is usable, run a simple analysis, such as computing a mean value.
-
-Example:
+To verify that the converted Zarr dataset is usable, run a simple analysis, such as computing a mean value. Example:
 
 ```python
 import xarray as xr
 import fsspec
 
+# Replace `my-bucket` with the actual bucket name you have access to.
 mapper = fsspec.get_mapper("s3://my-bucket/era5_swh.zarr")
 ds_zarr = xr.open_zarr(mapper, consolidated=True)
 
-# You can also access the dataset directly, as it is in a public bucket:
-ds_zarr = xr.open_zarr("https://my-bucket/era5_swh.zarr", consolidated=True)
+# You can also access the dataset directly, as it is in a public bucket (replace with your own bucket if needed):
+# ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/era5_swh.zarr", consolidated=True)
 
 # Choose a variable and compute a global mean over space
 var = ds_zarr["swh"]
@@ -365,7 +377,7 @@ Based on your NetCDF dataset and expected workloads:
 2. Estimate (roughly) the size of each chunk in bytes/MB (using variable sizes and dimension lengths).
 3. Explain how your chunk choices support your intended analyses.
 
-You do not need exact numbers; focus on reasoning.
+You do not need exact numbers. Focus on reasoning.
 
 ::::::::::::::: solution
 
@@ -401,7 +413,16 @@ You will practice linking chunk shapes to analysis patterns, preparing for actua
 
 ## Exercise 4 - Convert your NetCDF dataset to Zarr
 
-Using the NetCDF dataset on the server, after opening and chunking it, convert it to Zarr and write to a local directory (e.g. `data/converted.zarr`). Please make sure you are using dask for parallel conversion.
+After opening and chunking the NetCDF files, convert them to Zarr and write to a local directory (e.g. `data/converted.zarr`).
+
+Please make sure you are using dask for parallel conversion. You can use a local dask client with a few workers, like this:
+
+```python
+from dask.distributed import Client
+
+# You can change the number of workers and threads per worker
+client = Client(n_workers=2, threads_per_worker=2)
+```
 
 Questions:
 
@@ -421,8 +442,7 @@ client = Client(n_workers=2, threads_per_worker=2)
 ds_chunked.to_zarr("data/converted.zarr", mode="w", consolidated=True)
 ```
 
-Now you have a local Zarr store from the NetCDF dataset and begin to see how conversion time and output size depend on chunking and compression.
-They will also encounter practical issues (e.g. problematic variables, encoding quirks) that often arise in real conversions.
+Now you have a local Zarr store from the NetCDF dataset and begin to see how conversion time and output size depend on chunking and compression. You will also encounter practical issues (e.g. problematic variables, encoding quirks) that often arise in real conversions.
 
 :::::::::::::::::::::::::
 
@@ -434,11 +454,7 @@ They will also encounter practical issues (e.g. problematic variables, encoding 
 
 Now, repeat the last step, but instead of writing to local disk, write the Zarr store directly to an object store (e.g. JASMIN) using fsspec. And then, reopen the dataset from the object store and verify that it is usable, confirming that dimensions, variables, and attributes match expectations.
 
-Please use the credentials provided by the instructor to access the object store. In this lesson, also use the JASMIN dask cluster to run the conversion and upload, as it has better network access to the object store.
-
-::::::::::::::: solution
-
-Create the cluster:
+Please use the credentials provided by the instructor to access the object store. In this lesson, also use the JASMIN dask cluster to run the conversion and upload, as it has better network access to the object store. You can see an example below, but you can also take a look in the [Parallel Processing for Zarr](./07-parallel.html) episode for more details.
 
 ```python
 import dask_gateway
@@ -450,7 +466,7 @@ options = gw.cluster_options()
 options.worker_cores = 2
 options.scheduler_cores = 1
 options.account = "workshop"
-options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/colinsau/esces-env'
+options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'
 clusters = gw.list_clusters()
 if not clusters:
     cluster = gw.new_cluster(options, shutdown_on_close=False)
@@ -458,7 +474,9 @@ else:
    cluster = gw.connect(clusters[0].name)
 ```
 
-Now that we have a running cluster, we can get a client object from the cluster:
+::::::::::::::: solution
+
+After creating the cluster, you can get a client object from the cluster:
 
 ```python
 client = cluster.get_client()
@@ -472,10 +490,12 @@ import xarray as xr
 import fsspec
 
 storage_options = {
-    "key": "your-access-key",
-    "secret": "your-secret-key",
-    "client_kwargs": {
-        "endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk",
+    "key": os.environ["AWS_ACCESS_KEY_ID"],
+    "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
+    "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    "config_kwargs": {
+        "request_checksum_calculation": "when_required",
+        "response_checksum_validation": "when_required",
     },
 }
 
@@ -499,17 +519,12 @@ It can confirm that the conversion and upload have preserved structure and metad
 
 ## Exercise 6 - Check consistency and compute a mean
 
-Using both:
-
-- The original NetCDF files dataset (`ds_nc`).
-- The converted Zarr dataset (`ds_zarr` from object storage).
+Using both the original NetCDF files dataset (`ds_nc`) and the converted Zarr dataset (`ds_zarr` from object storage):
 
 1. Compute the same statistic in both cases (e.g. global mean temperature at a given time):
-
 2. Compare the results for equality (or near-equality within floating point tolerance).
 
 ::::::::::::::: solution
-
 
 ```python
 client = Client(n_workers=2, threads_per_worker=2)
@@ -523,7 +538,6 @@ var_nc = var_nc.isel(time=0)
 mean_nc = var_nc.mean(dim=("latitude", "longitude"))
 
 # Zarr
-# Assuming ds_zarr opened as above
 var_zarr = ds_zarr["swh"]
 var_zarr = var_zarr.isel(time=0)
 

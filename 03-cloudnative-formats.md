@@ -1,7 +1,7 @@
 ---
 title: What Are Cloud-Native Formats?
 teaching: 15
-exercises: 5
+exercises: 10
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -22,21 +22,21 @@ exercises: 5
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## “Hey, let’s not download the whole file every time.” (Cheipesh, 2018)
+## "Hey, let’s not download the whole file every time."[^cheipesh2018]
 
 Environmental data is growing rapidly in size and complexity, and traditional approaches based on downloading files are becoming increasingly impractical for scientific work. Users often cannot reasonably wait to download, store, and process very large files locally, especially when they only need a subset of the data.
 
 Cloud-native and cloud-optimized formats aim to support more direct access to the parts of a dataset we actually need, without requiring complete file downloads first. This matters in oceanography, climate, and meteorology, where datasets are often large, multidimensional, and shared by many users.
 
-## From files to cloud objects
+### From files to cloud objects
 
-Traditional scientific formats such as NetCDF, GRIB, and HDF5 were designed mainly for file-based storage systems: local disks, shared servers, and HPC filesystems. In that world, the standard workflow is often “download the file, open the file, analyse the file”.
+Traditional scientific formats such as NetCDF, GRIB, and HDF5 were designed mainly for file-based storage systems: local disks, shared servers, and HPC filesystems. In that world, the standard workflow is often "download the file, open the file, analyse the file".
 
 Cloud storage works differently. Instead of one large file on a filesystem, data is commonly stored as many independent objects accessed over HTTP or S3-style APIs. In this setting, performance depends not just on how data is encoded, but also on how many requests are needed, where metadata lives, and whether small subsets can be fetched efficiently.
 
-## What makes a format cloud-native?
+### What makes a format cloud-native?
 
-A useful community description from the Cloud-Native Geospatial Formats Guide is that cloud-optimized formats follow a common pattern:
+A useful community description from the Cloud-Native Geospatial Formats Guide[^cngguides] is that cloud-optimized formats follow a common pattern:
 
 - Metadata provides addresses for data blocks.
 - Metadata is stored in a consistent format and location.
@@ -62,9 +62,9 @@ There is no single cloud-native solution for all environmental data, and the com
 - [Zarr](https://zarr.dev/): a format for chunked N-dimensional arrays stored as key-value objects, widely used for climate and Earth observation data.
 - [Kerchunk](https://fsspec.github.io/kerchunk/): a Python library that builds reference files describing how to read existing NetCDF/HDF5/GRIB data as if it were a Zarr store, without rewriting the original data.
 - [VirtualiZarr](https://virtualizarr.readthedocs.io/): a project for creating cloud-optimized virtual Zarr stores from existing scientific data, exposing non-Zarr data through a Zarr-like interface.
+- [Cloud-optimized Geotiff (COG)](https://www.cogeo.org/): a format for geospatial raster data that allows efficient access to subsets of large images over HTTP or Object Storage, using internal tiling and metadata.
 - [GeoParquet](https://www.geoparquet.org/): a cloud-friendly columnar format for geospatial vector data, built on Apache Parquet.
 - [FlatGeobuf](https://flatgeobuf.org/): a binary geospatial vector format designed for efficient streaming and spatially indexed access, including over HTTP range requests.
-- [TileDB](https://tiledb.com/) and similar array databases: systems that represent large collections of NetCDF-like data as cloud-friendly arrays with indexing and cataloguing layers, enabling geoscience data to be stored and queried efficiently in the cloud.
 
 In practice, these approaches support different needs. Some workflows rewrite data into a new cloud-native layout such as Zarr, while others keep legacy files and expose them through references for cloud-friendly access.
 
@@ -79,7 +79,7 @@ Cloud-native approaches try to reduce those problems by making metadata easier t
 
 ## How this changes workflows
 
-With cloud-native approaches, the workflow can shift from “download first, analyse later” to “open remotely, inspect metadata, and read only the needed chunks”. This can reduce waiting time, duplicate local copies, and the amount of data transferred over the network.
+With cloud-native approaches, the workflow can shift from "download first, analyse later" to "open remotely, inspect metadata, and read only the needed chunks". This can reduce waiting time, duplicate local copies, and the amount of data transferred over the network.
 
 It also supports more scalable shared analysis: the data can stay in central storage while many users, notebooks, or processing jobs access different parts of it at the same time. For this course, the most important next step is Zarr, because it gives a concrete example of how chunked, multidimensional environmental data can be organised for this style of access.
 
@@ -127,7 +127,9 @@ For example, if you only want to extract sea surface temperature for one locatio
 
 ## Exercise 2 - Thinking in chunks
 
-Imagine a global sea surface temperature dataset stored as a Zarr archive.
+One of the main ideas behind Zarr is that data is divided into many smaller chunks. Instead of reading an entire dataset, software can load only the chunks needed for a particular operation.
+
+Now, imagine a global sea surface temperature dataset stored as a Zarr archive.
 
 For each task below, discuss which part of the dataset you would expect to read:
 
@@ -142,8 +144,6 @@ Questions:
 - How might the choice of chunk layout affect the speed of these different tasks?
 
 ::::::::::::::: solution
-
-One of the main ideas behind Zarr is that data is divided into many smaller chunks. Instead of reading an entire dataset, software can load only the chunks needed for a particular operation.
 
 For example:
 
@@ -166,3 +166,6 @@ Different analyses benefit from different chunk layouts, so choosing an appropri
 - "Cloud-native approaches can reduce data movement, improve sharing, and support scalable analysis of large environmental datasets."
 
 ::::::::::::::::::::::::::::::::::::::::::
+
+[^cheipesh2018]: Cheipesh, E. 2018. Available at: https://pt.slideshare.net/slideshow/cloud-optimized-geottiffs-enabling-efficient-cloud-workflows/97510557
+[^cngguides]: Cloud-Native Geospatial Formats Guide. Available at: https://guide.cloudnativegeo.org/
