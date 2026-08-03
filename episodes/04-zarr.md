@@ -1,7 +1,7 @@
 ---
 title: Zarr - Data Model, Metadata, and Chunked Storage
-teaching: 20
-exercises: 10
+teaching: 30
+exercises: 20
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -25,7 +25,7 @@ exercises: 10
 
 ## Zarr in context
 
-Zarr is an open-source format and data model for storing chunked, N-dimensional arrays in a way that works naturally with cloud object storage and file systems. It was originally developed in the scientific Python community, and has since grown into a multi-language ecosystem with implementations in [Python](https://zarr.readthedocs.io/en/stable/), [Rust](https://zarrs.dev/), [Julia](https://github.com/JuliaIO/Zarr.jl), [Matlab](https://github.com/mathworks/MATLAB-support-for-Zarr-files), [R](https://cran.r-project.org/web/packages/zarr/index.html), [JavaScript](https://zarrita.dev/)  and others. In the Zarr website and documentation, you can find a list of [implementations](https://zarr.dev/).
+Zarr is an open-source format and data model for storing chunked, N-dimensional arrays in a way that works naturally with cloud object storage and file systems. It was originally developed in the scientific Python community, and has since grown into a multi-language ecosystem with implementations in [Python](https://zarr.readthedocs.io/en/stable/), [Rust](https://zarrs.dev/), [Julia](https://github.com/JuliaIO/Zarr.jl), [Matlab](https://github.com/mathworks/MATLAB-support-for-Zarr-files), [R (programing language)](https://cran.r-project.org/web/packages/zarr/index.html), [JavaScript](https://zarrita.dev/)  and others. In the Zarr website and documentation, you can find a list of [implementations](https://zarr.dev/).
 
 For Earth and climate data, Zarr is being adopted by major providers (e.g. ESA's Sentinel products and National Weather Service-USA) and projects such as Earth Data Hub, Pangeo, and DestinE, precisely because it scales to petabyte-sized datasets while remaining accessible from tools like xarray.
 
@@ -43,7 +43,7 @@ A typical climate or ocean dataset might use one group containing arrays such as
 
 ![Zarr Organisation. Source: https://tutorial.xarray.dev/intermediate/intro-to-zarr.html](fig/zarr_organisation.png){alt="Zarr organisation, showing groups and arrays with chunked storage."}
 
-## Zarr v2
+### Zarr v2
 
 Zarr version 2 is the older, widely used storage specification. In Zarr v2, the dataset is organised as a directory-like structure with a few small metadata files plus folders for groups, arrays, and chunks.
 
@@ -62,6 +62,7 @@ Inside the group, each array usually appears as its own directory, and that arra
 A simple Zarr v2 layout might look like this:
 
 ```bash
+# This command shows the directory structure of a Zarr v2 store for an ocean temperature dataset that we have in the example data folder. You can run this command in a terminal to see the structure of the Zarr store.
 tree -L 2 data/ocean_temperature_v2.zarr
 ```
 
@@ -113,11 +114,11 @@ A key feature of Zarr v2 is that the metadata is small, human-readable, and easy
 
 ![Zarr V2. Source: https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/](fig/zarrv2.png){alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files."}
 
-## Zarr v3
+### Zarr v3
 
 Zarr version 3 is the newer core specification. It keeps the same basic idea of chunked arrays and groups, but it updates the metadata structure and some of the terminology to better support modern scientific and cloud-native use cases.
 
-At a high level, a Zarr v3 store still contains groups, arrays, and chunks, but the metadata is more explicit and consolidated. The main difference is that Zarr v3 uses a more explicit metadata layout. Instead of several small hidden JSON files spread through a directory tree, Zarr v3 uses `zarr.json` files to describe groups and arrays. In the metadata itself, the terminology has changed slightly to make it clearer and more flexible. Some important changes from v2 to v3 are:
+At a high level, a Zarr v3 store still contains groups, arrays, and chunks, but the metadata is more explicit and consolidated. Instead of several small hidden JSON files spread through a directory tree, Zarr v3 uses `zarr.json` files to describe groups and arrays. In the metadata itself, the terminology has changed slightly to make it clearer and more flexible. Some important changes from v2 to v3 are:
 
 - `dtype` becomes `data_type`.
 - `chunks` becomes `chunk_grid`.
@@ -125,11 +126,11 @@ At a high level, a Zarr v3 store still contains groups, arrays, and chunks, but 
 - `order` is replaced by the transpose codec.
 - `filters` and `compressor` are replaced by a more general `codecs` field.
 
-
 A simplified Zarr v3 structure might look like this:
 
 
 ```bash
+# This command shows the directory structure of a Zarr v3 store for an ocean temperature dataset that we have in the example data folder.
 tree -L 2 data/ocean_temperature.zarr
 ```
 
@@ -186,22 +187,21 @@ cat data/ocean_temperature.zarr/zarr.json
 cat data/ocean_temperature.zarr/sst/zarr.json
 ```
 
-Zarr v3 also adds more explicit support for features such as sharding, where several chunks can be grouped together inside a larger storage object. This helps reduce the overhead of managing very large numbers of tiny files or keys, especially in cloud object storage.
+Zarr v3 also adds more explicit support for features such as sharding, where several chunks can be grouped together inside a larger storage object. This helps reduce the overhead of managing very large numbers of tiny files or keys, especially in cloud object storage. We will talk more about sharding in later lessons.
 
 ## Chunked storage: how Zarr stores large arrays
 
 Chunking is central to Zarr's design. Instead of storing one very large array as a single block, Zarr splits it into many smaller pieces called **chunks**. Each chunk is a small N-dimensional block of the array, for example a subset in `time × lat × lon`, and each chunk can be stored and read separately.
 
-You can think of this like cutting a very large map into tiles. If you only want to look at one region, you do not need to unroll the whole map — you only fetch the tiles you need. Zarr does the same thing for multidimensional data.
+You can think of this like cutting a very large map into tiles. If you only want to look at one region, you do not need to unroll the whole map. You only fetch the tiles you need. Zarr does the same thing for multidimensional data.
 
 For environmental data, chunking is useful because:
 
-- **Selective reads**: a time series at one point, one region, or one variable can often be read without scanning the whole dataset.
-- **Parallelism**: different chunks can be processed at the same time by different workers.
-- **Compression**: each chunk can be compressed separately, which can reduce storage costs and data transfer.
+- Selective reads: a time series at one point, one region, or one variable can often be read without scanning the whole dataset.
+- Parallelism: different chunks can be processed at the same time by different workers.
+- Compression: each chunk can be compressed separately, which can reduce storage costs and data transfer.
 
 This is one reason Zarr fits cloud workflows well: object storage and HTTP-based access work naturally when data is organised into many addressable pieces rather than one large monolithic file.
-
 
 ### A simple way to think about chunks
 
@@ -217,7 +217,7 @@ If this were stored as one giant array, even small operations could require read
 - one chunk per spatial tile,
 - or a combination of both.
 
-When a user asks for “the temperature time series at this point” or “this region for this month”, the software can request only the chunks that overlap that query, rather than the whole array.
+When a user asks for "the temperature time series at this point" or "this region for this month", the software can request only the chunks that overlap that query, rather than the whole array.
 
 ![How chunking affects data access.](fig/chunk_effect.png){alt="Effect of chunking on data access."}
 
@@ -243,14 +243,14 @@ For these disciplines, Zarr brings several important shifts:
 
 - **From files to data cubes**: archives can be published as coherent Zarr "stores" representing large data cubes (e.g. global ERA5 climate fields or Sentinel EO products) rather than thousands of individual NetCDF/GRIB files.
 - **Direct cloud access**: scientists can open datasets directly from S3/HTTPS in notebooks or applications, reading only needed chunks instead of downloading entire files.
-- **Interoperability and tooling**: Zarr integrates well with xarray, dask, kerchunk, TileDB, Icechunk, and visualization tools such as browzarr and browser-based explorers, enabling rich, interactive workflows.
-- **Community-driven standards**: the Zarr Summit outcomes show a strong momentum for conventions, cross-language conformance, sparse arrays, and linked arrays, helping climate and ocean communities align around robust, shared practices.
+- **Interoperability and tooling**: Zarr integrates well with xarray, dask, Icechunk, and visualization tools such as [browzarr](https://browzarr.io/latest/) and [zarr-cesium](https://noc-oi.github.io/zarr-cesium/docs/), enabling rich, interactive workflows.
+- **Community-driven standards**: Zarr is being adopted by major providers and projects, and conventions are emerging to ensure interoperability and best practices.
 
-In short, Zarr doesn't replace scientific semantics like CF or the Common Data Model—it gives us a new storage and access layer that works natively with cloud infrastructure and modern analysis tools.
+In short, Zarr doesn't replace scientific semantics like CF or the Common Data Model. It gives us a new storage and access layer that works natively with cloud infrastructure and modern analysis tools.
 
 ## Inspect a Zarr store with Python
 
-To inspect a Zarr store, we can use the `zarr` library in Python. For example, in the example datasets, we have a Zarr store called `data/ocean_temperature_with_groups.zarr`. This zarr store represents a subset of the ERA5 reanalysis dataset, with sea surface temperature data organised into pyramid groups and arrays.
+To inspect a Zarr store, we can use the `zarr` library in Python. For example, in the example datasets, we have a Zarr store called `data/ocean_temperature_with_groups.zarr`. This zarr store represents a subset of the ERA5 reanalysis dataset, with sea surface temperature data organised into pyramid groups and arrays. We will talk later about pyramids and how they are used for multiscale visualisation, but for now we will focus on the Zarr structure itself.
 
 To open this Zarr store, we can run:
 
@@ -291,21 +291,20 @@ print(dict(sst.attrs))
 
 ## Exercise 1 - Inspecting a Zarr store with Python
 
-Using the Zarr store called `data/ocean_temperature_with_groups.zarr`, this store contains a hierarchical dataset with sea surface temperature data organised into groups and arrays.
-
-It contains several arrays, including sea surface temperature (`sst`), valid time, latitude, and longitude.
+Using the Zarr store called `data/ocean_temperature_with_groups.zarr`, please complete the following tasks:
 
 1. Use the Python `zarr` library to open the store.
 2. Inspect the group hierarchy and list available arrays, groups, and their attributes.
-3. Check the information about the `sst` array, including its shape, chunk shape, and data type.
-4. Explore the metadata files (`.zarray`, `.zgroup`, `.zattrs`) for one array.
+3. Identify the dimensions, shape, and data type of the `sst` array.
+4. Explore the metadata files (`.zarray`, `.zgroup`, `.zattrs` or `zarr.json`) for one array.
 
 Questions:
 
-- How are arrays and groups organised in the store (e.g. top-level group, subgroups)?
-- What chunk shape and data type does the `sst` array use?
-- Which attributes (metadata) are present on the array and group?
-- Are we opening the entire dataset into memory, or just inspecting the structure?
+- How is the store organised (root group, subgroups, arrays)?
+- Which variables are stored inside each group?
+- What are the shape and data type of the sst array?
+- Which attributes are attached to the root group and the sst array?
+- Are you loading the dataset into memory, or only inspecting its structure?
 
 ::::::::::::::: solution
 
@@ -315,24 +314,20 @@ Code to inspect the Zarr store:
 import zarr
 
 store = zarr.open_group("data/ocean_temperature_with_groups.zarr", mode="r")
+
 print(store)
-
-print(list(store.arrays()))  # List arrays
-print(list(store.groups()))  # List groups
-
-# Show arrays inside group "1"
+print(list(store.groups()))
 print(list(store["1"].arrays()))
 
-# Inspect a specific array
 sst = store["1"]["sst"]
-print(sst)
-print(sst.shape, sst.chunks, sst.dtype)
+print(sst.shape)
+print(sst.dtype)
 
-# Access attributes
+print(dict(store.attrs))
 print(dict(sst.attrs))
 ```
 
-Code to list the files and to see the content of the metadata files:
+Code to list the files and to see the content of the metadata files (as this is a Zarr v3 store, the metadata files are `zarr.json`):
 
 ```bash
 ls -R data/ocean_temperature_with_groups.zarr
@@ -345,35 +340,30 @@ The Zarr store is organised as a hierarchical container. In this example, the ro
 ```bash
 ocean_temperature_with_groups.zarr
 ├── 0/
-└── 1/
-├── sst
-├── valid_time
-├── latitude
-├── longitude
-├── spatial_ref
-└── number
+    ├── sst
+    ├── valid_time
+    ├── latitude
+    ├── longitude
+    ├── spatial_ref
+    ├── number
+    └── zarr.json
+├── 1/
+    └── ...
+└── zarr.json
 ```
 
-The root `Group` contains two child groups (`0` and `1`). The `sst` variable is stored inside group `1`, together with its coordinate arrays (`valid_time`, `latitude`, and `longitude`) and additional metadata arrays.
-
-The `sst` array has:
+The root `Group` contains two child groups (`0` and `1`). The `sst` variable is stored inside each group `1`. The `sst` array has:
 
 - Shape: `(10, 360, 720)`
   - 10 time steps
   - 360 latitude points
   - 720 longitude points
 
-- Chunk shape: `(1, 360, 360)`
-
 - Data type: `float32`
-
-The chunking strategy stores one time step per chunk while splitting the longitude dimension into smaller spatial tiles. This allows efficient access when reading individual time slices or spatial subsets.
 
 The array attributes contain metadata inherited from the original GRIB dataset and CF-style information, including  `long_name` -> `"Sea surface temperature"`, for example.
 
-These attributes demonstrate how Zarr separates the data storage structure (groups, arrays, chunks) from the metadata description. This enables flexible storage of scientific datasets while preserving information required for interpretation and analysis.
-
-We are not loading the entire dataset into memory; we are only inspecting the structure and metadata. The actual data is read from disk or object storage only when we explicitly request it (e.g., by slicing the array). This lazy loading is a key feature of Zarr and xarray, allowing efficient handling of large datasets.
+We are not loading the entire dataset into memory. We are only inspecting the structure and metadata. The actual data is read from disk or object storage only when we explicitly request it (e.g., by slicing the array). This lazy loading is a key feature of Zarr and xarray, allowing efficient handling of large datasets.
 
 :::::::::::::::::::::::::
 
@@ -383,22 +373,37 @@ We are not loading the entire dataset into memory; we are only inspecting the st
 
 ## Exercise 2 - Thinking about chunked storage
 
-Using the same Zarr dataset, answer these conceptual questions:
+Using the same Zarr dataset:
 
-1. Your array has dimensions `(valid_time, latitude, longitude)` and a chunk shape `(10, 100, 100)`, what does each chunk represent in terms of space and time?
-2. How might different chunk shapes (e.g. more time vs. more space in each chunk) affect typical operations, such as:
-   - Reading a time series at one grid point.
-   - Computing a spatial mean for each time step.
-3. Imagine you are designing a Zarr layout for a high‑resolution global reanalysis. What types of operations would you prioritise when choosing chunk shapes?
-
-You do not need to change any code. Focus on reasoning about chunks and operations.
+1. Inspect the chunk shape of the `sst` array.
+2. Explain what one chunk represents in terms of time and space.
+3. Consider how this chunking would affect:
+   - reading a time series at one location;
+   - computing a spatial mean for each time step.
+4. If you were storing a high-resolution global reanalysis, what workloads would you optimise for when choosing chunk shapes?
 
 ::::::::::::::: solution
 
+To explore the chunk shape of the `sst` array, you can run:
+
+```python
+print(sst.chunks)
+```
+
 A chunk shape such as `(10, 100, 100)` represents 10 time steps over a 100×100 spatial block.
-Chunk shapes that are "tall in time" can be efficient for time series at specific locations, while chunk shapes that cover larger spatial regions may be better for spatial aggregates; in practice, chunk shapes are a compromise based on dominant workloads.
+Chunk shapes that are "tall in time" can be efficient for time series at specific locations, while chunk shapes that cover larger spatial regions may be better for spatial aggregates. In practice, chunk shapes are a compromise based on dominant workloads.
 This exercise prepares you to think critically about chunking decisions, sharding (you will see later what this means), and performance optimisation covered in later lessons (e.g. on cloud-native formats, Zarr V3 features, and tools like Icechunk and Virtualizarr).
 
 :::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::: keypoints
+
+- "Zarr organises data into groups and arrays stored as addressable chunks, which supports efficient partial reads and writes."
+- "Metadata in Zarr describes array structure, chunking, and attributes, and can be extended through shared conventions for geoscience workflows."
+- "Chunked storage is central to Zarr performance because it lets tools read only the pieces needed for a given query or computation."
+- "Inspecting a Zarr store with Python and xarray helps distinguish cheap metadata exploration from actual data loading."
+- "Understanding data model, metadata, and chunk layout is the foundation for later lessons on rechunking, parallel processing, and cloud-native analysis."
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::

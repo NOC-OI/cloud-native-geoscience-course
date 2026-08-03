@@ -1,7 +1,7 @@
 ---
 title: How to Choose Chunks for Analysis and Processing at Scale
-teaching: 20
-exercises: 10
+teaching: 35
+exercises: 30
 ---
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
@@ -42,7 +42,7 @@ Chunks influence:
 
 Choosing good chunk shapes is critical when you move from "toy" datasets to large-scale reanalysis, ensemble, or high-resolution model data.
 
-## Thinking in dimensions and workloads
+### Thinking in dimensions and workloads
 
 To choose chunk shapes, start from your dimensions and typical workloads.
 
@@ -50,7 +50,7 @@ Common dimensions in ocean, climate, and meteorology:
 
 - `time`
 - `lat`, `lon` (or `x`, `y`)
-- `level` (or `depth`) (pressure or model levels; depth in the ocean)
+- `level` (or `depth`) (pressure or model levels, depth in the ocean)
 - `member` (ensemble member)
 
 Common workloads:
@@ -71,7 +71,7 @@ Each workload benefits from certain chunk layouts:
 
 There is no single "best" chunking: it depends on which workloads are most important for your users.
 
-![Chunk strategy. Source: Matt Piagge (UKCEH)](fig/chunk_strategy.png)
+![Chunk strategy. Source: Matt Piagge (UKCEH)](fig/chunk_strategy.png){alt="Diagram showing how different chunking strategies affect performance for different workloads."}
 
 
 ## Inspecting chunk shapes in a Zarr store
@@ -176,7 +176,7 @@ With xarray, rechunking is simple, but it can be expensive for large datasets. T
 
 ### Step 1: Open the dataset
 
-Start by opening the original Zarr dataset. For the examples below, we will use the ERA5 reanalysis dataset, because it is smaller and easier to work with than the GLORYS dataset (you can try larger datasets later if you have the resources).
+Start by opening the original Zarr dataset. For the examples below, we will use the ERA5 reanalysis dataset, because it is smaller and easier to work with than the GLORYS dataset (you can try larger datasets later if you want).
 
 ```python
 import xarray as xr
@@ -222,7 +222,7 @@ Save the dataset with the new chunk layout.
 ds_chunked.to_zarr("data/ocean_temperature_rechunked.zarr", mode="w")
 ```
 
-This approach is convenient, but it is not always the most efficient for very large datasets. If the original and target chunk layouts are very different, rechunking can require substantial temporary storage and memory.
+This approach is convenient, but it is not always the most efficient for very large datasets. If the original and target chunk layouts are very different, rechunking can require substantial temporary storage and memory. And we will also create a new Zarr store, which may be expensive in terms of storage.
 
 :::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -230,12 +230,12 @@ This approach is convenient, but it is not always the most efficient for very la
 
 [Rechunker](https://rechunker.readthedocs.io/) is a library designed specifically for rechunking large array datasets efficiently. It is useful when you want to move from one chunk layout to another without loading the whole dataset into memory at once. However, `rechunker` does not work with zarr v3 stores.
 
-[Cubed](https://cubed.readthedocs.io/) is a newer library that provides an array API for rechunking and other operations, designed to work with serverless backends or locally without needing a live Dask scheduler.
+[Cubed](https://cubed-dev.github.io/cubed/) is a newer library that provides an array API for rechunking and other operations, designed to work with serverless backends or locally without needing a live Dask scheduler.
 
 You can also integrate Cubed with xarray to rechunk datasets in a more memory-efficient way.
 
 ```python
-ds_chunked = ds.chunk({"valid_time": 1, "latitude": 721, "longitude": 1440}, , chunked_array_type="cubed")
+ds_chunked = ds.chunk({"valid_time": 1, "latitude": 721, "longitude": 1440}, chunked_array_type="cubed")
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -269,7 +269,7 @@ chunk_size_bytes = np.prod(chunk_shape) * ds["sst"].dtype.itemsize
 print(f"Approximate chunk size: {chunk_size_bytes / 1e6:.2f} MB")
 ```
 
-You do not need to run the code yet; focus on design:
+You do not need to run the code yet, focus on design:
 
 - Write down your proposed chunk sizes per dimension.
 - Explain how they help your chosen workload.
@@ -364,12 +364,12 @@ This means you can keep chunks small for efficient analysis, while using shardin
 
 ![A sharded Zarr showing how chunk data is grouped into shard files. Source: https://element84.com/software-engineering/is-zarr-the-new-cog/](fig/sharding2.png){alt="A sharded Zarr showing how chunk data is grouped into shard files."}
 
-### Why sharding helps
+### Benefits
 
 Sharding can be useful when:
 
-- You want **small chunks** for fast, selective reads.
-- You want to **reduce object counts** in cloud storage.
+- You want small chunks for fast, selective reads.
+- You want to reduce object counts in cloud storage.
 - You want to reduce filesystem overhead from very large numbers of files.
 - You want to keep the benefits of chunk-based analysis without paying the full cost of storing each chunk separately.
 
@@ -455,23 +455,18 @@ cat data/example_sharded.zarr/temperature/zarr.json
 
 Two fields matter:
 
-- "chunk_grid.configuration.chunk_shape": this is actually the shard shape ([100, 100] in our case). Confusingly, at the top level "chunk" means "storage object" (i.e. shard).
-- "codecs": look for the entry with "name": "sharding_indexed". Its configuration.chunk_shape ([10, 10]) is the real sub-chunk size inside each shard, along with the compressor used.
-
-### Seeing the effect of sharding
-
-Sharding "groups small chunks into larger files". For example, if you have a 1000×1000 array with 10×10 chunks, you would have 10,000 chunks. If you shard them into 100×100 shards, you would only have 100 shards. This reduces the number of files or objects in storage, which can improve performance and reduce overhead.
-
+- "chunk_grid.configuration.chunk_shape": this is actually the shard shape ([100, 100] in our case).
+- "codecs": look for the entry with `"name": "sharding_indexed"`. Its configuration.chunk_shape ([10, 10]) is the real sub-chunk size inside each shard, along with the compressor used.
 
 ### Using xarray with sharded Zarr
 
-xarray can open a sharded Zarr store the same way it opens other Zarr datasets, so the sharding is mostly a storage detail from the analyst's point of view.
+Xarray can open a sharded Zarr store the same way it opens other Zarr datasets, so the sharding is mostly a storage detail from the analyst's point of view.
 
 
 ```python
 import xarray as xr
 
-ds = xr.open_zarr("data/example_sharded_ds.zarr")
+ds = xr.open_zarr("data/example_sharded.zarr")
 print(ds)
 
 temp = ds["temperature"]
@@ -481,7 +476,6 @@ print(temp.chunks)
 ```
 
 This is useful because xarray still lets you work with labelled dimensions and high-level operations, while Zarr v3 handles the storage layout underneath.
-
 
 
 ::::::::::::::::::::::::::::::::::::::: challenge
@@ -530,9 +524,9 @@ Using this approach, you should see that the sharded dataset has fewer files/obj
 
 ## Remember:Chunking and sharding are not the same
 
-Chunking answers the question: **what is the unit of computation and access?**
+Chunking answers the question: what is the unit of computation and access?
 
-Sharding answers the question: **how are those chunks physically packed into storage objects?**
+Sharding answers the question: how are those chunks physically packed into storage objects?
 
 A dataset may use small chunks for flexible analysis, but store those chunks inside larger shards to make cloud storage more efficient.
 

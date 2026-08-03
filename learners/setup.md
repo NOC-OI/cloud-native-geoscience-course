@@ -4,136 +4,123 @@ title: Setup
 
 ## Introduction
 
-This workshop uses Python tools for working with large environmental datasets. You will install the workshop environment, connect to the lesson data, and learn the key terms that will appear throughout the workshop.
+This workshop introduces practical tools and workflows for working with large environmental datasets in a cloud-friendly way. Over the course of the lesson, you will set up a Python environment, access example data, and explore formats such as NetCDF, Zarr, and STAC that are designed for scalable analysis. You will also learn key concepts such as chunking, metadata, parallel processing, and versioned data storage. The aim is to help you understand not only how these tools work, but also why they are useful for analysing, sharing, and managing environmental data more efficiently.
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## What do you work with?
 
-1. In the Etherpad, write a sentence about the data you work with and how large it is.
-2. Describe any problems you have had when working with data that is too large for your computer.
-3. List any tools, libraries, or computing systems you have used to help with this.
+Before we start, take a moment to think about your own experience with environmental data. This short activity will help us understand the kinds of datasets and challenges you bring to the workshop.
+
+1. In the shared notes document (CodiMD), write one sentence about the data you usually work with and roughly how large it is.
+2. Describe one challenge you have faced when working with data that is too large for your computer or too slow to process.
+3. List one tool, library, or computing system you have used to help with analysis, storage, or data access.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 In this workshop, we will use:
 
-- `numpy`.
-- `xarray`.
-- `zarr`.
-- `dask`.
-- `fsspec`.
-- `s3fs` or other storage backends when needed.
-- `matplotlib`.
-- `cartopy` for maps.
-- `netCDF4`.
-- `jupyterlab`.
-- `ipykernel`.
+- `jupyterlab`
+- `numpy`
+- `netCDF4`
+- `xarray`
+- `zarr`
+- `dask`
+- `fsspec`, `s3fs`, `boto3`, and `obstore` for cloud storage access
+- `matplotlib` and `cartopy` for plotting
+- `icechunk` for versioning
+- `virtualizarr` for virtual Zarr stores
+- `stac` for cataloging
+- `topozarr` for multiscale Zarr visualization
+- others...
 
-The exact environment is provided in the lesson repository as an [environment.yaml](environment.yaml) file.
+The exact environment is provided in the course repository as an [environment.yml file for creating a conda environment](files/environment.yml).
 
 ## Jargon busting
 
-### CPU
+Here are some of the main terms that appear throughout the workshop.
 
-The **CPU** is the Central Processing Unit. It runs instructions and performs calculations for the computer.
+### CPU, core, process, and thread
 
-### Core
+The **CPU** is the Central Processing Unit that executes instructions and performs calculations. A **core** is one processing unit inside a CPU, while a **process** is one running instance of a program and a **thread** is a smaller unit of work inside that process.
 
-A **core** is one processing unit inside a CPU. More cores can allow more work to happen at the same time.
+### Parallel processing and Dask
 
-### Process
+**Parallel processing** means splitting work so that different parts run at the same time, often across cores, processes, or workers. **Dask** is a Python library that facilitates parallel computing by breaking down large computations into smaller tasks that can be executed concurrently.
 
-A **process** is one running instance of a program. When you start Python, you create a Python process.
+### RAM and storage
 
-### Thread
+**RAM** is the computer's short-term memory. **Storage** is where data live more permanently, such as on disk, SSDs, shared storage, or object storage.
 
-A **thread** is a smaller unit of work inside a process. Threads share memory within the same process.
+### Cluster, node, and HPC
 
-### Parallel processing
-
-**Parallel processing** means splitting work so that different parts run at the same time.
-
-### RAM
-
-**RAM** is the computer's short-term memory. Data must be loaded into RAM before it can be processed.
-
-### Storage
-
-**Storage** is where data live more permanently, such as on disk, SSD, shared storage, or object storage.
-
-### Cluster
-
-A **cluster** is a group of connected computers that work together.
-
-### Node
-
-A **node** is one computer inside a cluster.
-
-### HPC
-
-**High-performance computing (HPC)** refers to large shared systems built for heavy computation and large data processing.
-
+A **cluster** is a group of connected computers that work together, and a **node** is one computer within that cluster. **High-performance computing (HPC)** refers to large shared systems designed for heavy computation and large data processing.
 
 ![](fig/hpc.png){alt="A picture of the JASMIN HPC system."}
 
-### JASMIN
+### JASMIN and SSH
 
-[JASMIN](https://jasmin.ac.uk) is the UK's data analysis facility for data-intensive environmental science. It provides notebook services, shared storage, and computing resources for environmental data work.
+[JASMIN](https://jasmin.ac.uk) is the UK's data analysis facility for data-intensive environmental science. It provides notebook services, shared storage, and computing resources for environmental data work. **SSH** (Secure Shell) is a secure way to connect to a remote computer over a network.
 
 ![](fig/jasmin.png){alt="An image illustrating the JASMIN system."}
-
-### SSH
-
-**SSH** (Secure Shell) is a secure way to connect to a remote computer over a network.
-
-### Jupyter notebook
-
-A **Jupyter notebook** is a browser-based environment for running code, text, and plots together.
-
-### Kernel
-
-A **kernel** is the Python environment that runs notebook code.
-
-### Conda / Mamba
-
-**Conda** and **mamba** are tools for creating and managing Python environments.
-
-### Environment
-
-An **environment** is a self-contained set of Python packages and versions.
-
-### Zarr
-
-**Zarr** is a chunked data format for large N-dimensional arrays.
-
-### Xarray
-
-**Xarray** is a labelled array library for working with multidimensional scientific data.
-
-### Chunk
-
-A **chunk** is a smaller piece of a larger array. Zarr and xarray use chunks so they can read only part of a dataset at a time.
-
-### Lazy loading
-
-**Lazy loading** means data are not fully read into memory when a dataset is opened. The data are only loaded when you select, compute, or plot them.
-
-### Coordinate
-
-A **coordinate** is a named dimension value such as time, latitude, longitude, or depth.
-
-### Data variable
-
-A **data variable** is the main measured or modelled data, such as temperature or salinity.
-
-### Metadata
-
-**Metadata** is information about the data, such as units, long names, chunk sizes, and coordinate definitions.
 
 ### Group workspace
 
 A **group workspace** is shared storage on JASMIN for collaborative work and course data.
+
+### Jupyter notebook, and kernel
+
+A **Jupyter notebook** is a browser-based environment for running code, text, and plots together. A **kernel** is the Python environment that runs notebook code.
+
+### Environment.yml and conda/mamba
+
+An **environment.yml** file is used to define a Conda environment, specifying the Python version and the packages required. **Conda** and **mamba** are tools for managing these environments and installing packages.
+
+### Dataset, array, coordinate, and data variable
+
+A **dataset** is a collection of related scientific data and metadata in different formats. An **array** is a multi-dimensional grid of values, while a **coordinate** is a named axis such as time, latitude, longitude, or depth. A **data variable** is the main measured or modelled value, such as temperature or salinity.
+
+### Metadata and controlled vocabulary
+
+**Metadata** is information about the data, such as units, long names, chunk sizes, and coordinate definitions. A **controlled vocabulary** is a curated list of standard terms and identifiers used to avoid ambiguity in metadata.
+
+### Zarr, Xarray, chunk, and lazy loading
+
+**Zarr** is a chunked data format for large N-dimensional arrays. **Xarray** is a labelled array library for working with multidimensional scientific data. A **chunk** is a smaller piece of a larger array, and **lazy loading** means data are not fully read into memory when a dataset is opened; they are loaded only when needed.
+
+### Object storage and bucket
+
+**Object storage** keeps data as independent objects in a storage system, often accessed through APIs such as S3. A **bucket** is a top-level container for objects in object storage.
+
+![Source: https://blog.itkonekt.com/](fig/bucket_and_object_store.png){alt="A diagram showing a bucket containing objects in object storage."}
+
+### POSIX and Object-Store file system
+
+A **POSIX file system** is a traditional file-system model with directories, files, and paths that are accessed through a local or mounted storage interface. It is commonly used for shared filesystems and local disks.
+
+An **object-store file system** is a storage interface that exposes object storage through filesystem-like operations, often used in cloud workflows. It is different from a traditional POSIX filesystem because data are accessed through object APIs rather than a normal directory tree.
+
+### Cloud-native format
+
+A **cloud-native format** is designed to work efficiently with object storage and remote access patterns, often by allowing partial reads and parallel access.
+
+### STAC
+
+**STAC** is a standard for describing and organizing geospatial assets.
+
+![STAC example. Source: https://stacspec.org/](fig/stac_example.png){alt="An example of a STAC catalog."}
+
+### Icechunk
+
+**Icechunk** adds versioning and history tracking to Zarr stores.
+
+### VirtualiZarr
+
+**VirtualiZarr** lets you work with existing files as if they were Zarr datasets without copying all of the data.
+
+### Multiscale and pyramid
+
+A **multiscale** dataset stores the same data at multiple resolutions, and a **pyramid** is the layered structure that makes it possible to display coarse views quickly and zoom in later.
 
 
 ## Accessing the workshop environment
@@ -141,7 +128,7 @@ A **group workspace** is shared storage on JASMIN for collaborative work and cou
 There are two ways to join the workshop:
 
 - **In person:** use a JASMIN training account and the JASMIN notebook service.
-- **Remote:** install the environment on your own computer.
+- **Remote:** download the data locally and install the environment on your own computer.
 
 ::::::::::::::::: spoiler
 
@@ -157,20 +144,20 @@ In your browser, connect to [https://notebooks.jasmin.ac.uk](https://notebooks.j
 
 ### Setting up the environment
 
-A preconfigured INPO Conda environment is available for use. This environment includes all necessary packages and dependencies and is built using the `environment.yml` file from the Paidiverpy GitHub repository.
+A preconfigured Conda environment is available for use: `cloud-native-geoscience-course`. This environment includes all necessary packages and dependencies and is built using the [environment.yml file available here](files/environment.yml).
 
-Since the environment is stored in a non-standard location (`/gws/nopw/j04/paidiver/paidiver-env`), Jupyter will not detect it automatically. Follow these steps to set it up:
+Since the environment is stored in a non-standard location (`/work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env`), Jupyter will not detect it automatically. Follow these steps to set it up:
 
 - Open a Terminal.
 
 From the Jupyter launcher, click the Terminal icon.
 
-- Register the INPO kernel.
+- Register the `cloud-native-geoscience-course` kernel.
 
 Run the following command:
 
 ```bash
-mamba run -p /gws/nopw/j04/paidiver/paidiver-env python -m ipykernel install --user --name INPO
+mamba run -p /work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env python -m ipykernel install --user --name cloud-native-geoscience-course
 ```
 
 If the command above fails, try running these commands first, then repeat the registration step:
@@ -180,13 +167,13 @@ mamba init
 exec bash
 ```
 
-- Launch Jupyter with the INPO environment.
+- Launch Jupyter with the `cloud-native-geoscience-course` environment.
 
-Open a new Jupyter launcher by clicking **File > New Launcher**. Then a new notebook and console option named INPO should now be available. This may take about a minute to appear.
+Open a new Jupyter launcher by clicking **File > New Launcher**. Then a new notebook and console option named `cloud-native-geoscience-course` should now be available. This may take about a minute to appear.
 
 ![Jupyter kernel choice](fig/jupyter-kernel-choice.png){alt="Jupyter kernel choice mine."}
 
-Click on INPO to open a notebook.
+Click on `cloud-native-geoscience-course` to open a notebook.
 
 ### Data access
 
@@ -195,10 +182,12 @@ In-person participants will use a shared JASMIN group workspace for the example 
 Please run the following command in a terminal on the JASMIN notebook service to check that you can access the data:
 
 ```bash
-ls /gws/nopw/j04/paidiver/data
+ls /gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/
 ```
 
 If you see a list of files, you have access to the data. If you see an error, please ask for help.
+
+During the course, remember to use the full path `/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/` when accessing the data.
 
 :::::::::::::::::::::::::
 
@@ -218,12 +207,17 @@ You will need:
 - At least 10 GB of free disk space for the environment.
 - At least 20 GB of free disk space for the example data.
 - A stable internet connection for downloading packages and data.
+- A terminal application (e.g., Terminal on macOS, Console or Terminal in Linux, or [Git Bash](https://git-scm.com/downloads) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) on Windows).
 
 I will show below the steps to install Python and conda/mamba on your own computer. If you already have a working Python 3.12 installation with conda or mamba, you can skip to the next section.
 
 ### Install Miniforge
 
-If Conda has not been installed on your machine, then install [Miniforge](https://conda-forge.org/download/) for your OS. As the name suggests, Miniforge is a "mini" version of the [Anaconda Python distribution](https://www.anaconda.com/download) that includes only Conda, a Python 3 distribution, and any necessary OS-specific dependencies.
+If Conda has not been installed on your machine, then install it. You can install the [Anaconda distribution](https://www.anaconda.com/download). This is a conda distribution that includes many scientific packages. If you install Anaconda, you will have a working Python environment with conda already installed.
+
+However, Anaconda is large and may take a long time to install.
+
+Another option is to install [Miniforge](https://conda-forge.org/download/) for your OS. As the name suggests, Miniforge is a "mini" version of the Anaconda Python distribution that includes only Conda, a Python 3 distribution, and any necessary OS-specific dependencies.
 
 For convenience, here are links to the 64-bit Miniforge installers:
 
@@ -232,17 +226,13 @@ For convenience, here are links to the 64-bit Miniforge installers:
 - [Mac OSX - Apple M1/2/3 CPU](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh)
 - [Linux](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh)
 
-You can also use the Anaconda distribution, but it is larger and may take longer to install. If you already have Anaconda installed, you can skip this step.
-
 ::::::::::::::::: spoiler
 
 #### Windows installation
 
-
-After you download the [Windows installer](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe), double-click it and follow the instructions, including accepting the license.
+If you are using miniforge on Windows, after you download the [Windows installer](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe), double-click it and follow the instructions, including accepting the license.
 
 Make sure you tick the **"Add Miniforge3 to my PATH environment variable"** option.
-
 
 :::::::::::::::::::::::::
 
@@ -250,7 +240,7 @@ Make sure you tick the **"Add Miniforge3 to my PATH environment variable"** opti
 
 #### Mac OSX or Linux installation
 
-First, download the 64-bit Python 3 install script for Miniforge either by clicking the link above or using this command in your terminal:
+If you are using miniforge on Mac OSX or Linux, you can install it from the command line. First, download the 64-bit Python 3 install script for Miniforge either by clicking the link above or using this command in your terminal:
 
 ```bash
 wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
@@ -322,26 +312,33 @@ $ conda --version
 conda 4.8.2
 ```
 
-
 ### Recommended folder layout
 
 We suggest a simple folder structure like this:
 
 ```text
-workshop/
+cloud-native-geoscience-course/
 ├── environment/
-├── data/
-└── notebooks/
+└── data/
 ```
 
-Keep the environment files in `workshop/environment/` and the data in `workshop/data/`.
+Keep the environment files in `cloud-native-geoscience-course/environment/` and the data in `cloud-native-geoscience-course/data/`. And save all the jupyter notebooks you create in the `cloud-native-geoscience-course/` folder. This will make it easier to find your files later.
+
+Please create the `cloud-native-geoscience-course/` folder in your home directory, and then create the `environment/` and `data/` subfolders.
+
+```bash
+mkdir -p ~/Documents/cloud-native-geoscience-course/environment
+mkdir -p ~/Documents/cloud-native-geoscience-course/data
+```
 
 ### Install the environment
 
 Download the `environment.yaml` file from the lesson repository:
 
 ```bash
-curl -L <LINK-TO-ENVIRONMENT-YAML> -o environment.yaml
+cd ~/Documents/cloud-native-geoscience-course/environment
+
+curl -L https://raw.githubusercontent.com/NOC-OI/cloud-native-geoscience-course/refs/heads/main/episodes/files/environment.yml -o environment.yaml
 ```
 
 Then create the environment:
@@ -350,10 +347,13 @@ Then create the environment:
 conda env create -f environment.yaml
 ```
 
-This will create a new environment with all the required packages. The environment name is defined in the `environment.yaml` file, and it is **INPO** for this workshop.
+**Note:* This command can take several minutes to complete, depending on your internet connection and computer speed.**
+
+This will create a new environment with all the required packages. The environment name is defined in the `environment.yaml` file, and it is **cloud-native-geoscience-course** for this workshop.
+Now activate the environment:
 
 ```bash
-conda activate INPO
+conda activate cloud-native-geoscience-course
 ```
 
 If the command above fails, try running these commands first, then repeat the activation step:
@@ -369,14 +369,14 @@ Remote participants need to download the example data locally.
 
 The full example data is about 20 GB, so make sure you have enough free disk space before you start.
 
-Download the zip file from the lesson repository, then unzip it into your `workshop/data/` folder:
+Download the zip file from the lesson repository, then unzip it into your `cloud-native-geoscience-course/data/` folder:
 
 ```bash
-curl -L <LINK-TO-DATA-ZIP> -o data.zip
-unzip data.zip -d data/
+curl -L https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/data.zip -o data.zip
+unzip data.zip -d ~/Documents/cloud-native-geoscience-course/data/
 ```
 
-If you are on Windows, you can use a graphical unzip tool or a command-line tool that can extract zip archives.
+**Note:** The unzip process can take some time, because we are extracting a large number of files. You can check the progress by running `ls -lh ~/Documents/cloud-native-geoscience-course/data/` in another terminal window.
 
 ### Launch Python interface
 
@@ -388,16 +388,16 @@ A Jupyter notebook provides a browser-based interface for working with Python. Y
 
 ## Unix shell
 
-Navigate to the `data` directory. If you're using a Unix shell application, such as Terminal on macOS, Console or Terminal in Linux, or [Git Bash][gitbash] on Windows, execute the following command:
+Navigate to the `cloud-native-geoscience-course/` directory. If you're using a Unix shell application, such as Terminal on macOS, Console or Terminal in Linux, or [Git Bash][gitbash] on Windows, execute the following command:
 
 ```bash
-cd ~/Desktop/swc-python/data
+cd ~/Documents/cloud-native-geoscience-course/
 ```
 
 To launch the Jupyter server, run:
 
 ```bash
-jupyter notebook
+jupyter lab
 ```
 
 :::::::::::::::::::::::::
@@ -406,16 +406,16 @@ jupyter notebook
 
 ## Command Prompt (Windows)
 
-On Windows, you can use its native Command Prompt program. The easiest way to start it up is by pressing <kbd>Windows Logo Key</kbd>+<kbd>R</kbd>, entering `cmd`, and hitting <kbd>Return</kbd>. In the Command Prompt, use the following command to navigate to the `data` folder:
+On Windows, you can use its native Command Prompt program. The easiest way to start it up is by pressing <kbd>Windows Logo Key</kbd>+<kbd>R</kbd>, entering `cmd`, and hitting <kbd>Return</kbd>. In the Command Prompt, use the following command to navigate to the `cloud-native-geoscience-course/` folder:
 
 ```source
-cd /D %userprofile%\Desktop\swc-python\data
+cd /D %userprofile%\Documents\cloud-native-geoscience-course/
 ```
 
 To launch the Jupyter server, run:
 
 ```source
-python -m notebook
+python -m jupyter lab
 ```
 
 :::::::::::::::::::::::::
@@ -443,6 +443,10 @@ import matplotlib
 import cartopy
 import numba
 import fsspec
+import icechunk
+import virtualizarr
+import pystac
+import topozarr
 
 print("numpy:", numpy.__version__)
 print("xarray:", xarray.__version__)
@@ -453,6 +457,10 @@ print("matplotlib:", matplotlib.__version__)
 print("cartopy:", cartopy.__version__)
 print("numba:", numba.__version__)
 print("fsspec:", fsspec.__version__)
+print("icechunk:", icechunk.__version__)
+print("virtualizarr:", virtualizarr.__version__)
+print("pystac:", pystac.__version__)
+print("topozarr:", topozarr.__version__)
 ```
 
 You should see this output:
@@ -467,18 +475,26 @@ matplotlib: 3.9.2
 cartopy: 0.24.1
 numba: 0.59.0
 fsspec: 2024.12.0
+icechunk: 0.1.0
+virtualizarr: 0.1.0
+pystac: 1.6.0
+topozarr: 0.1.0
 ```
 
 ## About the example data
 
-The workshop uses a large environmental dataset stored in Zarr format. The data are chunked, so you can work with small parts of the dataset instead of loading everything at once.
+The workshop uses several example datasets that represent common environmental data products in the ocean and atmosphere domains. These examples are provided in different formats, including NetCDF, GRIB, and Zarr, so you can see how the same scientific data can be organised and accessed in different ways.
+
+The data come from public or widely used sources such as:
+
+- ERA5 reanalysis fields from the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) (ECMWF), including wave and surface variables.
+- GLORYS reanalysis products from the [Copernicus Marine Service](https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description).
+
+
+The data are chunked, so you can work with small parts of the dataset instead of loading everything at once.
 
 ### What to expect
 
 - The data are large enough that you should not expect to open the full dataset into memory.
 - You will often work on one variable, one time slice, or one small spatial region.
 - This is intentional: the workshop is about working efficiently with large datasets.
-
-### Why this matters
-
-Zarr and xarray make it possible to inspect and analyse only the portion of data you need. That is especially useful on laptops, on JASMIN notebooks, and in cloud-style workflows.

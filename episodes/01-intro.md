@@ -1,7 +1,7 @@
 ---
 title: Introduction to Data Formats, Metadata, and Vocabulary
-teaching: 20
-exercises: 10
+teaching: 30
+exercises: 15
 ---
 
 ::::::::::::::::::::::::::::::::::::::::::  objectives
@@ -40,15 +40,17 @@ Using standards‑aware formats together with a good metadata and controlled voc
 
 Environmental scientists use several families of formats. Here we focus on those most relevant to gridded, multidimensional ocean and atmosphere data, and then briefly note other formats that appear around them in modern workflows.
 
+![](fig/file_formats.png){alt="Common file formats in environmental data, including NetCDF, HDF5, Zarr, GRIB, BUFR, GeoTIFF, GeoJSON, Shapefile, Parquet/GeoParquet, and CSV."}
+
 ### Self‑describing array formats
 
 These formats store both array data and structural metadata (dimensions, variables, units, coordinate systems) in the same file or object:
 
 - [**NetCDF (Network Common Data Form)**](https://www.unidata.ucar.edu/software/netcdf) is a machine‑independent, binary, self‑describing format designed for array‑oriented scientific data, widely used to store gridded climate, ocean and meteorological variables.
 - [**HDF5 (Hierarchical Data Format)**](https://www.hdfgroup.org/solutions/hdf5/) is another self‑describing format supporting large, complex datasets with a "directory‑like" internal structure. It is used for satellite products, model output and other multidimensional data.
-- [**Zarr**](https://zarr.dev/) is a newer, cloud‑native format for chunked, N‑dimensional arrays; the GeoZarr standard describes how to represent geospatial datasets in Zarr using concepts from the Unidata Common Data Model, including dimensions, coordinate variables, attributes and metadata style.
+- [**Zarr**](https://zarr.dev/) is a newer, cloud‑native format for chunked, N‑dimensional arrays. The GeoZarr standard describes how to represent geospatial datasets in Zarr using concepts from the Unidata Common Data Model, including dimensions, coordinate variables, attributes and metadata style.
 
-This “self‑describing” property is particularly important for large climate model outputs, reanalysis products and ocean observing systems, where many different tools need to interpret the same files without bespoke documentation.
+This "self‑describing" property is particularly important for large climate model outputs, reanalysis products and ocean observing systems, where many different tools need to interpret the same files without bespoke documentation.
 
 ### WMO exchange formats
 
@@ -84,7 +86,7 @@ The other formats (vector, tabular, point‑cloud, XML/JSON) typically rely more
 
 ## Parquet and GeoParquet in practice
 
-Parquet and GeoParquet are increasingly used as cloud‑native table and vector formats in data lakes and lakehouses, especially for large point, line and polygon datasets. They are replacing many large CSV and Shapefile/GeoJSON workflows in logistics, urban planning, mobility, environmental monitoring, remote sensing, and national‑scale GIS platforms, because they are compact, fast to scan, and integrate directly with analytics engines like Spark, DuckDB, BigQuery, Snowflake and modern GIS tools [^clement].
+Parquet and GeoParquet are increasingly used as cloud‑native table and vector formats in data lakes and lakehouses, especially for large point, line and polygon datasets. They are replacing many large CSV and Shapefile/GeoJSON workflows in logistics, urban planning, mobility, environmental monitoring, remote sensing, and national‑scale GIS platforms, because they are compact, fast to scan, and integrate directly with analytics engines like Spark, DuckDB, BigQuery, Snowflake and modern GIS tools.
 
 In this course, we mention Parquet/GeoParquet as part of the broader cloud‑native ecosystem, but our main focus is on self‑describing array formats (NetCDF, HDF5, Zarr and GeoZarr) for multidimensional ocean and atmosphere data.
 
@@ -104,24 +106,26 @@ In the marine and atmospheric domains, common metadata elements include:
 
 Standards such as [ISO 19115](https://www.iso.org/standard/53798.html) for geographic information define sets of metadata elements covering identification, extent, quality, spatial and temporal schema, reference systems and distribution. These are used in catalogues and portals to support dataset discovery and evaluation.
 
-## Controlled vocabularies and vocabulary services
+![Source: https://www.seadatanet.org/Standards](fig/metadata_words.png){alt="Word cloud of common metadata elements, including title, abstract, keywords, contact, spatial extent, temporal extent, units, standard_name, cell_methods, coordinates, bounds, grid_mapping, quality flags, provenance."}
 
-Free‑text metadata can be ambiguous (“temp”, “T”, “temperature”) and hard to search; controlled vocabularies fix this by providing curated lists of standard terms and identifiers.
+### Controlled vocabularies and vocabulary services
+
+Free‑text metadata can be ambiguous ("temp", "T", "temperature") and hard to search. Controlled vocabularies fix this by providing curated lists of standard terms and identifiers.
 
 The [NERC Vocabulary Server (NVS)](https://vocab.nerc.ac.uk/), operated by the [British Oceanographic Data Centre (BODC)](https://www.bodc.ac.uk/), publishes centrally managed lists of terms for annotating marine and related Earth science data, using the SKOS (Simple Knowledge Organization System) model to represent concepts and collections. NVS hosts vocabularies for platforms, instruments, parameters, projects, geographic regions and more. These vocabularies are used to:
 
 - Populate drop‑down lists in metadata editors, ensuring consistent choice of parameter names, platforms, and methods.
 - Mark up metadata with stable URIs rather than free text, enabling machine‑readable search and semantic cross‑walks between different metadata schemas.
-- Support “smart search” and semantic web services in marine data portals, including collections specifically for MEDIN controlled vocabularies and SeaDataNet common vocabularies.
+- Support "smart search" and semantic web services in marine data portals, including collections specifically for MEDIN controlled vocabularies and SeaDataNet common vocabularies.
 
-[MEDIN's Discovery Metadata Standard](https://medin.org.uk/data-standards/medin-discovery-metadata-standard) is a marine profile of the UK government's GEMINI standard and is aligned with INSPIRE and ISO 19115, providing a consistent template for describing marine datasets in the UK context. This profile focuses on “discovery metadata”, the core elements needed for catalogues and portals to help users find and evaluate datasets.
+[MEDIN's Discovery Metadata Standard](https://medin.org.uk/data-standards/medin-discovery-metadata-standard) is a marine profile of the UK government's GEMINI standard and is aligned with INSPIRE and ISO 19115, providing a consistent template for describing marine datasets in the UK context. This profile focuses on "discovery metadata", the core elements needed for catalogues and portals to help users find and evaluate datasets.
 
 
 ::::::::::::::::::::::::::::::::::::::::::  callout
 
 ## Example: A parameter name from NVS
 
-A single measured variable (e.g. “sea water temperature at 5 m”) might be described by a P01 code in NVS that encodes the phenomenon, medium, vertical position and statistical operation in a single, standardised label. Using that code in your metadata ensures different datasets use *&**exactly** the same concept when they mean the same thing.
+A single measured variable (e.g. "sea water temperature at 5 m") might be described by a P01 code in NVS that encodes the phenomenon, medium, vertical position and statistical operation in a single, standardised label. Using that code in your metadata ensures different datasets use exactly the same concept when they mean the same thing.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -150,15 +154,16 @@ Operational data centres and services often distribute ocean and marine meteorol
 [STAC (SpatioTemporal Asset Catalogs)](https://stacspec.org) defines a common JSON/GeoJSON‑based language to describe and organise geospatial assets (files, APIs, data cubes) in space and time. It introduces three core objects:
 
 - Catalog: an entry point that links to Collections and Items.
-- Collection: a grouped set of related data (e.g. “ERA5 surface climate cubes”), with shared metadata and spatial/temporal extent.
-- Item: a single spatiotemporal asset (e.g. one product or one NetCDF file), linking to the actual data files via “assets”.
+- Collection: a grouped set of related data (e.g. "ERA5 surface climate cubes"), with shared metadata and spatial/temporal extent.
+- Item: a single spatiotemporal asset (e.g. one product or one NetCDF file), linking to the actual data files via "assets".
 
 STAC is often used *on top of* ISO 19115‑style discovery metadata: ISO profiles provide rich descriptions, while STAC standardises how those assets are organised and queried via static catalogs or STAC APIs. In this course we focus mainly on CF and NVS for internal metadata, but later lessons show how STAC can reference datasets and support cloud‑native discovery workflows.
 
 ### Metadata inside data files vs discovery metadata
 
-- In formats like NetCDF, metadata lives "inside" the file as attributes attached to variables and dimensions (e.g. `units`, `standard_name`, `long_name`, `history`). Normally, this metadata is structured according to the CF conventions, which allow software tools to interpret the data correctly.
-- Discovery metadata standards (MEDIN, GEMINI, INSPIRE, ISO 19115, STAC) describe datasets at a higher level, typically as XML or JSON records in catalogues, including title, abstract, keywords, contact, spatial/temporal extent, and links to data services.
+In formats like NetCDF, metadata lives "inside" the file as attributes attached to variables and dimensions (e.g. `units`, `standard_name`, `long_name`, `history`). Normally, this metadata is structured according to the CF conventions, which allow software tools to interpret the data correctly.
+
+Discovery metadata standards (MEDIN, GEMINI, INSPIRE, ISO 19115, STAC) describe datasets at a higher level, typically as XML or JSON records in catalogues, including title, abstract, keywords, contact, spatial/temporal extent, and links to data services.
 
 Both layers are needed: internal metadata lets analysis tools interpret arrays correctly, while discovery metadata lets users and catalogues know the dataset exists and decide whether it is suitable for their purpose.
 
@@ -177,7 +182,7 @@ Take 5 minutes to think or discuss in pairs, then share your answers.
 
 :::::::::::::::  solution
 
-## Solution (example answers)
+Example answers:
 
 1. NetCDF (or cloud‑native Zarr) with CF conventions for internal metadata, plus an ISO 19115/INSPIRE‑compliant discovery metadata record using the relevant national profile (e.g. MEDIN Discovery Metadata in the UK), and a STAC Collection/Items to expose the Zarr stores in a cloud‑native catalog.
 2. NetCDF or CSV for the data, with rich internal metadata (units, calibration info) and discovery metadata following MEDIN Data Guidelines and Discovery Metadata Standard, using NVS controlled vocabularies for parameters, platforms and instruments, and optionally STAC Items to reference individual cruises or deployments.
@@ -197,7 +202,7 @@ Using community standards has practical benefits:
 - **Semantic clarity**: Controlled vocabularies via NVS ensure that different datasets and organisations use the same, well‑defined concepts for parameters, platforms and methods, reducing ambiguity.
 - **Governance and efficiency**: Embedding data management (including standards, metadata and vocabularies) into organisational policy can reduce risk, support audits, and lower costs over the data lifecycle.
 
-For cloud‑native data, standards are what allow us to move from traditional files to object storage and APIs without losing meaning: GeoZarr's alignment with CF and NetCDF, and catalogue metadata aligned with ISO/INSPIRE, make Zarr‑based datasets interoperable with both scientific and geospatial ecosystems.
+For cloud‑native data, standards are what allow us to move from traditional files to object storage and APIs without losing meaning: GeoZarr's alignment with CF and NetCDF, and catalogue metadata aligned with STAC, make Zarr‑based datasets interoperable with both scientific and geospatial ecosystems.
 
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -220,9 +225,9 @@ Take 5 minutes, then share your ideas.
 
 :::::::::::::::  solution
 
-## Solution (example points)
+Example answers:
 
-1. Without `units`, users cannot be sure whether `temp` is in Kelvin, Celsius, or something else; without `standard_name`, automated tools cannot recognise the variable as sea surface temperature; ambiguous time coordinates make it hard to align with other datasets or interpret the temporal coverage.
+1. Without `units`, users cannot be sure whether `temp` is in Kelvin, Celsius, or something else. Without `standard_name`, automated tools cannot recognise the variable as sea surface temperature. Ambiguous time coordinates make it hard to align with other datasets or interpret the temporal coverage.
 2. At minimum, add CF attributes: `standard_name="sea_surface_temperature"`, `units="K"` (or appropriate units), `long_name` describing the variable, and proper time metadata (e.g. `time` with `units="days since 1970-01-01"` and `calendar="gregorian"`), plus a descriptive `title` and `institution` for provenance. In discovery metadata (ISO 19115 / MEDIN), ensure fields like abstract, keywords (from NVS vocabularies), temporal extent and geographic bounding box are populated.
 
 :::::::::::::::::::::::::

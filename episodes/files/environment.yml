@@ -1,0 +1,52 @@
+name: cloud-native-geoscience-course
+
+channels:
+  - conda-forge
+
+channel_priority: strict
+
+dependencies:
+  - python>=3.12,<3.14
+  - pip
+  - tree
+
+  # Notebook/runtime
+  - jupyterlab
+  - ipykernel
+
+  # Core scientific stack
+  - numpy
+  - scipy
+  - pandas
+  - xarray
+  - dask
+  - distributed
+  - dask-gateway
+
+  # Cloud-native arrays and I/O
+  - zarr>=3.0
+  - numcodecs
+  - netcdf4
+  - h5netcdf
+  - fsspec
+  - s3fs
+  - gcsfs
+
+  # Object storage and metadata/catalog tooling
+  - boto3
+  - botocore
+  - pystac
+
+  # Visualization and geospatial
+  - matplotlib
+  - cartopy
+  - shapely
+
+  # Packages currently easiest to keep in sync from PyPI
+  - pip:
+      - icechunk
+      - virtualizarr
+      - obstore
+      - obspec-utils
+      - topozarr
+      - scour

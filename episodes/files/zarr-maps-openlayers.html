@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zarr-maps OpenLayers Example</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@10.6.1/ol.css" />
   <style>
     html, body {
       margin: 0;
@@ -187,11 +187,11 @@
   </div>
 
   <script type="module">
-    import Map from "https://esm.sh/ol@latest/Map.js";
-    import View from "https://esm.sh/ol@latest/View.js";
-    import TileLayer from "https://esm.sh/ol@latest/layer/Tile.js";
-    import OSM from "https://esm.sh/ol@latest/source/OSM.js";
-    import { fromLonLat } from "https://esm.sh/ol@latest/proj.js";
+    import Map from "https://esm.sh/ol@10.6.1/Map.js";
+    import View from "https://esm.sh/ol@10.6.1/View.js";
+    import TileLayer from "https://esm.sh/ol@10.6.1/layer/Tile.js";
+    import OSM from "https://esm.sh/ol@10.6.1/source/OSM.js";
+    import { fromLonLat } from "https://esm.sh/ol@10.6.1/proj.js";
     import { ZarrLayer } from "https://esm.sh/zarr-maps/ol?bundle";
 
     const DEFAULT_URL = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/noc-npd-era5-demo/npd-eorca025-era5v1/gn/T1y_4d/thetao_con";

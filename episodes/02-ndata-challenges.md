@@ -1,7 +1,7 @@
 ---
 title: Challenges of N-dimensional Data
-teaching: 20
-exercises: 10
+teaching: 25
+exercises: 20
 ---
 
 
@@ -37,16 +37,15 @@ Over the last three decades, higher spatial and temporal resolution, more vertic
 Early attempts to manage this data with generic database systems ran into limitations: they did not treat multidimensional arrays as first-class objects and performed poorly on large scientific datasets, motivating specialised formats like NetCDF and GRIB.
 
 
-## NetCDF: self-describing arrays
+### NetCDF: self-describing arrays
 
 NetCDF was designed in the late 1980s as a portable, self-describing file format and data model for array-oriented scientific data such as climate and ocean model output.
 A NetCDF file stores variables (arrays), dimensions (e.g. `time`, `lat`, `lon`, `level`), and attributes (metadata) in a single container, enabling programs to discover structure and metadata at runtime without relying on separate documentation.
 
 NetCDF-3 stores data in a simple, contiguous layout, while NetCDF-4 builds on HDF5 as a storage layer, adding features such as groups and support for very large arrays and complex hierarchies.
-From the user's point of view, NetCDF provides an intuitive way to represent n-dimensional fields; but as datasets grow, organisational choices (e.g. which dimensions to include, how to structure variables and files) strongly affect how easy they are to work with.
+From the user's point of view, NetCDF provides an intuitive way to represent n-dimensional fields. But as datasets grow, organisational choices (e.g. which dimensions to include, how to structure variables and files) strongly affect how easy they are to work with.
 
-
-## GRIB: compact operational exchange
+### GRIB: compact operational exchange
 
 GRIB (GRIdded Binary) is a World Meteorological Organization format designed for efficient transmission and storage of gridded meteorological fields, especially numerical weather prediction outputs.
 It uses many "messages", each containing a field plus encoded metadata, and is governed by WMO tables that define parameters, levels, and other descriptors.
@@ -54,8 +53,7 @@ It uses many "messages", each containing a field plus encoded metadata, and is g
 GRIB was declared operational as a standard in the early 2000s with GRIB2, providing more flexible metadata, additional compression methods, and improved support for missing values compared to the original GRIB.
 This message-based structure is highly compact and well suited to operational workflows, but it can be more difficult to treat GRIB files as simple n-dimensional arrays, and heterogeneous messages may need to be filtered or regrouped before analysis.
 
-
-## HDF5: a general high-performance container
+### HDF5: a general high-performance container
 
 HDF5 is a general hierarchical data format that supports large, complex datasets, and underpins NetCDF-4's storage layer.
 It provides groups, datasets, and rich metadata, allowing complex scientific data structures to be represented in a single file, and has been widely adopted beyond atmospheric science, including in remote sensing and other Earth-observation products.
@@ -64,7 +62,7 @@ NetCDF-4 hides much of HDF5's complexity behind the NetCDF API and data model, s
 However, the ability to represent large hierarchical datasets efficiently is one reason NetCDF-4/HDF5 has become a backbone for many modern environmental archives.
 
 
-## Thirty years of growing data volumes
+### Thirty years of growing data volumes
 
 Over roughly the last 30 years, several trends have driven data growth in meteorology and oceanography:
 
@@ -74,9 +72,9 @@ Over roughly the last 30 years, several trends have driven data growth in meteor
 - Longer archives of observations and reanalyses, often spanning many decades.
 - Ensembles of forecasts and climate simulations, multiplying data volume by the number of members.
 
-![The volume of worldwide climate data is expanding rapidly [^overpeck_etal2011]](fig/data_size_trends.png)
+These trends have pushed archives from simple files to huge collections, requiring careful selection of formats, file organisation strategies, and access tools.
 
-As NetCDF documentation and developer resources emphasise, these trends have pushed archives from simple files to huge collections, requiring careful selection of formats, file organisation strategies, and access tools.
+![The volume of worldwide climate data is expanding rapidly [^overpeck_etal2011]](fig/data_size_trends.png){alt="Chart showing the growth of climate data volumes over time, with a steep increase in the last decades."}
 
 ## Typical access patterns today
 
@@ -86,14 +84,13 @@ In many workflows, meteorology and oceanography practitioners:
 - Use GRIB for operational forecast products and exchange between centres.
 - Rely on high-level libraries such as xarray to open NetCDF and GRIB files and represent them as labelled n-dimensional datasets.
 
-From the perspective of "The NetCDF Developer's Handbook"[^netcdf_handbook], high-performance programs must understand both the logical data model (variables, dimensions, attributes) and practical constraints (file size, number of files, hardware) to manage scientific data effectively.
-This episode focuses on understanding the problem space and the structures we are working with.
+From the perspective of "The NetCDF Developer's Handbook"[^netcdf_handbook], high-performance programs must understand both the logical data model (variables, dimensions, attributes) and practical constraints (file size, number of files, hardware) to manage scientific data effectively. This episode focuses on understanding the problem space and the structures we are working with.
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 1: Inspecting the structure of a NetCDF file
 
-The example NetCDF file `data/ocean_temperature.nc` contains monthly 3D temperature fields:
+The example NetCDF file `data/ocean_temperature.nc` contains a subset of the ERA5 Reanalysis, consisting of 2D sea surface temperature fields (latitude and longitude) recorded every 2 hours during the first five days of 2025.
 
 1. Use xarray to open the dataset.
 2. Inspect dimensions, coordinates, and attributes.
@@ -117,7 +114,7 @@ Think about:
 
 ::::::::::::::: solution
 
-This dataset has dimensions for "time" (`valid_time`), "lat" (`latitude`), and `lon` (`longitude`), with corresponding coordinate variables. Attributes provide metadata about the dataset, such as the source, institution, and conventions used.
+This dataset has dimensions for "time" (`valid_time`), "lat" (`latitude`), and "lon" (`longitude`), with corresponding coordinate variables. Attributes provide metadata about the dataset, such as the source, institution, and conventions used.
 Adding ensemble members or more levels would introduce additional dimensions, increasing the size of the dataset and potentially complicating access patterns.
 
 :::::::::::::::::::::::::
@@ -135,7 +132,7 @@ Many forecast products are distributed in GRIB, while climate or reanalysis prod
 2. Open a GRIB example (e.g. `data/ocean_temperature.grib`) with xarray using the `cfgrib` engine.
 3. Compare what `print(ds)` shows for each: dimensions, data variables, coordinates, and attributes.
 
-To open a GRIB file, you may need to use engine="cfgrib" in `xr.open_dataset()`:
+To open a GRIB file, you may need to use `engine="cfgrib"` in `xr.open_dataset()`:
 
 ```python
 ds_grib = xr.open_dataset(
@@ -161,7 +158,6 @@ Both files expose a very similar data model when opened with xarray. They contai
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 3 - Thinking about growth and organisation
@@ -173,14 +169,14 @@ Using the `data/ocean_temperature.nc` NetCDF file, imagine that:
 - We add more time steps to cover a 30‑year period.
 - Several colleagues also need to analyse this dataset, possibly from different institutions.
 
-Discuss in small groups:
+Discuss:
 
 1. How would this change the dimensions of your dataset (e.g. `lat`, `lon`, `time`, `depth`)?
 2. How might file sizes change for a single file and for the full archive?
 3. What practical challenges might you face when trying to open and inspect such datasets with the same tools?
-4. How would you **share** this growing dataset today (local copies, shared server, remote service), and what problems might that create?
+4. How would you share this growing dataset today (local copies, shared server, remote service), and what problems might that create?
 
-You do not need to implement anything; focus on reasoning about dimensions, size, organisation, and sharing.
+You do not need to implement anything. Focus on reasoning about dimensions, size, organisation, and sharing.
 
 ::::::::::::::: solution
 
@@ -193,7 +189,6 @@ Sharing the dataset by giving everyone a local copy would be inefficient because
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
 
 ## Sharing data and accessing subsets
 
@@ -215,9 +210,19 @@ For small datasets this is fine, but for multi‑gigabyte or multi‑terabyte ar
 
 Even when chunking is used inside NetCDF‑4/HDF5, the file is still treated as a single object: clients ultimately have to read data from that file (locally or via a server) to do any calculation, and classical NetCDF/HDF5 are optimised for POSIX‑style file systems rather than direct object‑store access.
 
+:::::::::::::::::::::::::::::::::::::::::: callout
+
+## POSIX file systems and object storage
+
+A **POSIX file system** is a traditional file-system model with directories, files, and paths that are accessed through a local or mounted storage interface. It is commonly used for shared filesystems and local disks.
+
+An **object-store file system** is a storage interface that exposes object storage through filesystem-like operations, often used in cloud workflows. It is different from a traditional POSIX filesystem because data are accessed through object APIs rather than a normal directory tree.
+
+::::::::::::::::::::::::::::::::::::::::::
+
 ### Server‑side subsetting and remote access
 
-Server‑side access protocols such as [OPeNDAP](https://www.opendap.org/) and modern APIs allow clients to request subsets of NetCDF data (e.g. a bounding box in space and a time range) without transferring the entire file, which is already a step toward “not download the whole file all the time”. These services can reduce duplication and help centralise access, but they require maintained infrastructure, and performance still depends on server load and network bandwidth.
+Server‑side access protocols such as [OPeNDAP](https://www.opendap.org/) and modern APIs allow clients to request subsets of NetCDF data (e.g. a bounding box in space and a time range) without transferring the entire file, which is already a step toward "not download the whole file all the time". These services can reduce duplication and help centralise access, but they require maintained infrastructure, and performance still depends on server load and network bandwidth.
 
 ### Storage considerations
 
@@ -235,7 +240,7 @@ Later lessons on Zarr and cloud‑native workflows will show how chunking, objec
 
 ## A note on access and storage
 
-NetCDF and GRIB are often used in a “download first, analyse later” workflow, where people copy the whole file to a local machine or shared server before opening it. Xarray can be *lazy* when it opens NetCDF files, so metadata can be inspected without immediately reading all values, but many analyses still end up pulling large parts of the file into memory when the data are actually used. In practice, this means that sharing data efficiently is still a challenge, especially when many people need access to the same large archive.
+NetCDF and GRIB are often used in a "download first, analyse later" workflow, where people copy the whole file to a local machine or shared server before opening it. Xarray can be *lazy* when it opens NetCDF files, so metadata can be inspected without immediately reading all values, but many analyses still end up pulling large parts of the file into memory when the data are actually used. In practice, this means that sharing data efficiently is still a challenge, especially when many people need access to the same large archive.
 
 For that reason, large scientific archives are often easier to manage on central servers or object storage systems than as many duplicated local copies. Classical NetCDF/HDF5 workflows also tend to fit better with shared file systems than with direct object storage, which is one reason cloud-native formats such as Zarr are becoming important later in this course.
 
@@ -245,7 +250,7 @@ For that reason, large scientific archives are often easier to manage on central
 
 Over the last 30 years, meteorology and oceanography have moved from modest, locally processed datasets to global, multi‑decadal archives and high‑resolution forecasts stored in specialised formats. NetCDF (particularly NetCDF‑4/HDF5) provides a flexible, self‑describing model for n‑dimensional arrays that has become central to many scientific archives, while GRIB offers compact, operational‑oriented storage and transmission for gridded meteorological fields governed by WMO codes and tables.
 
-Today, tools such as xarray allow us to open both NetCDF and GRIB as labelled n‑dimensional datasets, but the growing scale of data and the organisational choices made in these formats create real challenges for sharing data efficiently, avoiding whole‑file downloads, and managing performance, scalability, memory, and storage cost. Server‑side subsetting and chunked storage help, but classical file‑based formats are still built around single files and shared file systems. The rest of the course will show how cloud‑native formats and workflows build on these ideas—especially chunking and object storage—to make large n‑dimensional data more manageable.
+Today, tools such as xarray allow us to open both NetCDF and GRIB as labelled n‑dimensional datasets, but the growing scale of data and the organisational choices made in these formats create real challenges for sharing data efficiently, avoiding whole‑file downloads, and managing performance, scalability, memory, and storage cost. Server‑side subsetting and chunked storage help, but classical file‑based formats are still built around single files and shared file systems. The rest of the course will show how cloud‑native formats and workflows build on these ideas, especially chunking and object storage, to make large n‑dimensional data more manageable.
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
