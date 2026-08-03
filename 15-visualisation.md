@@ -77,7 +77,7 @@ Useful references:
 
 ## Exercise 1 - Design a multiscale strategy
 
-Creating a multiscale Zarr store requires some design decisions. Before implementing it, think about your dataset and how you want to visualise it. Because it can be resource-intensive to create multiple levels, we are going to use a small example dataset for this exercise, the `data/ocean_temperature.zarr`, related to the ERA5 reanalysis dataset.
+Creating a multiscale Zarr store requires some design decisions. Before implementing it, think about your dataset and how you want to visualise it. Because it can be resource-intensive to create multiple levels, we are going to use a small example dataset for this exercise, the `data/era5_sst/ocean_temperature.zarr`, related to the ERA5 reanalysis dataset.
 
 1. Look at your example Zarr dataset (dimensions, spatial resolution, domain).
 2. Propose:
@@ -109,7 +109,7 @@ First, load the zarr dataset using xarray:
 
 ```python
 import xarray as xr
-ds = xr.open_zarr("data/ocean_temperature.zarr", consolidated=True)
+ds = xr.open_zarr("data/era5_sst/ocean_temperature.zarr", consolidated=True)
 ```
 
 Now, you can choose a variable to visualise (e.g. `ssh`) and use Topozarr to build the multiscale pyramid.

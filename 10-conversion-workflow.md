@@ -42,12 +42,14 @@ To convert NetCDF to Zarr, we typically use xarray's `to_zarr` method, optionall
 
 1. Inspect the NetCDF dataset(s) to understand variables, dimensions, coordinates, and existing chunking.
 
-We will use a simple example NetCDF dataset (`data/ocean_temperature.nc`) to illustrate the conversion workflow.
+We will use a simple example NetCDF dataset (`data/era5_sst/ocean_temperature.nc`) to illustrate the conversion workflow.
 
 ```python
 import xarray as xr
 
-ds_nc = xr.open_dataset("data/ocean_temperature.nc")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds_nc = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 print(ds_nc)
 print(ds_nc.dims)
 print(ds_nc.data_vars)
@@ -79,13 +81,13 @@ Now you have a Zarr store that can be uploaded to object storage and accessed in
 
 ## Exercise 1 - Convert a NetCDF dataset to Zarr
 
-Using the NetCDF dataset provided (`data/ocean_temperature.nc`), open a single file with `open_dataset`, chunk it with `{"valid_time": 10, "latitude": 100, "longitude": 100}`, and write it to a local Zarr store.
+Using the NetCDF dataset provided (`data/era5_sst/ocean_temperature.nc`), open a single file with `open_dataset`, chunk it with `{"valid_time": 10, "latitude": 100, "longitude": 100}`, and write it to a local Zarr store.
 
 ::::::::::::::: solution
 
 ```python
 import xarray as xr
-ds_nc = xr.open_dataset("data/ocean_temperature.nc")
+ds_nc = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 ds_zarr = ds_nc.chunk({"valid_time": 10, "latitude": 100, "longitude": 100})
 ds_zarr.to_zarr("data/example.zarr", mode="w")
 ```
@@ -120,7 +122,7 @@ Example of opening a single NetCDF file:
 ```python
 import xarray as xr
 
-ds_nc = xr.open_dataset("data/daily_swh/swh_2025-01-01.nc")
+ds_nc = xr.open_dataset(f"{base_path}data/daily_swh/swh_2025-01-01.nc")
 print(ds_nc)
 print(ds_nc.dims)
 print(ds_nc.data_vars)
@@ -139,7 +141,7 @@ Because we have multiple NetCDF files, we can use `open_mfdataset` to open them 
 
 ```python
 ds_nc_multi = xr.open_mfdataset(
-    "data/daily_swh/swh_*.nc",
+    f"{base_path}data/daily_swh/swh_*.nc",
     combine="by_coords",
 )
 print(ds_nc_multi)
@@ -217,7 +219,7 @@ import zarr
 from zarr.codecs import BloscCodec, BloscShuffle
 import xarray as xr
 
-ds = xr.open_dataset("data/ocean_temperature.nc")
+ds = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 compressor = BloscCodec(cname="zstd", clevel=3, shuffle=BloscShuffle.shuffle)
 encoding = {
     "sst": {
@@ -262,6 +264,28 @@ s3cmd put -r data/era5_swh.zarr s3://my-bucket/era5_swh.zarr
 Once uploaded, you can access the Zarr store directly from the object store using xarray and filesystem adapters, as in previous lessons.
 
 In our lesson here, instead of generating the zarr dataset locally and upload then later to the object store, we will directly write the zarr dataset to the object store using fsspec. This is a more efficient approach and avoids unnecessary local storage usage. In the code below, remember to replace `my-bucket` with the actual bucket name you have access to (please ask the instructor for the bucket name and credentials).
+
+Because the dataset is large, we will use the JASMIN dask cluster to run the conversion and upload, as it has better network access to the object store. You can see an example below, but you can also take a look in the [Parallel Processing for Zarr](./07-parallel.html) episode for more details.
+
+```python
+import dask_gateway
+
+# Create a connection to dask-gateway.
+gw = dask_gateway.Gateway("https://dask-gateway.jasmin.ac.uk", auth="jupyterhub")
+
+options = gw.cluster_options()
+options.worker_cores = 4
+options.scheduler_cores = 2
+options.account = "workshop"
+options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'
+clusters = gw.list_clusters()
+if not clusters:
+    cluster = gw.new_cluster(options, shutdown_on_close=False)
+else:
+   cluster = gw.connect(clusters[0].name)
+client = cluster.get_client()
+cluster.adapt(minimum=1, maximum=4)
+```
 
 ```python
 import xarray as xr

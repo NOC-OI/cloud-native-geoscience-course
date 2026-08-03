@@ -169,10 +169,10 @@ storage_options = {
 
 ### Step 2 - Opening the local Zarr store
 
-Open the local Zarr dataset with xarray. We are going to use the `data/ocean_temperature.zarr` dataset as an example.
+Open the local Zarr dataset with xarray. We are going to use the `data/era5_sst/ocean_temperature.zarr` dataset as an example.
 
 ```python
-local_zarr = "data/ocean_temperature.zarr"
+local_zarr = "data/era5_sst/ocean_temperature.zarr"
 
 ds = xr.open_zarr(local_zarr)
 
@@ -263,7 +263,7 @@ This is the standard way to read data from an Icechunk repository. Opening a rea
 
 ## Exercise 2 - Your turn: open the ocean_temperature zarr dataset and and add Icechunk
 
-Using the `data/ocean_temperature.zarr` dataset:
+Using the `data/era5_sst/ocean_temperature.zarr` dataset:
 
 1. Open the store with xarray.
 2. Create an Icechunk repository in the object store.
@@ -302,7 +302,7 @@ Open the local zarr store:
 
 ```python
 # Open the local Zarr store
-ds = xr.open_zarr("data/ocean_temperature.zarr")
+ds = xr.open_zarr("data/era5_sst/ocean_temperature.zarr")
 ```
 
 Create an Icechunk repository in the object store:

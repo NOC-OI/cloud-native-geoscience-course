@@ -185,7 +185,7 @@ Please run the following command in a terminal on the JASMIN notebook service to
 ls /gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/
 ```
 
-If you see a list of files, you have access to the data. If you see an error, please ask for help.
+If you see a folder called `data`, you have access to the example data. If you see an error, please ask for help.
 
 During the course, remember to use the full path `/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/` when accessing the data.
 
@@ -205,7 +205,7 @@ You will need:
 - Conda or mamba installed.
 - At least 8 GB of RAM, with 16 GB preferred.
 - At least 10 GB of free disk space for the environment.
-- At least 20 GB of free disk space for the example data.
+- At least 30 GB of free disk space for the example data and for data that will be generated during the workshop.
 - A stable internet connection for downloading packages and data.
 - A terminal application (e.g., Terminal on macOS, Console or Terminal in Linux, or [Git Bash](https://git-scm.com/downloads) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) on Windows).
 
@@ -309,7 +309,7 @@ At the bottom of the help menu you will see a section with some optional argumen
 
 ```bash
 $ conda --version
-conda 4.8.2
+conda 24.11.3 # or similar, depending on the version you installed
 ```
 
 ### Recommended folder layout
@@ -327,8 +327,8 @@ Keep the environment files in `cloud-native-geoscience-course/environment/` and 
 Please create the `cloud-native-geoscience-course/` folder in your home directory, and then create the `environment/` and `data/` subfolders.
 
 ```bash
-mkdir -p ~/Documents/cloud-native-geoscience-course/environment
-mkdir -p ~/Documents/cloud-native-geoscience-course/data
+mkdir -p ~/cloud-native-geoscience-course/environment
+mkdir -p ~/cloud-native-geoscience-course/data
 ```
 
 ### Install the environment
@@ -336,7 +336,7 @@ mkdir -p ~/Documents/cloud-native-geoscience-course/data
 Download the `environment.yaml` file from the lesson repository:
 
 ```bash
-cd ~/Documents/cloud-native-geoscience-course/environment
+cd ~/cloud-native-geoscience-course/environment
 
 curl -L https://raw.githubusercontent.com/NOC-OI/cloud-native-geoscience-course/refs/heads/main/episodes/files/environment.yml -o environment.yaml
 ```
@@ -372,11 +372,11 @@ The full example data is about 20 GB, so make sure you have enough free disk spa
 Download the zip file from the lesson repository, then unzip it into your `cloud-native-geoscience-course/data/` folder:
 
 ```bash
-curl -L https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/data.zip -o data.zip
-unzip data.zip -d ~/Documents/cloud-native-geoscience-course/data/
+curl -L https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/cloud-native-geoscience-course-data.tar.gz -o data.tar.gz
+tar -xzf data.tar.gz -C ~/cloud-native-geoscience-course/data/
 ```
 
-**Note:** The unzip process can take some time, because we are extracting a large number of files. You can check the progress by running `ls -lh ~/Documents/cloud-native-geoscience-course/data/` in another terminal window.
+**Note:** The extraction process can take some time, because we are extracting a large number of files. You can check the progress by running `ls -lh ~/cloud-native-geoscience-course/data/` in another terminal window.
 
 ### Launch Python interface
 
@@ -391,7 +391,7 @@ A Jupyter notebook provides a browser-based interface for working with Python. Y
 Navigate to the `cloud-native-geoscience-course/` directory. If you're using a Unix shell application, such as Terminal on macOS, Console or Terminal in Linux, or [Git Bash][gitbash] on Windows, execute the following command:
 
 ```bash
-cd ~/Documents/cloud-native-geoscience-course/
+cd ~/cloud-native-geoscience-course/
 ```
 
 To launch the Jupyter server, run:
@@ -409,7 +409,7 @@ jupyter lab
 On Windows, you can use its native Command Prompt program. The easiest way to start it up is by pressing <kbd>Windows Logo Key</kbd>+<kbd>R</kbd>, entering `cmd`, and hitting <kbd>Return</kbd>. In the Command Prompt, use the following command to navigate to the `cloud-native-geoscience-course/` folder:
 
 ```source
-cd /D %userprofile%\Documents\cloud-native-geoscience-course/
+cd /D %userprofile%\cloud-native-geoscience-course/
 ```
 
 To launch the Jupyter server, run:
@@ -435,50 +435,69 @@ Run the following code to check that the core packages are available:
 
 ```python
 import numpy
+import pandas
 import xarray
+import s3fs
 import dask
+import dask_gateway
 import zarr
 import netCDF4
 import matplotlib
 import cartopy
-import numba
 import fsspec
 import icechunk
 import virtualizarr
 import pystac
 import topozarr
+import boto3
+import shapely
+import obstore
 
 print("numpy:", numpy.__version__)
+print("pandas:", pandas.__version__)
 print("xarray:", xarray.__version__)
+print("s3fs:", s3fs.__version__)
 print("dask:", dask.__version__)
+print("dask_gateway:", dask_gateway.__version__)
 print("zarr:", zarr.__version__)
 print("netCDF4:", netCDF4.__version__)
 print("matplotlib:", matplotlib.__version__)
 print("cartopy:", cartopy.__version__)
-print("numba:", numba.__version__)
 print("fsspec:", fsspec.__version__)
 print("icechunk:", icechunk.__version__)
 print("virtualizarr:", virtualizarr.__version__)
 print("pystac:", pystac.__version__)
 print("topozarr:", topozarr.__version__)
+print("boto3:", boto3.__version__)
+print("shapely:", shapely.__version__)
+print("obstore:", obstore.__version__)
+print("eccodes:", eccodes.__version__)
+print("cfgrib:", cfgrib.__version__)
 ```
 
-You should see this output:
+You should see something like:
 
 ```output
-numpy: 1.26.2
-xarray: 2024.12.0
-dask: 2024.12.0
-zarr: 2.24.0
-netCDF4: 1.6.4
-matplotlib: 3.9.2
-cartopy: 0.24.1
-numba: 0.59.0
-fsspec: 2024.12.0
-icechunk: 0.1.0
-virtualizarr: 0.1.0
-pystac: 1.6.0
-topozarr: 0.1.0
+numpy: 2.4.3
+pandas: 3.0.2
+xarray: 2026.7.0
+s3fs: 2026.4.0
+dask: 2026.3.0
+dask_gateway: 2026.3.0
+zarr: 3.2.1
+netCDF4: 1.7.4
+matplotlib: 3.11.1
+cartopy: 0.25.0
+fsspec: 2026.4.0
+icechunk: 2.1.1
+virtualizarr: 2.7.1
+pystac: 1.15.2
+topozarr: 0.1.2
+boto3: 1.43.46
+shapely: 2.1.2
+obstore: 0.11.0
+eccodes: 2.48.0
+cfgrib: 0.9.15.1
 ```
 
 ## About the example data

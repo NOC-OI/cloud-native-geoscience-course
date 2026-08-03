@@ -90,7 +90,7 @@ From the perspective of "The NetCDF Developer's Handbook"[^netcdf_handbook], hig
 
 ## Exercise 1: Inspecting the structure of a NetCDF file
 
-The example NetCDF file `data/ocean_temperature.nc` contains a subset of the ERA5 Reanalysis, consisting of 2D sea surface temperature fields (latitude and longitude) recorded every 2 hours during the first five days of 2025.
+The example NetCDF file `data/era5_sst/ocean_temperature.nc` contains a subset of the ERA5 Reanalysis, consisting of 2D sea surface temperature fields (latitude and longitude) recorded every 2 hours during the first five days of 2025.
 
 1. Use xarray to open the dataset.
 2. Inspect dimensions, coordinates, and attributes.
@@ -99,7 +99,9 @@ The example NetCDF file `data/ocean_temperature.nc` contains a subset of the ERA
 ```python
 import xarray as xr
 
-ds = xr.open_dataset("data/ocean_temperature.nc")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds = xr.open_dataset(f"{base_path}data/era5_sst/ocean_temperature.nc")
 print(ds)
 print(ds.dims)
 print(ds.coords)
@@ -128,15 +130,15 @@ Adding ensemble members or more levels would introduce additional dimensions, in
 
 Many forecast products are distributed in GRIB, while climate or reanalysis products may be available as NetCDF. To get a feeling for differences:
 
-1. Open a NetCDF example (e.g. `data/ocean_temperature.nc`) with xarray.
-2. Open a GRIB example (e.g. `data/ocean_temperature.grib`) with xarray using the `cfgrib` engine.
+1. Open a NetCDF example (e.g. `data/era5_sst/ocean_temperature.nc`) with xarray.
+2. Open a GRIB example (e.g. `data/era5_sst/ocean_temperature.grib`) with xarray using the `cfgrib` engine.
 3. Compare what `print(ds)` shows for each: dimensions, data variables, coordinates, and attributes.
 
 To open a GRIB file, you may need to use `engine="cfgrib"` in `xr.open_dataset()`:
 
 ```python
 ds_grib = xr.open_dataset(
-    "data/ocean_temperature.grib",
+    f"{base_path}data/era5_sst/ocean_temperature.grib",
     engine="cfgrib",
 )
 print(ds_grib)
@@ -162,7 +164,7 @@ Both files expose a very similar data model when opened with xarray. They contai
 
 ## Exercise 3 - Thinking about growth and organisation
 
-Using the `data/ocean_temperature.nc` NetCDF file, imagine that:
+Using the `data/era5_sst/ocean_temperature.nc` NetCDF file, imagine that:
 
 - Spatial resolution doubles in each horizontal direction.
 - Output frequency increases from monthly to hourly.
@@ -232,7 +234,7 @@ In this lesson we do not go into technical details of object stores or cloud pri
 
 - Growing data volumes make it expensive to keep multiple full copies on local disks or HPC filesystems.
 - Centralised archives and object storage are attractive for long‑term, shared access.
-- Formats and access patterns that support **subsetting and streaming** (rather than whole‑file downloads) will become more important as archives grow.
+- Formats and access patterns that support subsetting and streaming (rather than whole‑file downloads) will become more important as archives grow.
 
 Later lessons on Zarr and cloud‑native workflows will show how chunking, object storage, and tools like xarray/dask are combined to address these challenges more directly.
 
