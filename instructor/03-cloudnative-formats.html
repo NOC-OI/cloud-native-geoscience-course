@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>What Are Cloud-Native Formats?</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/03-cloudnative-formats.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -504,11 +504,11 @@ to change the meaning of the data, but to change how efficiently we can
 discover, access, and process it.</p>
 <figure><img src="../fig/traditional_vs_cloud_native.png" alt="Difference between traditional files and cloud-native objects, with metadata and chunks." class="figure mx-auto d-block"><div class="figcaption">Difference between traditional files and
 cloud-native objects</div>
-</figure><div id="cloud-native-does-not-just-mean-stored-in-the-cloud" class="callout">
+</figure><div id="cloud-native-does-not-just-mean-stored-in-the-cloud" class="callout caution">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Caution</span>
 <div id="cloud-native-does-not-just-mean-stored-in-the-cloud" class="callout-inner">
 <h3 class="callout-title">Cloud-native does not just mean “stored in the
 cloud”</h3>
@@ -558,8 +558,7 @@ indexed access, including over HTTP range requests.</li>
 rewrite data into a new cloud-native layout such as Zarr, while others
 keep legacy files and expose them through references for cloud-friendly
 access.</p>
-<figure><img src="../fig/cogf.png" alt="Cloud-Optimized Geospatial Formats." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://guide.cloudnativegeo.org/" class="external-link uri">https://guide.cloudnativegeo.org/</a>
-</div>
+<figure><img src="../fig/cogf.png" alt="Cloud-Optimized Geospatial Formats." class="figure mx-auto d-block"><div class="figcaption"><a href="https://guide.cloudnativegeo.org/" class="external-link">Source</a></div>
 </figure></section><section><h2 class="section-heading" id="why-not-rely-only-on-traditional-formats">Why not rely only on traditional formats?<a class="anchor" aria-label="anchor" href="#why-not-rely-only-on-traditional-formats"></a></h2>
 <hr class="half-width"><p>Traditional formats remain essential in Earth system science, and
 they are not going away. However, large collections of NetCDF, HDF5, or
@@ -636,7 +635,7 @@ available in a cloud-native form.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>There is no single correct answer, but many datasets are still
 accessed by downloading files or reading them from shared storage, even
@@ -685,7 +684,7 @@ different tasks?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>For example:</p>
 <ul><li>A global map for one day mainly needs chunks covering that single
@@ -793,7 +792,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

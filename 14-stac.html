@@ -412,7 +412,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Zarr Data Organization in the Cloud with STAC</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/14-stac.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -484,8 +484,7 @@ extent/time).</li>
 Optimized GeoTIFFs) are referenced as <code>assets</code> in the Item.
 Each asset has a URL (or Object Store path), media type, and optional
 roles (e.g. “data”, “thumbnail”, “metadata”).</p>
-<figure><img src="fig/stac_organisation.png" alt="STAC organisation diagram showing Catalog, Collection, Item, and Asset relationships." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/" class="external-link uri">https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/</a>
-</div>
+<figure><img src="fig/stac_organisation.png" alt="STAC organisation diagram showing Catalog, Collection, Item, and Asset relationships." class="figure mx-auto d-block"><div class="figcaption"><a href="https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/" class="external-link">Source</a></div>
 </figure><p>For cloud‑native workflows, STAC is important because:</p>
 <ul><li>It standardises how we describe and organise datasets (including
 Zarr) so that tools and portals can discover them without custom code
@@ -700,12 +699,15 @@ range.</p>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/daily_swh"</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>ds <span class="op">=</span> xr.open_zarr(url, consolidated<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a>ds <span class="op">=</span> xr.open_zarr(url, consolidated<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="co"># Get spatial extent (bounding box)</span></span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>lon_min, lon_max <span class="op">=</span> <span class="bu">float</span>(ds.longitude.<span class="bu">min</span>()), <span class="bu">float</span>(ds.longitude.<span class="bu">max</span>())</span>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>lat_min, lat_max <span class="op">=</span> <span class="bu">float</span>(ds.latitude.<span class="bu">min</span>()), <span class="bu">float</span>(ds.latitude.<span class="bu">max</span>())</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a><span class="co"># Get temporal extent (start and end time)</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>time_min, time_max <span class="op">=</span> ds.time.<span class="bu">min</span>().values, ds.time.<span class="bu">max</span>().values</span></code></pre>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>time_min, time_max <span class="op">=</span> ds.time.<span class="bu">min</span>().values, ds.time.<span class="bu">max</span>().values</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1" aria-label="code-block-5-11"></a><span class="bu">print</span>(<span class="ss">f"Spatial extent: lon [</span><span class="sc">{</span>lon_min<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>lon_max<span class="sc">}</span><span class="ss">], lat [</span><span class="sc">{</span>lat_min<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>lat_max<span class="sc">}</span><span class="ss">]"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1" aria-label="code-block-5-12"></a><span class="bu">print</span>(<span class="ss">f"Temporal extent: time [</span><span class="sc">{</span>time_min<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>time_max<span class="sc">}</span><span class="ss">]"</span>)</span></code></pre>
 </div>
 <p>For this tutorial, we will define the Collection as covering the
 years 2000–2026, even though the example dataset represents only a
@@ -911,11 +913,11 @@ STAC API to support efficient queries and updates.</p>
 </div>
 </div>
 </div>
-<div id="visualising-your-catalog-with-stac-browser" class="callout">
+<div id="visualising-your-catalog-with-stac-browser" class="callout checklist">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="check-square"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Checklist</span>
 <div id="visualising-your-catalog-with-stac-browser" class="callout-inner">
 <h3 class="callout-title">Visualising your catalog with STAC
 Browser</h3>
@@ -1089,7 +1091,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/14-stac.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/14-stac.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

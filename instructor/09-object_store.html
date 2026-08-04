@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Object Storage - Concepts, Remote Access, and Data Organization in the Cloud</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/09-object_store.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -500,8 +500,7 @@ independent objects, such as NetCDF files, image tiles, or Zarr chunks.
 Because each object can be accessed independently, applications running
 on HPC systems, cloud platforms, or local infrastructure can efficiently
 process data in parallel while accessing the same shared dataset.</p>
-<figure><img src="../fig/file_object.png" alt="File vs Object Storage." class="figure mx-auto d-block"><div class="figcaption">File vs Object Storage. Source: <a href="https://www.datacore.com/blog/file-object-storage-differences/" class="external-link uri">https://www.datacore.com/blog/file-object-storage-differences/</a>
-</div>
+<figure><img src="../fig/file_object.png" alt="File vs Object Storage." class="figure mx-auto d-block"><div class="figcaption"><a href="https://www.datacore.com/blog/file-object-storage-differences/" class="external-link">Source</a></div>
 </figure></div>
 </section><section><h2 class="section-heading" id="advantages-of-object-storage">Advantages of object storage<a class="anchor" aria-label="anchor" href="#advantages-of-object-storage"></a></h2>
 <hr class="half-width"><div class="section level3">
@@ -560,11 +559,11 @@ retrieval charges.</li>
 higher retrieval latency and fees.</li>
 </ul><p>Selecting the appropriate storage class helps balance cost and
 performance according to how often the data are used.</p>
-<div id="deployment-trade-offs" class="callout">
+<div id="deployment-trade-offs" class="callout discussion">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="message-circle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Discussion</span>
 <div id="deployment-trade-offs" class="callout-inner">
 <h3 class="callout-title">Deployment trade-offs</h3>
 <div class="callout-content">
@@ -917,18 +916,19 @@ xarray:</p>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>    <span class="st">"config_kwargs"</span>: {</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a>    },</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1" aria-label="code-block-8-12"></a>}</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1" aria-label="code-block-8-13"></a></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1" aria-label="code-block-8-14"></a>ds <span class="op">=</span> xr.open_zarr(</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1" aria-label="code-block-8-15"></a>    <span class="st">"s3://cloud-native-geoscience-course/glorys_202605.zarr"</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1" aria-label="code-block-8-16"></a>    storage_options<span class="op">=</span>storage_options,</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1" aria-label="code-block-8-17"></a>)</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1" aria-label="code-block-8-18"></a></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1" aria-label="code-block-8-19"></a><span class="bu">print</span>(ds)</span></code></pre>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>    <span class="co"># these are JASMIN-specific options to avoid checksum errors on some datasets</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1" aria-label="code-block-8-12"></a>    },</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1" aria-label="code-block-8-13"></a>}</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1" aria-label="code-block-8-14"></a></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1" aria-label="code-block-8-15"></a>ds <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1" aria-label="code-block-8-16"></a>    <span class="st">"s3://cloud-native-geoscience-course/glorys_202605.zarr"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1" aria-label="code-block-8-17"></a>    storage_options<span class="op">=</span>storage_options,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1" aria-label="code-block-8-18"></a>)</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1" aria-label="code-block-8-19"></a></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1" aria-label="code-block-8-20"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
 <p>In this example, you will see the variables, dimensions, and shapes
 of the Zarr store. The key point is that object storage discovery and
@@ -966,15 +966,13 @@ and many concurrent requests.</li>
 <li>Stable power, cooling, and physical security.</li>
 <li>A plan for identity, access control, and certificate
 management.</li>
-</ul><div id="minimal-minio-deployment-with-docker-compose" class="callout">
-<div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
-</div>
-<span class="callout-header">Callout</span>
-<div id="minimal-minio-deployment-with-docker-compose" class="callout-inner">
-<h3 class="callout-title">Minimal MinIO deployment with Docker
-Compose</h3>
-<div class="callout-content">
+</ul><div id="accordionSpoiler1" class="accordion spoiler-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button spoiler-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpoiler1" aria-expanded="false" aria-controls="collapseSpoiler1">
+  <h3 class="accordion-header" id="headingSpoiler1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="eye"></i></div> Minimal MinIO deployment with Docker Compose </h3>
+</button>
+<div id="collapseSpoiler1" class="accordion-collapse collapse" aria-labelledby="headingSpoiler1" data-bs-parent="#accordionSpoiler1">
+<div class="accordion-body">
 <p>In class, we will not expect you to run these commands yourself.
 Instead, we will show how a self-hosted S3-compatible service such as
 MinIO could be deployed inside an institution’s own infrastructure, so
@@ -1016,6 +1014,7 @@ the cloud.</p>
 standard S3 tools (e.g. AWS CLI, <code>boto3</code>, <code>mc</code>
 MinIO client) to interact with this bucket, just pointing them at your
 MinIO endpoint (<code>http://localhost:9000</code>).</p>
+</div>
 </div>
 </div>
 </div>
@@ -1180,7 +1179,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/09-object_store.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/09-object_store.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

@@ -415,7 +415,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Conversion Workflow of Traditional Formats to Zarr</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/10-conversion-workflow.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -480,44 +480,41 @@ workflows and more efficient analysis at scale.</p>
 <h3 id="converting-from-netcdf-to-zarr-with-xarray">Converting from NetCDF to Zarr with xarray<a class="anchor" aria-label="anchor" href="#converting-from-netcdf-to-zarr-with-xarray"></a></h3>
 <p>To convert NetCDF to Zarr, we typically use xarray’s
 <code>to_zarr</code> method, optionally with Dask for parallelism. The
-main steps are:</p>
-<ol style="list-style-type: decimal"><li>Inspect the NetCDF dataset(s) to understand variables, dimensions,
-coordinates, and existing chunking.</li>
-</ol><p>We will use a simple example NetCDF dataset
-(<code>data/era5_sst/ocean_temperature.nc</code>) to illustrate the
-conversion workflow.</p>
-<div class="codewrapper sourceCode" id="cb1">
+following example uses the
+<code>data/era5_sst/ocean_temperature.nc</code> dataset:</p>
+<ol style="list-style-type: decimal"><li>Open data netCDF dataset with xarray:</li>
+</ol><div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds_nc)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="bu">print</span>(ds_nc.coords)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a><span class="bu">print</span>(ds_nc.encoding)  <span class="co"># may show chunking and compression info</span></span></code></pre>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="bu">print</span>(ds_nc)</span></code></pre>
 </div>
-<ol start="2" style="list-style-type: decimal"><li>Decide how the Zarr dataset should be chunked</li>
+<ol start="2" style="list-style-type: decimal"><li>Decide how the dataset should be chunked</li>
 </ol><p>The chunking scheme should match the way the data will be used later.
 A simple example chunking choice might look like this:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>ds_zarr <span class="op">=</span> ds_nc.chunk({<span class="st">"valid_time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a><span class="bu">print</span>(ds_zarr.chunks)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>ds_nc <span class="op">=</span> ds_nc.chunk({<span class="st">"valid_time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a><span class="bu">print</span>(ds_nc.chunks)</span></code></pre>
 </div>
 <ol start="3" style="list-style-type: decimal"><li>Write the Zarr store</li>
 </ol><p>Once the chunking looks right, write the dataset to Zarr.</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>ds_zarr.to_zarr(<span class="st">"data/example.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>ds_nc.to_zarr(<span class="st">"data/example.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
 </div>
-<p>Now you have a Zarr store that can be uploaded to object storage and
-accessed in parallel by multiple clients.</p>
+<p>Now you have a local Zarr store that can be uploaded to object
+storage and accessed in parallel by multiple clients:</p>
+<div class="codewrapper sourceCode" id="cb4">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="bu">print</span>(ds_zarr)</span></code></pre>
+</div>
 <div id="exercise-1---convert-a-netcdf-dataset-to-zarr" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -532,6 +529,9 @@ Zarr</h3>
 with <code>open_dataset</code>, chunk it with
 <code>{"valid_time": 10, "latitude": 100, "longitude": 100}</code>, and
 write it to a local Zarr store.</p>
+<p>Then, reopen the Zarr store and verify that the dimensions and
+variables match the original NetCDF dataset, and if the chunking is as
+expected.</p>
 </div>
 </div>
 </div>
@@ -542,13 +542,22 @@ write it to a local Zarr store.</p>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb4">
+<div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds_zarr <span class="op">=</span> ds_nc.chunk({<span class="st">"valid_time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a>ds_zarr.to_zarr(<span class="st">"data/example.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a>ds_nc <span class="op">=</span> ds_nc.chunk({<span class="st">"valid_time"</span>: <span class="dv">10</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>ds_nc.to_zarr(<span class="st">"data/example.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>)</span></code></pre>
+</div>
+<div class="codewrapper sourceCode" id="cb6">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"data/example.zarr"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="bu">print</span>(ds_zarr)</span></code></pre>
 </div>
 </div>
 </div>
@@ -556,7 +565,8 @@ write it to a local Zarr store.</p>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="overall-workflow-netcdf-zarr-object-store">Overall workflow: NetCDF → Zarr → object store<a class="anchor" aria-label="anchor" href="#overall-workflow-netcdf-zarr-object-store"></a></h2>
-<hr class="half-width"><p>Typical steps:</p>
+<hr class="half-width"><p>In the real world, the conversion of NetCDF to Zarr is often done in
+a workflow that includes the following typical steps:</p>
 <ol style="list-style-type: decimal"><li>
 <strong>Understand the NetCDF input</strong>: check variables,
 dimensions, coordinates, and chunking.</li>
@@ -571,21 +581,20 @@ files.</li>
 <strong>Apply chunking and encoding</strong>: use
 <code>.chunk()</code> and define any compression or encoding
 options.</li>
-<li>
-<strong>Write Zarr to local storage</strong> (Optional): using
+<li>(Optional) <strong>Write Zarr to local storage</strong>: using
 <code>Dataset.to_zarr()</code>, possibly with Dask for parallel
 writes.</li>
 <li>
 <strong>Upload Zarr store to object storage</strong>: using cloud
-CLI tools or filesystem libraries.</li>
+CLI tools or filesystem libraries, or directly write to object storage
+with fsspec.</li>
 <li>
 <strong>Verify by reopening from object storage and running
 analyses</strong> (e.g. computing mean values).</li>
 </ol><p>We’ll walk through these steps conceptually and via exercises. For
-the example below and the exercises, we will use a subset of the ERA5
-reanalysis dataset related to significant wave height
-(<code>swh</code>). The data is located in the
-<code>data/daily_swh</code> directory and is provided as multiple NetCDF
+the example below, we will use a subset of the <a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description" class="external-link">GLORYS
+Reanalysis dataset</a>. The data is located in the
+<code>data/glorys/</code> directory and is provided as multiple NetCDF
 files, one per day. The goal is to convert this collection of NetCDF
 files into a single Zarr store that can be accessed efficiently in
 parallel.</p>
@@ -595,17 +604,17 @@ design, validation, and publishing checkpoints.</div>
 <hr class="half-width"><p>Before converting, inspect the NetCDF file(s) you plan to
 convert.</p>
 <p>Example of opening a single NetCDF file:</p>
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_2025-01-01.nc"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds_nc)</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a><span class="bu">print</span>(ds_nc.coords)</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a><span class="bu">print</span>(ds_nc.encoding)  <span class="co"># may show chunking and compression info</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/glorys/glorys_20260501.nc"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a><span class="bu">print</span>(ds_nc)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a><span class="bu">print</span>(ds_nc.dims)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a><span class="bu">print</span>(ds_nc.coords)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1" aria-label="code-block-7-8"></a><span class="bu">print</span>(ds_nc.encoding)  <span class="co"># may show chunking and compression info</span></span></code></pre>
 </div>
 <p>Questions to answer:</p>
 <ul><li>Are there multiple files (e.g. one per time slice) or just a single
@@ -618,14 +627,14 @@ file?</li>
 you plan to use <code>open_mfdataset</code>?</li>
 </ul><p>Because we have multiple NetCDF files, we can use
 <code>open_mfdataset</code> to open them all at once:</p>
-<div class="codewrapper sourceCode" id="cb6">
+<div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a>ds_nc_multi <span class="op">=</span> xr.open_mfdataset(</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a>    <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_*.nc"</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>    combine<span class="op">=</span><span class="st">"by_coords"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a>)</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a><span class="bu">print</span>(ds_nc_multi)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>ds_nc_multi <span class="op">=</span> xr.open_mfdataset(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>    <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/glorys/*.nc"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a>    combine<span class="op">=</span><span class="st">"by_coords"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a><span class="bu">print</span>(ds_nc_multi)</span></code></pre>
 </div>
 <p>It is important to mention that <code>open_mfdataset</code> will
 combine multiple files into a single xarray dataset, but it requires
@@ -644,11 +653,13 @@ ensemble statistics.</li>
 <li>Storage: local HPC disk vs object store, network bandwidth, parallel
 framework (Dask).</li>
 </ul><p>Example chunk strategy for a dataset with dimensions
-<code>(time, latitude, longitude)</code>:</p>
+<code>(time, latitude, longitude, depth)</code>:</p>
 <ul><li>If time series are common:
-<code>{"time": 360, "latitude": 100, "longitude": 100}</code>.</li>
+<code>{"time": 360, "latitude": 100, "longitude": 100, "depth": 1}</code>.</li>
 <li>If spatial maps per time are common:
-<code>{"time": 1, "latitude": 361, "longitude": 720}</code>.</li>
+<code>{"time": 1, "latitude": 361, "longitude": 720, "depth": 1}</code>.</li>
+<li>If depth slices are common:
+<code>{"time": 1, "latitude": 100, "longitude": 100, "depth": 10}</code>.</li>
 </ul><p>You can experiment with different chunk shapes and use Dask’s
 dashboard and performance measurements to refine choices.</p>
 </section><section><h2 class="section-heading" id="step-3---convert-netcdf-to-zarr-with-xarray-and-dask">Step 3 - Convert NetCDF to Zarr with xarray and Dask<a class="anchor" aria-label="anchor" href="#step-3---convert-netcdf-to-zarr-with-xarray-and-dask"></a></h2>
@@ -657,29 +668,36 @@ dashboard and performance measurements to refine choices.</p>
 serially or in parallel using Dask. For large datasets, parallel writing
 is often necessary to avoid long runtimes.</p>
 <p>First, create a Dask client to manage parallelism:</p>
-<div class="codewrapper sourceCode" id="cb7">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span></code></pre>
-</div>
-<p>Then, open the NetCDF dataset and apply chunking:</p>
-<div class="codewrapper sourceCode" id="cb8">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="st">"data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a><span class="co"># Choose chunking</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a>ds_chunked <span class="op">=</span> ds_nc.chunk({<span class="st">"time"</span>: <span class="dv">12</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>})</span></code></pre>
-</div>
-<p>Now you can write the chunked dataset to Zarr. You can choose to
-consolidate metadata for faster reads later:</p>
 <div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a>ds_chunked.to_zarr(<span class="st">"data/era5_swh.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span></code></pre>
+</div>
+<p>Then, open the NetCDF dataset and apply chunking:</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/glorys/*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="co"># Choose chunking</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a>ds_chunked <span class="op">=</span> ds_nc.chunk({<span class="st">"time"</span>: <span class="dv">5</span>, <span class="st">"latitude"</span>: <span class="dv">400</span>, <span class="st">"longitude"</span>: <span class="dv">400</span>, <span class="st">"depth"</span>: <span class="dv">10</span>})</span></code></pre>
+</div>
+<p>Now you can write the chunked dataset to Zarr. You can choose to
+consolidate metadata for faster reads later:</p>
+<div class="codewrapper sourceCode" id="cb11">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a>ds_chunked.to_zarr(<span class="st">"data/glorys.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+</div>
+<p>Open the Zarr store to verify:</p>
+<div class="codewrapper sourceCode" id="cb12">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a><span class="bu">print</span>(ds_zarr)</span></code></pre>
 </div>
 <div id="consolidated-metadata" class="callout">
 <div class="callout-square">
@@ -716,28 +734,28 @@ and compressed. In most teaching and analysis workflows, the goal is not
 to maximise compression at all costs, but to choose a strategy that
 balances file size, speed, and ease of reading.</p>
 <p>A simple example looks like this:</p>
-<div class="codewrapper sourceCode" id="cb10">
+<div class="codewrapper sourceCode" id="cb13">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> zarr</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="im">from</span> zarr.codecs <span class="im">import</span> BloscCodec, BloscShuffle</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>ds <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>compressor <span class="op">=</span> BloscCodec(cname<span class="op">=</span><span class="st">"zstd"</span>, clevel<span class="op">=</span><span class="dv">3</span>, shuffle<span class="op">=</span>BloscShuffle.shuffle)</span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a>encoding <span class="op">=</span> {</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a>    <span class="st">"sst"</span>: {</span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a>        <span class="st">"compressors"</span>: compressor,</span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1" aria-label="code-block-10-10"></a>        <span class="st">"chunks"</span>: (<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">100</span>),</span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1" aria-label="code-block-10-11"></a>    }</span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1" aria-label="code-block-10-12"></a>}</span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1" aria-label="code-block-10-13"></a></span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1" aria-label="code-block-10-14"></a>ds.to_zarr(</span>
-<span id="cb10-15"><a href="#cb10-15" tabindex="-1" aria-label="code-block-10-15"></a>    <span class="st">"data/example_compressed.zarr"</span>,</span>
-<span id="cb10-16"><a href="#cb10-16" tabindex="-1" aria-label="code-block-10-16"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
-<span id="cb10-17"><a href="#cb10-17" tabindex="-1" aria-label="code-block-10-17"></a>    encoding<span class="op">=</span>encoding,</span>
-<span id="cb10-18"><a href="#cb10-18" tabindex="-1" aria-label="code-block-10-18"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb10-19"><a href="#cb10-19" tabindex="-1" aria-label="code-block-10-19"></a>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> zarr</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a><span class="im">from</span> zarr.codecs <span class="im">import</span> BloscCodec, BloscShuffle</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>ds <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.nc"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a>compressor <span class="op">=</span> BloscCodec(cname<span class="op">=</span><span class="st">"zstd"</span>, clevel<span class="op">=</span><span class="dv">3</span>, shuffle<span class="op">=</span>BloscShuffle.shuffle)</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a>encoding <span class="op">=</span> {</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a>    <span class="st">"sst"</span>: {</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>        <span class="st">"compressors"</span>: compressor,</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a>        <span class="st">"chunks"</span>: (<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">100</span>),</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a>    }</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a>}</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a>ds.to_zarr(</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1" aria-label="code-block-13-15"></a>    <span class="st">"data/example_compressed.zarr"</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1" aria-label="code-block-13-16"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1" aria-label="code-block-13-17"></a>    encoding<span class="op">=</span>encoding,</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1" aria-label="code-block-13-18"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1" aria-label="code-block-13-19"></a>)</span></code></pre>
 </div>
 <p>In this example: - <code>zstd</code> gives good compression with
 reasonable speed. - <code>clevel=3</code> is a moderate compression
@@ -756,109 +774,125 @@ that trade-off is often not worth it.</p>
 </section><section><h2 class="section-heading" id="step-4---upload-zarr-to-object-storage">Step 4 - Upload Zarr to object storage<a class="anchor" aria-label="anchor" href="#step-4---upload-zarr-to-object-storage"></a></h2>
 <hr class="half-width"><p>After successfully writing Zarr locally, you can upload the Zarr
 directory store to an object store (AWS S3, GCS, MinIO, etc.).</p>
-<p>Examples for <a href="https://s3tools.org/s3cmd" class="external-link">s3cmd</a> (using CLI
-tools):</p>
-<div class="codewrapper sourceCode" id="cb11">
+<p>The following example uses <a href="https://s3tools.org/s3cmd" class="external-link">s3cmd</a>, which is a command-line tool
+for interacting with S3-compatible object stores. You can also use other
+tools like <code>awscli</code>, <code>rclone</code>, or Python libraries
+like <code>boto3</code> or <code>fsspec</code>.</p>
+<div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="co"># Create a bucket (if it doesn't exist)</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="ex">s3cmd</span> mb s3://my-bucket</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1" aria-label="code-block-11-3"></a></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="co"># Upload the Zarr store recursively</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a><span class="ex">s3cmd</span> put <span class="at">-r</span> data/era5_swh.zarr s3://my-bucket/era5_swh.zarr</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="co"># Create a bucket (if it doesn't exist)</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="ex">s3cmd</span> mb s3://my-bucket</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="co"># Upload the Zarr store recursively</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a><span class="ex">s3cmd</span> put <span class="at">-r</span> data/glorys.zarr s3://my-bucket/glorys.zarr</span></code></pre>
 </div>
 <p>Once uploaded, you can access the Zarr store directly from the object
 store using xarray and filesystem adapters, as in previous lessons.</p>
 <p>In our lesson here, instead of generating the zarr dataset locally
 and upload then later to the object store, we will directly write the
-zarr dataset to the object store using fsspec. This is a more efficient
-approach and avoids unnecessary local storage usage. In the code below,
-remember to replace <code>my-bucket</code> with the actual bucket name
-you have access to (please ask the instructor for the bucket name and
-credentials).</p>
+zarr dataset to the object store using <code>fsspec</code>. This is a
+more efficient approach and avoids unnecessary local storage usage. In
+the code below, remember to replace <code>my-bucket</code> with the
+actual bucket name you have access to (please ask the instructor for the
+bucket name and credentials).</p>
 <p>Because the dataset is large, we will use the JASMIN dask cluster to
 run the conversion and upload, as it has better network access to the
 object store. You can see an example below, but you can also take a look
 in the <a href="./07-parallel.html">Parallel Processing for Zarr</a>
 episode for more details.</p>
-<div class="codewrapper sourceCode" id="cb12">
+<p>Create a connection to dask-gateway and start a cluster:</p>
+<div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> dask_gateway</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a><span class="co"># Create a connection to dask-gateway.</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>options <span class="op">=</span> gw.cluster_options()</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>options.worker_cores <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'</span></span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1" aria-label="code-block-12-14"></a><span class="cf">else</span>:</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1" aria-label="code-block-12-15"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1" aria-label="code-block-12-16"></a>client <span class="op">=</span> cluster.get_client()</span>
-<span id="cb12-17"><a href="#cb12-17" tabindex="-1" aria-label="code-block-12-17"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a><span class="co"># Create a connection to dask-gateway.</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>options <span class="op">=</span> gw.cluster_options()</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>options.worker_cores <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1" aria-label="code-block-15-12"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1" aria-label="code-block-15-13"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1" aria-label="code-block-15-14"></a><span class="cf">else</span>:</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1" aria-label="code-block-15-15"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1" aria-label="code-block-15-16"></a>client <span class="op">=</span> cluster.get_client()</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1" aria-label="code-block-15-17"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span></code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb13">
+<p>Create a mapper for the object store:</p>
+<div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a><span class="im">import</span> fsspec</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a><span class="im">import</span> os</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/era5_swh.zarr"</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a>storage_options <span class="op">=</span> {</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a>    <span class="co"># The `config_kwargs` is required for JASMIN S3 object store.</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a>    <span class="st">"config_kwargs"</span>: {</span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1" aria-label="code-block-13-15"></a>    },</span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1" aria-label="code-block-13-16"></a>}</span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1" aria-label="code-block-13-17"></a></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1" aria-label="code-block-13-18"></a><span class="co"># Create a mapper for the object store</span></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1" aria-label="code-block-13-19"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1" aria-label="code-block-13-20"></a>    store_url,</span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1" aria-label="code-block-13-21"></a>    <span class="op">**</span>storage_options,</span>
-<span id="cb13-22"><a href="#cb13-22" tabindex="-1" aria-label="code-block-13-22"></a>)</span>
-<span id="cb13-23"><a href="#cb13-23" tabindex="-1" aria-label="code-block-13-23"></a></span>
-<span id="cb13-24"><a href="#cb13-24" tabindex="-1" aria-label="code-block-13-24"></a><span class="co"># Write the dataset directly to the object store</span></span>
-<span id="cb13-25"><a href="#cb13-25" tabindex="-1" aria-label="code-block-13-25"></a>ds_chunked.to_zarr(</span>
-<span id="cb13-26"><a href="#cb13-26" tabindex="-1" aria-label="code-block-13-26"></a>    mapper,</span>
-<span id="cb13-27"><a href="#cb13-27" tabindex="-1" aria-label="code-block-13-27"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
-<span id="cb13-28"><a href="#cb13-28" tabindex="-1" aria-label="code-block-13-28"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb13-29"><a href="#cb13-29" tabindex="-1" aria-label="code-block-13-29"></a>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a><span class="im">import</span> fsspec</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a><span class="im">import</span> os</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1" aria-label="code-block-16-5"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/glorys.zarr"</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1" aria-label="code-block-16-6"></a></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1" aria-label="code-block-16-7"></a><span class="co"># remember to set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables with your credentials</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1" aria-label="code-block-16-8"></a>os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>] <span class="op">=</span> <span class="st">"your-access-key"</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1" aria-label="code-block-16-9"></a>os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>] <span class="op">=</span> <span class="st">"your-secret-key"</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1" aria-label="code-block-16-10"></a></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1" aria-label="code-block-16-11"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1" aria-label="code-block-16-12"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1" aria-label="code-block-16-13"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1" aria-label="code-block-16-14"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1" aria-label="code-block-16-15"></a>    <span class="co"># The `config_kwargs` is required for JASMIN S3 object store.</span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1" aria-label="code-block-16-16"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1" aria-label="code-block-16-17"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1" aria-label="code-block-16-18"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1" aria-label="code-block-16-19"></a>    },</span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1" aria-label="code-block-16-20"></a>}</span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1" aria-label="code-block-16-21"></a></span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1" aria-label="code-block-16-22"></a><span class="co"># Create a mapper for the object store</span></span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1" aria-label="code-block-16-23"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1" aria-label="code-block-16-24"></a>    store_url,</span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1" aria-label="code-block-16-25"></a>    <span class="op">**</span>storage_options,</span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1" aria-label="code-block-16-26"></a>)</span></code></pre>
+</div>
+<p>Write the dataset directly to the object store:</p>
+<div class="codewrapper sourceCode" id="cb17">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a>ds_chunked.to_zarr(</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a>    mapper,</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>)</span></code></pre>
 </div>
 </section><section><h2 class="section-heading" id="step-5---verify-with-a-simple-analysis">Step 5 - Verify with a simple analysis<a class="anchor" aria-label="anchor" href="#step-5---verify-with-a-simple-analysis"></a></h2>
 <hr class="half-width"><p>To verify that the converted Zarr dataset is usable, run a simple
 analysis, such as computing a mean value. Example:</p>
-<div class="codewrapper sourceCode" id="cb14">
+<div class="codewrapper sourceCode" id="cb18">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="im">import</span> fsspec</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="co"># Replace `my-bucket` with the actual bucket name you have access to.</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a>mapper <span class="op">=</span> fsspec.get_mapper(<span class="st">"s3://my-bucket/era5_swh.zarr"</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a>ds_zarr <span class="op">=</span> xr.open_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1" aria-label="code-block-14-7"></a></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1" aria-label="code-block-14-8"></a><span class="co"># You can also access the dataset directly, as it is in a public bucket (replace with your own bucket if needed):</span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1" aria-label="code-block-14-9"></a><span class="co"># ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/era5_swh.zarr", consolidated=True)</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1" aria-label="code-block-14-10"></a></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1" aria-label="code-block-14-11"></a><span class="co"># Choose a variable and compute a global mean over space</span></span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1" aria-label="code-block-14-12"></a>var <span class="op">=</span> ds_zarr[<span class="st">"swh"</span>]</span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1" aria-label="code-block-14-13"></a>global_mean <span class="op">=</span> var.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1" aria-label="code-block-14-14"></a><span class="bu">print</span>(global_mean)</span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1" aria-label="code-block-14-15"></a></span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1" aria-label="code-block-14-16"></a><span class="co"># Compute a time series mean over space</span></span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1" aria-label="code-block-14-17"></a>swh_mean <span class="op">=</span> var.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1" aria-label="code-block-14-18"></a><span class="bu">print</span>(swh_mean)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a><span class="im">import</span> fsspec</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a><span class="co"># Replace `my-bucket` with the actual bucket name you have access to.</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1" aria-label="code-block-18-5"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1" aria-label="code-block-18-6"></a>    store_url,</span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1" aria-label="code-block-18-7"></a>    <span class="op">**</span>storage_options,</span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1" aria-label="code-block-18-8"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1" aria-label="code-block-18-9"></a>ds_zarr <span class="op">=</span> xr.open_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1" aria-label="code-block-18-10"></a></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1" aria-label="code-block-18-11"></a><span class="co"># You can also access the dataset directly, as it is in a public bucket (replace with your own bucket if needed):</span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1" aria-label="code-block-18-12"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/glorys.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1" aria-label="code-block-18-13"></a></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1" aria-label="code-block-18-14"></a><span class="co"># Choose a variable</span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1" aria-label="code-block-18-15"></a>var <span class="op">=</span> ds_zarr[<span class="st">"zos"</span>]</span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1" aria-label="code-block-18-16"></a></span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1" aria-label="code-block-18-17"></a><span class="co"># Mean for each time step (global spatial mean)</span></span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1" aria-label="code-block-18-18"></a>mean_per_time <span class="op">=</span> var.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>)).compute()</span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1" aria-label="code-block-18-19"></a><span class="bu">print</span>(mean_per_time)</span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1" aria-label="code-block-18-20"></a></span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1" aria-label="code-block-18-21"></a><span class="co"># Mean for each latitude/longitude location (time mean)</span></span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1" aria-label="code-block-18-22"></a>mean_per_latlon <span class="op">=</span> var.mean(dim<span class="op">=</span><span class="st">"time"</span>).compute()</span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1" aria-label="code-block-18-23"></a><span class="bu">print</span>(mean_per_latlon)</span></code></pre>
 </div>
 <div id="exercise-2---understand-your-netcdf-dataset" class="callout challenge">
 <div class="callout-square">
@@ -869,6 +903,10 @@ analysis, such as computing a mean value. Example:</p>
 <h3 class="callout-title">Exercise 2 - Understand your NetCDF
 dataset</h3>
 <div class="callout-content">
+<p>For the exercises 2-5, we are going to work with the subset of the <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels" class="external-link">ERA5
+Reanalysis dataset</a> related to the variable <code>swh</code>
+(significant wave height). The dataset is provided as multiple NetCDF
+files, one per day, in the <code>data/daily_swh/</code> directory.</p>
 <p>Using the NetCDF dataset(s) provided on the server:</p>
 <ol style="list-style-type: decimal"><li>Open a single file with <code>open_dataset</code> and print:
 <ul><li>Dimensions and coordinates.</li>
@@ -893,27 +931,27 @@ is the existing chunking layout (if any)?</p>
 <div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>Open a single NetCDF file:</p>
-<div class="codewrapper sourceCode" id="cb15">
+<div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="st">"data/daily_swh/swh_2025-01-01.nc"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a><span class="bu">print</span>(ds_nc.coords)</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a><span class="bu">print</span>(ds_nc.encoding)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a>ds_nc <span class="op">=</span> xr.open_dataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_2025-01-01.nc"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a><span class="bu">print</span>(ds_nc.dims)</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a><span class="bu">print</span>(ds_nc.coords)</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a><span class="bu">print</span>(ds_nc.encoding)</span></code></pre>
 </div>
 <p>Open multiple NetCDF files:</p>
-<div class="codewrapper sourceCode" id="cb16">
+<div class="codewrapper sourceCode" id="cb20">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1" aria-label="code-block-16-2"></a>    <span class="st">"data/daily_swh/swh_*.nc"</span>,</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1" aria-label="code-block-16-3"></a>    combine<span class="op">=</span><span class="st">"by_coords"</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1" aria-label="code-block-16-4"></a>)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1" aria-label="code-block-16-5"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1" aria-label="code-block-16-6"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1" aria-label="code-block-16-7"></a><span class="bu">print</span>(ds_nc.coords)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a>    <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_*.nc"</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a>    combine<span class="op">=</span><span class="st">"by_coords"</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a>)</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a><span class="bu">print</span>(ds_nc.dims)</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1" aria-label="code-block-20-7"></a><span class="bu">print</span>(ds_nc.coords)</span></code></pre>
 </div>
 <p>Now you should have a clear picture of the input data: variables,
 dimensions, coordinates, and any existing chunking or compression. This
@@ -933,7 +971,7 @@ any conversion.</p>
 <div class="callout-content">
 <p>Based on your NetCDF dataset and expected workloads:</p>
 <ol style="list-style-type: decimal"><li>Propose a chunk dictionary,
-e.g. <code>{"time": 12, "lat": 100, "lon": 100}</code> or similar.</li>
+e.g. <code>{"time": 720, "lat": 100, "lon": 100}</code> or similar.</li>
 <li>Estimate (roughly) the size of each chunk in bytes/MB (using
 variable sizes and dimension lengths).</li>
 <li>Explain how your chunk choices support your intended analyses.</li>
@@ -948,27 +986,27 @@ variable sizes and dimension lengths).</li>
 </button>
 <div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb17">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="co"># Example chunk proposal</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a>chunking <span class="op">=</span> {<span class="st">"time"</span>: <span class="dv">12</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>}</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a></span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a>chunk_size_bytes <span class="op">=</span> (</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>    ds_chunked[<span class="st">"swh"</span>].dtype.itemsize  <span class="co"># bytes per element</span></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1" aria-label="code-block-17-6"></a>    <span class="op">*</span> chunking[<span class="st">"time"</span>]</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1" aria-label="code-block-17-7"></a>    <span class="op">*</span> chunking[<span class="st">"latitude"</span>]</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1" aria-label="code-block-17-8"></a>    <span class="op">*</span> chunking[<span class="st">"longitude"</span>]</span>
-<span id="cb17-9"><a href="#cb17-9" tabindex="-1" aria-label="code-block-17-9"></a>)</span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1" aria-label="code-block-17-10"></a>chunk_size_MB <span class="op">=</span> chunk_size_bytes <span class="op">/</span> (<span class="dv">1024</span> <span class="op">**</span> <span class="dv">2</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1" aria-label="code-block-17-11"></a><span class="bu">print</span>(<span class="ss">f"Estimated chunk size: </span><span class="sc">{</span>chunk_size_MB<span class="sc">:.2f}</span><span class="ss"> MB"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="co"># Example chunk proposal</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a>chunking <span class="op">=</span> {<span class="st">"time"</span>: <span class="dv">720</span>, <span class="st">"latitude"</span>: <span class="dv">100</span>, <span class="st">"longitude"</span>: <span class="dv">100</span>}</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>chunk_size_bytes <span class="op">=</span> (</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a>    ds_nc[<span class="st">"swh"</span>].dtype.itemsize  <span class="co"># bytes per element</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a>    <span class="op">*</span> chunking[<span class="st">"time"</span>]</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>    <span class="op">*</span> chunking[<span class="st">"latitude"</span>]</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a>    <span class="op">*</span> chunking[<span class="st">"longitude"</span>]</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>)</span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a>chunk_size_MB <span class="op">=</span> chunk_size_bytes <span class="op">/</span> (<span class="dv">1024</span> <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a><span class="bu">print</span>(<span class="ss">f"Estimated chunk size: </span><span class="sc">{</span>chunk_size_MB<span class="sc">:.2f}</span><span class="ss"> MB"</span>)</span></code></pre>
 </div>
 <p>After calculating the estimated chunk size, you can reason about how
 this chunking supports your analysis:</p>
-<div class="codewrapper sourceCode" id="cb18">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a>ds_chunked <span class="op">=</span> ds_nc.chunk(chunking)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a>ds_chunked <span class="op">=</span> ds_nc.chunk(chunking)</span></code></pre>
 </div>
 <p>You’d propose reasonable chunk sizes that reflect your workloads and
 aim for manageable chunk sizes. You will practice linking chunk shapes
@@ -977,33 +1015,32 @@ to analysis patterns, preparing for actual conversion.</p>
 </div>
 </div>
 </div>
-<div id="exercise-4---convert-your-netcdf-dataset-to-zarr" class="callout challenge">
+<div id="exercise-4---convert-your-netcdf-dataset-to-zarr-in-object-storage" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-4---convert-your-netcdf-dataset-to-zarr" class="callout-inner">
+<div id="exercise-4---convert-your-netcdf-dataset-to-zarr-in-object-storage" class="callout-inner">
 <h3 class="callout-title">Exercise 4 - Convert your NetCDF dataset to
-Zarr</h3>
+Zarr in object storage</h3>
 <div class="callout-content">
-<p>After opening and chunking the NetCDF files, convert them to Zarr and
-write to a local directory (e.g. <code>data/converted.zarr</code>).</p>
-<p>Please make sure you are using dask for parallel conversion. You can
-use a local dask client with a few workers, like this:</p>
-<div class="codewrapper sourceCode" id="cb19">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a><span class="co"># You can change the number of workers and threads per worker</span></span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span></code></pre>
-</div>
+<p>After opening and chunking the NetCDF dataset, convert it to Zarr and
+write it directly to the object store using <code>fsspec</code>.</p>
+<p>Please use the credentials provided by the instructor to access the
+object store. For this exercise, use the JASMIN Dask cluster (or the
+local Cluster) to perform the conversion and upload, as it provides
+better network access to the object store. You can refer to the <a href="./07-parallel.html">Parallel Processing for Zarr</a> episode for
+more details.</p>
+<p>Once the conversion is complete, reopen the dataset from the object
+store and verify that it can be read correctly.</p>
 <p>Questions:</p>
-<ul><li>How long does the conversion take?</li>
+<ul><li>How long did the conversion and upload take?</li>
 <li>Does the size of the Zarr store seem reasonable compared to the
 original NetCDF files?</li>
 <li>Were there any variables or attributes you needed to drop or
 adjust?</li>
+<li>Does the reopened dataset have the expected dimensions, variables,
+and attributes?</li>
 </ul></div>
 </div>
 </div>
@@ -1014,121 +1051,104 @@ adjust?</li>
 </button>
 <div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb20">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1" aria-label="code-block-20-5"></a></span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1" aria-label="code-block-20-6"></a>ds_chunked.to_zarr(<span class="st">"data/converted.zarr"</span>, mode<span class="op">=</span><span class="st">"w"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
-</div>
-<p>Now you have a local Zarr store from the NetCDF dataset and begin to
-see how conversion time and output size depend on chunking and
-compression. You will also encounter practical issues (e.g. problematic
-variables, encoding quirks) that often arise in real conversions.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="exercise-5---upload-and-reopen-from-object-storage" class="callout challenge">
-<div class="callout-square">
-<i class="callout-icon" data-feather="zap"></i>
-</div>
-<span class="callout-header">Challenge</span>
-<div id="exercise-5---upload-and-reopen-from-object-storage" class="callout-inner">
-<h3 class="callout-title">Exercise 5 - Upload and reopen from object
-storage</h3>
-<div class="callout-content">
-<p>Now, repeat the last step, but instead of writing to local disk,
-write the Zarr store directly to an object store (e.g. JASMIN) using
-fsspec. And then, reopen the dataset from the object store and verify
-that it is usable, confirming that dimensions, variables, and attributes
-match expectations.</p>
-<p>Please use the credentials provided by the instructor to access the
-object store. In this lesson, also use the JASMIN dask cluster to run
-the conversion and upload, as it has better network access to the object
-store. You can see an example below, but you can also take a look in the
-<a href="./07-parallel.html">Parallel Processing for Zarr</a> episode
-for more details.</p>
-<div class="codewrapper sourceCode" id="cb21">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> dask_gateway</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Create a connection to dask-gateway.</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a></span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a>options <span class="op">=</span> gw.cluster_options()</span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>options.worker_cores <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course'</span></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
-<span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
-<span id="cb21-13"><a href="#cb21-13" tabindex="-1" aria-label="code-block-21-13"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb21-14"><a href="#cb21-14" tabindex="-1" aria-label="code-block-21-14"></a><span class="cf">else</span>:</span>
-<span id="cb21-15"><a href="#cb21-15" tabindex="-1" aria-label="code-block-21-15"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span></code></pre>
-</div>
-</div>
-</div>
-</div>
-<div id="accordionSolution5" class="accordion challenge-accordion accordion-flush">
-<div class="accordion-item">
-<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution5" aria-expanded="false" aria-controls="collapseSolution5">
-  <h4 class="accordion-header" id="headingSolution5"> Show me the solution </h4>
-</button>
-<div id="collapseSolution5" class="accordion-collapse collapse" data-bs-parent="#accordionSolution5" aria-labelledby="headingSolution5">
-<div class="accordion-body">
-<p>After creating the cluster, you can get a client object from the
-cluster:</p>
-<div class="codewrapper sourceCode" id="cb22">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a>client <span class="op">=</span> cluster.get_client()</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span></code></pre>
-</div>
-<p>Now you can use the client to run the conversion and upload to object
-storage:</p>
+<p>First, create a Dask cluster and connect a client. You can use a
+local Cluster:</p>
 <div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a><span class="im">import</span> fsspec</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a></span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a>storage_options <span class="op">=</span> {</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a>    <span class="st">"config_kwargs"</span>: {</span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1" aria-label="code-block-23-9"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1" aria-label="code-block-23-10"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1" aria-label="code-block-23-11"></a>    },</span>
-<span id="cb23-12"><a href="#cb23-12" tabindex="-1" aria-label="code-block-23-12"></a>}</span>
-<span id="cb23-13"><a href="#cb23-13" tabindex="-1" aria-label="code-block-23-13"></a></span>
-<span id="cb23-14"><a href="#cb23-14" tabindex="-1" aria-label="code-block-23-14"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/converted.zarr"</span></span>
-<span id="cb23-15"><a href="#cb23-15" tabindex="-1" aria-label="code-block-23-15"></a>mapper <span class="op">=</span> fsspec.get_mapper(store_url, storage_options<span class="op">=</span>storage_options)</span>
-<span id="cb23-16"><a href="#cb23-16" tabindex="-1" aria-label="code-block-23-16"></a></span>
-<span id="cb23-17"><a href="#cb23-17" tabindex="-1" aria-label="code-block-23-17"></a>ds_chunked.to_zarr(mapper, mode<span class="op">=</span><span class="st">"w"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb23-18"><a href="#cb23-18" tabindex="-1" aria-label="code-block-23-18"></a>ds_zarr <span class="op">=</span> xr.open_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb23-19"><a href="#cb23-19" tabindex="-1" aria-label="code-block-23-19"></a><span class="bu">print</span>(ds_zarr)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span></code></pre>
 </div>
-<p>Once the Zarr store is in object storage, you can open it almost as
-easily as a local dataset, using the right filesystem adapter. It can
-confirm that the conversion and upload have preserved structure and
-metadata, and that the dataset is ready for analysis.</p>
+<p>Or a JASMIN Dask cluster:</p>
+<div class="codewrapper sourceCode" id="cb24">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a><span class="co"># Create a connection to dask-gateway.</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a>gw <span class="op">=</span> dask_gateway.Gateway(</span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>    <span class="st">"https://dask-gateway.jasmin.ac.uk"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a>    auth<span class="op">=</span><span class="st">"jupyterhub"</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1" aria-label="code-block-24-7"></a>)</span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1" aria-label="code-block-24-8"></a></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1" aria-label="code-block-24-9"></a>options <span class="op">=</span> gw.cluster_options()</span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1" aria-label="code-block-24-10"></a>options.worker_cores <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1" aria-label="code-block-24-11"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1" aria-label="code-block-24-12"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1" aria-label="code-block-24-13"></a>options.worker_setup <span class="op">=</span> (</span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1" aria-label="code-block-24-14"></a>    <span class="st">"source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/"</span></span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1" aria-label="code-block-24-15"></a>    <span class="st">"mf3-23.11.0-0/bin/activate "</span></span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1" aria-label="code-block-24-16"></a>    <span class="st">"/work/scratch-nopw2/tobfer/cloud-native-geoscience-course"</span></span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1" aria-label="code-block-24-17"></a>)</span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1" aria-label="code-block-24-18"></a></span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1" aria-label="code-block-24-19"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1" aria-label="code-block-24-20"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1" aria-label="code-block-24-21"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1" aria-label="code-block-24-22"></a><span class="cf">else</span>:</span>
+<span id="cb24-23"><a href="#cb24-23" tabindex="-1" aria-label="code-block-24-23"></a>    cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span>
+<span id="cb24-24"><a href="#cb24-24" tabindex="-1" aria-label="code-block-24-24"></a></span>
+<span id="cb24-25"><a href="#cb24-25" tabindex="-1" aria-label="code-block-24-25"></a>client <span class="op">=</span> cluster.get_client()</span>
+<span id="cb24-26"><a href="#cb24-26" tabindex="-1" aria-label="code-block-24-26"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span></code></pre>
+</div>
+<p>Then convert the dataset directly to object storage and reopen
+it:</p>
+<div class="codewrapper sourceCode" id="cb25">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" tabindex="-1" aria-label="code-block-25-1"></a><span class="im">import</span> os</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1" aria-label="code-block-25-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1" aria-label="code-block-25-3"></a><span class="im">import</span> fsspec</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1" aria-label="code-block-25-4"></a></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1" aria-label="code-block-25-5"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1" aria-label="code-block-25-6"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1" aria-label="code-block-25-7"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1" aria-label="code-block-25-8"></a>    <span class="st">"client_kwargs"</span>: {</span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1" aria-label="code-block-25-9"></a>        <span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1" aria-label="code-block-25-10"></a>    },</span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1" aria-label="code-block-25-11"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1" aria-label="code-block-25-12"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" tabindex="-1" aria-label="code-block-25-13"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" tabindex="-1" aria-label="code-block-25-14"></a>    },</span>
+<span id="cb25-15"><a href="#cb25-15" tabindex="-1" aria-label="code-block-25-15"></a>}</span>
+<span id="cb25-16"><a href="#cb25-16" tabindex="-1" aria-label="code-block-25-16"></a></span>
+<span id="cb25-17"><a href="#cb25-17" tabindex="-1" aria-label="code-block-25-17"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/era5_swh.zarr"</span></span>
+<span id="cb25-18"><a href="#cb25-18" tabindex="-1" aria-label="code-block-25-18"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
+<span id="cb25-19"><a href="#cb25-19" tabindex="-1" aria-label="code-block-25-19"></a>    store_url,</span>
+<span id="cb25-20"><a href="#cb25-20" tabindex="-1" aria-label="code-block-25-20"></a>    <span class="op">**</span>storage_options,</span>
+<span id="cb25-21"><a href="#cb25-21" tabindex="-1" aria-label="code-block-25-21"></a>)</span>
+<span id="cb25-22"><a href="#cb25-22" tabindex="-1" aria-label="code-block-25-22"></a></span>
+<span id="cb25-23"><a href="#cb25-23" tabindex="-1" aria-label="code-block-25-23"></a>ds_chunked.to_zarr(</span>
+<span id="cb25-24"><a href="#cb25-24" tabindex="-1" aria-label="code-block-25-24"></a>    mapper,</span>
+<span id="cb25-25"><a href="#cb25-25" tabindex="-1" aria-label="code-block-25-25"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb25-26"><a href="#cb25-26" tabindex="-1" aria-label="code-block-25-26"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb25-27"><a href="#cb25-27" tabindex="-1" aria-label="code-block-25-27"></a>)</span>
+<span id="cb25-28"><a href="#cb25-28" tabindex="-1" aria-label="code-block-25-28"></a></span>
+<span id="cb25-29"><a href="#cb25-29" tabindex="-1" aria-label="code-block-25-29"></a>ds_zarr <span class="op">=</span> xr.open_zarr(</span>
+<span id="cb25-30"><a href="#cb25-30" tabindex="-1" aria-label="code-block-25-30"></a>    mapper,</span>
+<span id="cb25-31"><a href="#cb25-31" tabindex="-1" aria-label="code-block-25-31"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb25-32"><a href="#cb25-32" tabindex="-1" aria-label="code-block-25-32"></a>)</span>
+<span id="cb25-33"><a href="#cb25-33" tabindex="-1" aria-label="code-block-25-33"></a></span>
+<span id="cb25-34"><a href="#cb25-34" tabindex="-1" aria-label="code-block-25-34"></a><span class="bu">print</span>(ds_zarr)</span></code></pre>
+</div>
+<p>Writing directly to object storage avoids creating an intermediate
+local copy and reflects a typical cloud-native workflow. Reopening the
+dataset verifies that the conversion completed successfully and that the
+dataset structure and metadata have been preserved.</p>
+<p>The time taken for conversion and upload will depend on the dataset
+size, chunking, network speed, and cluster resources. You can use Dask’s
+dashboard to monitor progress and performance.</p>
 </div>
 </div>
 </div>
 </div>
-<div id="exercise-6---check-consistency-and-compute-a-mean" class="callout challenge">
+<div id="exercise-5---check-consistency-and-compute-a-mean" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-6---check-consistency-and-compute-a-mean" class="callout-inner">
-<h3 class="callout-title">Exercise 6 - Check consistency and compute a
+<div id="exercise-5---check-consistency-and-compute-a-mean" class="callout-inner">
+<h3 class="callout-title">Exercise 5 - Check consistency and compute a
 mean</h3>
 <div class="callout-content">
 <p>Using both the original NetCDF files dataset (<code>ds_nc</code>) and
@@ -1138,38 +1158,51 @@ storage):</p>
 temperature at a given time):</li>
 <li>Compare the results for equality (or near-equality within floating
 point tolerance).</li>
+<li>Compare the time taken to open the dataset and compute the statistic
+in both cases.</li>
 </ol></div>
 </div>
 </div>
-<div id="accordionSolution6" class="accordion challenge-accordion accordion-flush">
+<div id="accordionSolution5" class="accordion challenge-accordion accordion-flush">
 <div class="accordion-item">
-<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution6" aria-expanded="false" aria-controls="collapseSolution6">
-  <h4 class="accordion-header" id="headingSolution6"> Show me the solution </h4>
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution5" aria-expanded="false" aria-controls="collapseSolution5">
+  <h4 class="accordion-header" id="headingSolution5"> Show me the solution </h4>
 </button>
-<div id="collapseSolution6" class="accordion-collapse collapse" data-bs-parent="#accordionSolution6" aria-labelledby="headingSolution6">
+<div id="collapseSolution5" class="accordion-collapse collapse" data-bs-parent="#accordionSolution5" aria-labelledby="headingSolution5">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb24">
+<div class="codewrapper sourceCode" id="cb26">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">2</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a></span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a><span class="co"># NetCDF</span></span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="st">"data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>var_nc <span class="op">=</span> ds_nc[<span class="st">"swh"</span>]</span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a><span class="co"># slice to a single time step for comparison</span></span>
-<span id="cb24-7"><a href="#cb24-7" tabindex="-1" aria-label="code-block-24-7"></a>var_nc <span class="op">=</span> var_nc.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb24-8"><a href="#cb24-8" tabindex="-1" aria-label="code-block-24-8"></a></span>
-<span id="cb24-9"><a href="#cb24-9" tabindex="-1" aria-label="code-block-24-9"></a>mean_nc <span class="op">=</span> var_nc.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb24-10"><a href="#cb24-10" tabindex="-1" aria-label="code-block-24-10"></a></span>
-<span id="cb24-11"><a href="#cb24-11" tabindex="-1" aria-label="code-block-24-11"></a><span class="co"># Zarr</span></span>
-<span id="cb24-12"><a href="#cb24-12" tabindex="-1" aria-label="code-block-24-12"></a>var_zarr <span class="op">=</span> ds_zarr[<span class="st">"swh"</span>]</span>
-<span id="cb24-13"><a href="#cb24-13" tabindex="-1" aria-label="code-block-24-13"></a>var_zarr <span class="op">=</span> var_zarr.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb24-14"><a href="#cb24-14" tabindex="-1" aria-label="code-block-24-14"></a></span>
-<span id="cb24-15"><a href="#cb24-15" tabindex="-1" aria-label="code-block-24-15"></a>mean_zarr <span class="op">=</span> var_zarr.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb24-16"><a href="#cb24-16" tabindex="-1" aria-label="code-block-24-16"></a>mean_zarr <span class="op">=</span> mean_zarr.compute()</span>
-<span id="cb24-17"><a href="#cb24-17" tabindex="-1" aria-label="code-block-24-17"></a></span>
-<span id="cb24-18"><a href="#cb24-18" tabindex="-1" aria-label="code-block-24-18"></a><span class="bu">print</span>(<span class="st">"NetCDF mean:"</span>, <span class="bu">float</span>(mean_nc.values))</span>
-<span id="cb24-19"><a href="#cb24-19" tabindex="-1" aria-label="code-block-24-19"></a><span class="bu">print</span>(<span class="st">"Zarr mean:"</span>, <span class="bu">float</span>(mean_zarr.values))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" tabindex="-1" aria-label="code-block-26-1"></a><span class="im">import</span> time</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1" aria-label="code-block-26-2"></a></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1" aria-label="code-block-26-3"></a><span class="co"># NetCDF</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1" aria-label="code-block-26-4"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1" aria-label="code-block-26-5"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1" aria-label="code-block-26-6"></a>var_nc <span class="op">=</span> ds_nc[<span class="st">"swh"</span>]</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1" aria-label="code-block-26-7"></a><span class="co"># slice to a single time step for comparison</span></span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1" aria-label="code-block-26-8"></a>var_nc <span class="op">=</span> var_nc.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1" aria-label="code-block-26-9"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1" aria-label="code-block-26-10"></a>mean_nc <span class="op">=</span> var_nc.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1" aria-label="code-block-26-11"></a></span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1" aria-label="code-block-26-12"></a>t2 <span class="op">=</span> time.time()</span>
+<span id="cb26-13"><a href="#cb26-13" tabindex="-1" aria-label="code-block-26-13"></a><span class="bu">print</span>(<span class="st">"NetCDF mean:"</span>, <span class="bu">float</span>(mean_nc.values))</span>
+<span id="cb26-14"><a href="#cb26-14" tabindex="-1" aria-label="code-block-26-14"></a><span class="bu">print</span>(<span class="st">"Time to open NetCDF files:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
+<span id="cb26-15"><a href="#cb26-15" tabindex="-1" aria-label="code-block-26-15"></a><span class="bu">print</span>(<span class="st">"Time taken for NetCDF computation:"</span>, t2 <span class="op">-</span> t1, <span class="st">"seconds"</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" tabindex="-1" aria-label="code-block-26-16"></a><span class="bu">print</span>(<span class="st">"Total time for NetCDF:"</span>, t2 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
+<span id="cb26-17"><a href="#cb26-17" tabindex="-1" aria-label="code-block-26-17"></a></span>
+<span id="cb26-18"><a href="#cb26-18" tabindex="-1" aria-label="code-block-26-18"></a><span class="co"># Zarr</span></span>
+<span id="cb26-19"><a href="#cb26-19" tabindex="-1" aria-label="code-block-26-19"></a>t0 <span class="op">=</span> time.time()</span>
+<span id="cb26-20"><a href="#cb26-20" tabindex="-1" aria-label="code-block-26-20"></a>ds_zarr <span class="op">=</span> xr.open_zarr(<span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/era5_swh.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-21"><a href="#cb26-21" tabindex="-1" aria-label="code-block-26-21"></a>var_zarr <span class="op">=</span> ds_zarr[<span class="st">"swh"</span>]</span>
+<span id="cb26-22"><a href="#cb26-22" tabindex="-1" aria-label="code-block-26-22"></a>var_zarr <span class="op">=</span> var_zarr.isel(time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb26-23"><a href="#cb26-23" tabindex="-1" aria-label="code-block-26-23"></a>t1 <span class="op">=</span> time.time()</span>
+<span id="cb26-24"><a href="#cb26-24" tabindex="-1" aria-label="code-block-26-24"></a>mean_zarr <span class="op">=</span> var_zarr.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb26-25"><a href="#cb26-25" tabindex="-1" aria-label="code-block-26-25"></a>mean_zarr <span class="op">=</span> mean_zarr.compute()</span>
+<span id="cb26-26"><a href="#cb26-26" tabindex="-1" aria-label="code-block-26-26"></a>t2 <span class="op">=</span> time.time()</span>
+<span id="cb26-27"><a href="#cb26-27" tabindex="-1" aria-label="code-block-26-27"></a><span class="bu">print</span>(<span class="st">"Zarr mean:"</span>, <span class="bu">float</span>(mean_zarr.values))</span>
+<span id="cb26-28"><a href="#cb26-28" tabindex="-1" aria-label="code-block-26-28"></a><span class="bu">print</span>(<span class="st">"Time to open Zarr store:"</span>, t1 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span>
+<span id="cb26-29"><a href="#cb26-29" tabindex="-1" aria-label="code-block-26-29"></a><span class="bu">print</span>(<span class="st">"Time taken for Zarr computation:"</span>, t2 <span class="op">-</span> t1, <span class="st">"seconds"</span>)</span>
+<span id="cb26-30"><a href="#cb26-30" tabindex="-1" aria-label="code-block-26-30"></a><span class="bu">print</span>(<span class="st">"Total time for Zarr:"</span>, t2 <span class="op">-</span> t0, <span class="st">"seconds"</span>)</span></code></pre>
 </div>
 <p>When done carefully, converting NetCDF to Zarr and back preserves
 scientific values. The mean values should match within floating point
@@ -1264,7 +1297,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/10-conversion-workflow.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/10-conversion-workflow.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

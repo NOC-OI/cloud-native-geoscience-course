@@ -414,7 +414,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Data Versioning with Icechunk</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/12-icechunk.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -473,8 +473,7 @@ control on top of Zarr. It lets you manage data in a repository with
 transactions, snapshots, branches, and tags, so you can update data
 atomically, recover from mistakes, and refer to exact versions in future
 analysis.</p>
-<figure><img src="fig/zarr_without_icechunk.png" alt="Zarr without Icechunk." class="figure mx-auto d-block"><div class="figcaption">Zarr without Icechunk. Source: <a href="https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/" class="external-link uri">https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/</a>
-</div>
+<figure><img src="fig/zarr_without_icechunk.png" alt="Zarr without Icechunk." class="figure mx-auto d-block"><div class="figcaption"><a href="https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/" class="external-link">Source</a></div>
 </figure></section><section><h2 class="section-heading" id="icechunk-concepts">Icechunk concepts<a class="anchor" aria-label="anchor" href="#icechunk-concepts"></a></h2>
 <hr class="half-width"><p>Icechunk wraps Zarr stores inside repositories that track changes
 over time, in a similar way to how Git tracks changes to code. The main
@@ -567,8 +566,7 @@ mix.</p>
 <p>This shows that Icechunk provides a safe, consistent, and
 reproducible way to manage evolving Zarr datasets, making it suitable
 for collaborative scientific workflows.</p>
-<figure><img src="fig/shark.jpg" alt="Happy and sad shark!" class="figure mx-auto d-block"><div class="figcaption">Happy and sad shark!</div>
-</figure></div>
+<figure><img src="fig/sharks.png" alt="Happy, sad and mix sharks!" class="figure mx-auto d-block"></figure></div>
 </div>
 </div>
 <div id="exercise-1---map-git-concepts-to-icechunk" class="callout challenge">
@@ -597,7 +595,7 @@ time.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>Git concepts map naturally to Icechunk. An Icechunk repository stores
 the history of a dataset, similar to a Git repository for code.
@@ -652,14 +650,14 @@ over time while keeping the repository in object storage.</p>
 <div class="section level3">
 <h3 id="step-2---opening-the-local-zarr-store">Step 2 - Opening the local Zarr store<a class="anchor" aria-label="anchor" href="#step-2---opening-the-local-zarr-store"></a></h3>
 <p>Open the local Zarr dataset with xarray. We are going to use the
-<code>data/era5_sst/ocean_temperature.zarr</code> dataset as an
-example.</p>
+<code>data/era5_sst/ocean_temperature.zarr</code> (ERA5 Reanalysis)
+dataset as an example.</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>local_zarr <span class="op">=</span> <span class="st">"data/era5_sst/ocean_temperature.zarr"</span></span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds <span class="op">=</span> xr.open_zarr(local_zarr)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a><span class="bu">print</span>(ds)</span></code></pre>
 </div>
@@ -713,15 +711,17 @@ object store. Now I can start a writable session on the
 <div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="co"># Create a writable session on the main branch</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="co"># Import the `to_icechunk` function from the `icechunk.xarray` module</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a><span class="im">from</span> icechunk.xarray <span class="im">import</span> to_icechunk</span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a><span class="co"># Save the dataset to the Icechunk repository</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>ds.to_zarr(</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a>    session.store,</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>)</span></code></pre>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a><span class="co"># Create a writable session on the main branch</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1" aria-label="code-block-8-5"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1" aria-label="code-block-8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1" aria-label="code-block-8-7"></a><span class="co"># Save the dataset to the Icechunk repository</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1" aria-label="code-block-8-8"></a>to_icechunk(</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1" aria-label="code-block-8-9"></a>    ds,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1" aria-label="code-block-8-10"></a>    session,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1" aria-label="code-block-8-11"></a>)</span></code></pre>
 </div>
 <p>Now that the dataset is added to the Icechunk repository, I can
 commit the session to create a snapshot.</p>
@@ -757,6 +757,7 @@ repository:</p>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a></span>
 <span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a><span class="bu">print</span>(ds_main)</span></code></pre>
 </div>
+<p>You can also use</p>
 <p>This is the standard way to read data from an Icechunk repository.
 Opening a read-only session on the <code>main</code> branch gives you a
 consistent snapshot of the dataset, ensuring that analyses always use a
@@ -789,7 +790,7 @@ path?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>Set the object store credentials:</p>
 <div class="codewrapper sourceCode" id="cb12">
@@ -816,7 +817,9 @@ path?</li>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="co"># Open the local Zarr store</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature.zarr"</span>)</span></code></pre>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span></code></pre>
 </div>
 <p>Create an Icechunk repository in the object store:</p>
 <div class="codewrapper sourceCode" id="cb14">
@@ -844,16 +847,17 @@ path?</li>
 <div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="im">from</span> icechunk.xarray <span class="im">import</span> to_icechunk</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>ds.to_zarr(</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>    session.store,</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>)</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a>snapshot <span class="op">=</span> session.commit(<span class="st">"Initial import of ocean_temperature.zarr"</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a><span class="bu">print</span>(<span class="ss">f"Snapshot: </span><span class="sc">{</span>snapshot<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>session <span class="op">=</span> repo.writable_session(<span class="st">"main"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>to_icechunk(</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    ds,</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>    session,</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a>)</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a>snapshot <span class="op">=</span> session.commit(<span class="st">"Initial import of ocean_temperature.zarr"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a><span class="bu">print</span>(<span class="ss">f"Snapshot: </span><span class="sc">{</span>snapshot<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
 </div>
 <p>Reopen the dataset from the main branch and compare it with the local
 Zarr store:</p>
@@ -987,7 +991,7 @@ Icechunk?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>Update the dataset:</p>
 <div class="codewrapper sourceCode" id="cb22">
@@ -1046,7 +1050,7 @@ Zarr?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
 <p>Make a good update:</p>
 <div class="codewrapper sourceCode" id="cb24">
@@ -1128,9 +1132,11 @@ reference point for a publication, report, or operational run.</p>
 </div>
 <p>This makes it easy to say exactly which version of the data was used,
 and to reopen that same version later for verification or reruns.</p>
-<figure><img src="fig/git_workflow.png" alt="Git Workflow, which is similar to Icechunk Workflow." class="figure mx-auto d-block"><div class="figcaption">Git Workflow, which is similar to Icechunk
-Workflow. Source: <a href="https://yakiloo.com/getting-started-git-flow/" class="external-link uri">https://yakiloo.com/getting-started-git-flow/</a>
-</div>
+<p>The diagram below shows the Git workflow, which is similar to
+Icechunk’s workflow. You can create branches for development, commit
+changes to snapshots, and tag important versions for
+reproducibility.</p>
+<figure><img src="fig/git_workflow.png" alt="Git Workflow, which is similar to Icechunk Workflow." class="figure mx-auto d-block"><div class="figcaption"><a href="https://yakiloo.com/getting-started-git-flow/" class="external-link">Source</a></div>
 </figure><div id="exercise-5---tag-a-reproducible-version" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
@@ -1157,7 +1163,7 @@ and compare the results.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution5" aria-expanded="false" aria-controls="collapseSolution5">
   <h4 class="accordion-header" id="headingSolution5"> Show me the solution </h4>
 </button>
-<div id="collapseSolution5" class="accordion-collapse collapse" aria-labelledby="headingSolution5" data-bs-parent="#accordionSolution5">
+<div id="collapseSolution5" class="accordion-collapse collapse" data-bs-parent="#accordionSolution5" aria-labelledby="headingSolution5">
 <div class="accordion-body">
 <p>Create a tag for the last version of the main branch:</p>
 <div class="codewrapper sourceCode" id="cb30">
@@ -1293,7 +1299,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/12-icechunk.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/12-icechunk.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

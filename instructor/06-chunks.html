@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>How to Choose Chunks for Analysis and Processing at Scale</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/06-chunks.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -536,14 +536,16 @@ and work well with parallel processing, but still fit in memory
 comfortably (e.g. 10-100 MB size).</li>
 </ul><p>There is no single “best” chunking: it depends on which workloads are
 most important for your users.</p>
-<figure><img src="../fig/chunk_strategy.png" alt="Diagram showing how different chunking strategies affect performance for different workloads." class="figure mx-auto d-block"><div class="figcaption">Chunk strategy. Source: Matt Piagge
-(UKCEH)</div>
+<figure><img src="../fig/chunk_strategy.png" alt="Diagram showing how different chunking strategies affect performance for different workloads." class="figure mx-auto d-block"><div class="figcaption"><a href="https://zenodo.org/records/17968159" class="external-link">Source</a></div>
 </figure></div>
 </section><section><h2 class="section-heading" id="inspecting-chunk-shapes-in-a-zarr-store">Inspecting chunk shapes in a Zarr store<a class="anchor" aria-label="anchor" href="#inspecting-chunk-shapes-in-a-zarr-store"></a></h2>
 <hr class="half-width"><p>Let’s take a look on one of our example Zarr datasets to see how
-chunks are laid out. Now we are using a subset of the GLORYS Reanalysis
-dataset (<a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description" class="external-link uri">https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description</a>),
-stored in a single Zarr group:</p>
+chunks are laid out. Now we are using a subset of the <a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description" class="external-link">GLORYS12V1
+Ocean Reanalysis dataset</a>. The GLORYS12V1 product is the CMEMS global
+ocean eddy-resolving (1/12° horizontal resolution, 50 vertical levels)
+reanalysis covering the altimetry period from 1993 onward.</p>
+<p>The subset is stored in a single Zarr group, and it is available in
+the <code>data/glorys/</code> directory.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -576,7 +578,7 @@ about how the current chunking might align with your workloads.</p>
 <h3 class="callout-title">Exercise 1 - Relate current chunking to
 workloads</h3>
 <div class="callout-content">
-<p>Using the GLORYS Reanalysis example Zarr dataset
+<p>Using the GLORYS12V1 Ocean Reanalysis example Zarr dataset
 (<code>data/glorys/glorys_202605.zarr</code>), answer the following:</p>
 <ol style="list-style-type: decimal"><li><p>Inspect the <code>so</code> (Salinity) array’s <code>shape</code>
 and <code>chunks</code> using <code>xarray</code>.</p></li>
@@ -1178,11 +1180,11 @@ still maintaining the benefits of chunked access for analysis.</p>
 </div>
 </div>
 </div>
-<div id="rememberchunking-and-sharding-are-not-the-same" class="callout">
+<div id="rememberchunking-and-sharding-are-not-the-same" class="callout caution">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Caution</span>
 <div id="rememberchunking-and-sharding-are-not-the-same" class="callout-inner">
 <h3 class="callout-title">Remember:Chunking and sharding are not the
 same</h3>
@@ -1226,7 +1228,7 @@ any links that you are not going to use.
 </div>
 </section><div class="footnotes footnotes-end-of-document">
 <hr><ol><li id="fn1"><p>Nguyean, T., et al. (2023). <em>Impact of Chunk Size on
-Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https://essopenarchive.org/doi/pdf/10.1002/essoar.10511054.2?download=true" class="external-link uri">https://essopenarchive.org/doi/pdf/10.1002/essoar.10511054.2?download=true</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https://essopenarchive.org/doi/full/10.1002/essoar.10511054.2" class="external-link uri">https://essopenarchive.org/doi/full/10.1002/essoar.10511054.2</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol></div>
 
 
@@ -1291,7 +1293,7 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-chunks.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-chunks.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

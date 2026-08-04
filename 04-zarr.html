@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Zarr - Data Model, Metadata, and Chunked Storage</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/04-zarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -496,8 +496,7 @@ dimensions such as <code>time</code>, <code>lat</code>,
 <code>lon</code>, and <code>level</code>. Instead of one monolithic
 file, each array is split into chunks, and each chunk can be stored and
 read separately.</p>
-<figure><img src="fig/zarr_organisation.png" alt="Zarr organisation, showing groups and arrays with chunked storage." class="figure mx-auto d-block"><div class="figcaption">Zarr Organisation. Source: <a href="https://tutorial.xarray.dev/intermediate/intro-to-zarr.html" class="external-link uri">https://tutorial.xarray.dev/intermediate/intro-to-zarr.html</a>
-</div>
+<figure><img src="fig/zarr_organisation.png" alt="Zarr organisation, showing groups and arrays with chunked storage." class="figure mx-auto d-block"><div class="figcaption"><a href="https://tutorial.xarray.dev/intermediate/intro-to-zarr.html" class="external-link">Source</a></div>
 </figure><div class="section level3">
 <h3 id="zarr-v2">Zarr v2<a class="anchor" aria-label="anchor" href="#zarr-v2"></a></h3>
 <p>Zarr version 2 is the older, widely used storage specification. In
@@ -587,8 +586,7 @@ in files such as <code>0.0.0</code>, <code>0.0.1</code>,
 human-readable, and easy to inspect without opening the full dataset.
 That makes it convenient for browsing dataset structure and
 understanding how the data are organised before any analysis begins.</p>
-<figure><img src="fig/zarrv2.png" alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files." class="figure mx-auto d-block"><div class="figcaption">Zarr V2. Source: <a href="https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/" class="external-link uri">https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/</a>
-</div>
+<figure><img src="fig/zarrv2.png" alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files." class="figure mx-auto d-block"><div class="figcaption"><a href="https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/" class="external-link">Source</a></div>
 </figure></div>
 <div class="section level3">
 <h3 id="zarr-v3">Zarr v3<a class="anchor" aria-label="anchor" href="#zarr-v3"></a></h3>
@@ -649,8 +647,7 @@ top-level group, and each array has its own <code>zarr.json</code> file
 describing its shape, chunk grid, data type, codecs, and other metadata.
 The chunk data are stored separately under chunk key paths such as
 <code>c/0/0/0</code>.</p>
-<figure><img src="fig/zarrv3.png" alt="Zarr V3 metadata structure, showing zarr.json files" class="figure mx-auto d-block"><div class="figcaption">Zarr V3. Source: <a href="https://earthmover.io/blog/what-is-zarr/" class="external-link uri">https://earthmover.io/blog/what-is-zarr/</a>
-</div>
+<figure><img src="fig/zarrv3.png" alt="Zarr V3 metadata structure, showing zarr.json files" class="figure mx-auto d-block"><div class="figcaption"><a href="https://earthmover.io/blog/what-is-zarr/" class="external-link">Source</a></div>
 </figure><p>An example of a Zarr v3 metadata file for an array might look like
 this:</p>
 <div class="codewrapper sourceCode" id="cb7">
@@ -722,11 +719,11 @@ can instead be divided into smaller blocks, such as:</p>
 “this region for this month”, the software can request only the chunks
 that overlap that query, rather than the whole array.</p>
 <figure><img src="fig/chunk_effect.png" alt="Effect of chunking on data access." class="figure mx-auto d-block"><div class="figcaption">How chunking affects data access.</div>
-</figure><div id="chunking-also-has-trade-offs" class="callout">
+</figure><div id="chunking-also-has-trade-offs" class="callout caution">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Caution</span>
 <div id="chunking-also-has-trade-offs" class="callout-inner">
 <h3 class="callout-title">Chunking also has trade-offs</h3>
 <div class="callout-content">
@@ -1066,7 +1063,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/04-zarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/04-zarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

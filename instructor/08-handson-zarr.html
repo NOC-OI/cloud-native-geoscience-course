@@ -412,7 +412,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Hands-On with Open Zarr Datasets Using Python</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/08-handson-zarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -466,8 +466,8 @@ affect performance.”</li>
 <ul><li>
 <a href="https://dynamical.org/catalog/" class="external-link"><strong>IFS ensemble
 forecasts</strong></a> in Icechunk/Zarr from dynamical.org - global
-ensemble forecasts on AWS (I will explain later what Icechunk is and how
-it relates to Zarr).</li>
+ensemble forecasts on AWS (Icechunk and its relationship to Zarr are
+explained later in this lesson).</li>
 <li>
 <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data" class="external-link"><strong>ERA5
 ARCO</strong></a> reanalysis in Zarr on Climate Data Store - global
@@ -487,9 +487,9 @@ your interests.</li>
 <li>Ensembles with <code>member</code> dimensions.</li>
 </ul><p>All these datasets are hosted in cloud object storage (Google Cloud,
 AWS S3, or HTTPS) and can be accessed programmatically with Python tools
-like <code>xarray</code> and <code>zarr</code>. I will explain later
-what object storage is and how it differs from traditional file
-systems.</p>
+like <code>xarray</code> and <code>zarr</code>. Object storage and how
+it differs from traditional file systems are explained later in this
+lesson.</p>
 <p>These datasets can be several terabytes in size. <strong>DO NOT
 DOWNLOAD THEM LOCALLY.</strong></p>
 </section><section><h2 class="section-heading" id="ensemble-forecasts---ecmwf-aifs-ens-icechunkzarr">Ensemble forecasts - ECMWF AIFS ENS Icechunk/Zarr<a class="anchor" aria-label="anchor" href="#ensemble-forecasts---ecmwf-aifs-ens-icechunkzarr"></a></h2>
@@ -588,9 +588,9 @@ examples of how to access and manipulate these datasets in the <a href="https://
 <h3 class="callout-title">Integrate cartopy for better
 visualisation</h3>
 <div class="callout-content">
-<p>You can see below an example of the integration of cartopy to
-visualise the sea zonal wind at 10 meters above the surface from the
-ECMWF AIFS SINGLE dataset:</p>
+<p>The following example integrates cartopy to visualise the sea zonal
+wind at 10 meters above the surface from the ECMWF AIFS SINGLE
+dataset:</p>
 <div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -599,7 +599,7 @@ ECMWF AIFS SINGLE dataset:</p>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a><span class="im">import</span> cartopy.feature <span class="im">as</span> cfeature</span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr"</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>wind_u_10m <span class="op">=</span> ds[<span class="st">'wind_u_10m'</span>].isel(init_time<span class="op">=</span><span class="st">"2025-01-01"</span>,method<span class="op">=</span><span class="st">"nearest"</span>).isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>wind_u_10m <span class="op">=</span> ds[<span class="st">'wind_u_10m'</span>].sel(init_time<span class="op">=</span><span class="st">"2025-01-01"</span>,method<span class="op">=</span><span class="st">"nearest"</span>).isel(lead_time<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1" aria-label="code-block-10-7"></a></span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1" aria-label="code-block-10-8"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1" aria-label="code-block-10-9"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span>ccrs.PlateCarree())</span>
@@ -711,9 +711,8 @@ ARCO documentation</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="create-a-plot-of-a-variable">Create a plot of a variable<a class="anchor" aria-label="anchor" href="#create-a-plot-of-a-variable"></a></h3>
-<p>You can see below an example of how to create a plot of the
-significant wave height (swh) variable at a single time step using
-matplotlib:</p>
+<p>The following example shows how to create a plot of the significant
+wave height (swh) variable at a single time step using matplotlib:</p>
 <div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -821,8 +820,7 @@ Attributes:
 a similar dataset: <a href="https://www.aoml.noaa.gov/global-drifter-program/" class="external-link">Global Drifter
 Program (GDP)</a> Drifter data. The explanation below about this dataset
 was extracted and adapted from the <a href="https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane" class="external-link">OHW
-2024 Tutorials -
-collocating_noaa_gfs_sofar_spotter_during_hurricane</a>.</p>
+2024 Tutorials</a>.</p>
 <p>Each Spotter buoy records a different number of observations because
 of factors such as deployment time, reporting frequency, instrument
 lifetime, and missing measurements. One way to represent these
@@ -846,21 +844,22 @@ to store missing values while preserving the original trajectories.</p>
 <div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="co"># choose a drifter by ID</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a>spotter_id <span class="op">=</span> <span class="st">'SPOT-0164'</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a></span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a><span class="co"># choose a drifter by ID</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a>spotter_id <span class="op">=</span> <span class="st">'SPOT-0164'</span></span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a><span class="co"># create array that points to indices for each trajectory</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a><span class="co"># create array that points to indices for each trajectory</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>traj_idx <span class="op">=</span> np.insert(np.cumsum(ds.rowsize.values), <span class="dv">0</span>, <span class="dv">0</span>)</span>
 <span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1" aria-label="code-block-19-9"></a><span class="co"># find index of chosen drifter</span></span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1" aria-label="code-block-19-10"></a>j <span class="op">=</span> np.where(ds.trajectory<span class="op">==</span>spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1" aria-label="code-block-19-11"></a><span class="bu">print</span>(<span class="ss">f"Drifter index for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> is </span><span class="sc">{</span>j<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1" aria-label="code-block-19-12"></a></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1" aria-label="code-block-19-9"></a></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1" aria-label="code-block-19-10"></a><span class="co"># find index of chosen drifter</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1" aria-label="code-block-19-11"></a>j <span class="op">=</span> np.where(ds.trajectory<span class="op">==</span>spotter_id)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1" aria-label="code-block-19-12"></a><span class="bu">print</span>(<span class="ss">f"Drifter index for </span><span class="sc">{</span>spotter_id<span class="sc">}</span><span class="ss"> is </span><span class="sc">{</span>j<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb19-13"><a href="#cb19-13" tabindex="-1" aria-label="code-block-19-13"></a></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1" aria-label="code-block-19-14"></a><span class="co"># create the slice index `sli` for data from that drifter</span></span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1" aria-label="code-block-19-15"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j<span class="op">+</span><span class="dv">1</span>])</span></code></pre>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1" aria-label="code-block-19-14"></a></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1" aria-label="code-block-19-15"></a><span class="co"># create the slice index `sli` for data from that drifter</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1" aria-label="code-block-19-16"></a>sli <span class="op">=</span> <span class="bu">slice</span>(traj_idx[j], traj_idx[j<span class="op">+</span><span class="dv">1</span>])</span></code></pre>
 </div>
 <p>Plot the trajectory colored by significant wave height (swh):</p>
 <div class="codewrapper sourceCode" id="cb20">
@@ -930,7 +929,7 @@ week).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -994,7 +993,7 @@ year).</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -1059,7 +1058,7 @@ similar) and extract its time series:</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -1098,14 +1097,13 @@ similar) and extract its time series:</li>
 </div>
 </div>
 </div>
-<div id="other-open-zarr-datasets-to-explore" class="callout">
-<div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
-</div>
-<span class="callout-header">Callout</span>
-<div id="other-open-zarr-datasets-to-explore" class="callout-inner">
-<h3 class="callout-title">Other open Zarr datasets to explore</h3>
-<div class="callout-content">
+<div id="accordionSpoiler1" class="accordion spoiler-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button spoiler-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpoiler1" aria-expanded="false" aria-controls="collapseSpoiler1">
+  <h3 class="accordion-header" id="headingSpoiler1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="eye"></i></div> Other open Zarr datasets to explore </h3>
+</button>
+<div id="collapseSpoiler1" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler1" aria-labelledby="headingSpoiler1">
+<div class="accordion-body">
 <p>You can broaden the lesson with other open Zarr datasets:</p>
 <ul><li>
 <a href="https://registry.opendata.aws/cmip6/" class="external-link"><strong>CMIP6 Zarr on
@@ -1124,6 +1122,7 @@ which are available in Zarr format.</li>
 Near-Present-Day</a> - ocean model output in Zarr format, including
 near-present-day simulations.</li>
 </ul></div>
+</div>
 </div>
 </div>
 <div id="exercise-4-optional---build-your-own-mini-project" class="callout discussion">
@@ -1244,7 +1243,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/08-handson-zarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/08-handson-zarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

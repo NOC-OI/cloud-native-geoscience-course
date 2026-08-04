@@ -410,7 +410,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Creating Virtual Zarr Stores with Virtualizarr</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/13-virtualizarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -543,9 +543,10 @@ workflow, but with one key difference: instead of copying data into new
 Zarr chunks, VirtualiZarr creates a virtual Zarr dataset whose chunks
 reference the original NetCDF files. This avoids duplicating the
 underlying data while providing a Zarr-compatible interface.</p>
-<p>In this lesson, we will use a subset of the ERA5 dataset containing
-significant wave height data, located in <code>data/daily_swh/</code>,
-which is already available on the server.</p>
+<p>In this lesson, we will use a subset of the <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels" class="external-link">ERA5
+Reanalysis dataset</a> containing significant wave height data. The
+dataset is provided as multiple NetCDF files, one per day, in the
+<code>data/daily_swh/</code> directory.</p>
 <p>All examples in this lesson use files stored on the server for
 simplicity. However, the same workflow also works with NetCDF files
 stored in an object store.</p>
@@ -558,12 +559,14 @@ working with.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="st">"data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="bu">print</span>(ds_nc)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="bu">print</span>(ds_nc.dims)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(ds_nc.coords)</span></code></pre>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_*.nc"</span>, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(ds_nc)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(ds_nc.dims)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a><span class="bu">print</span>(ds_nc.data_vars)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a><span class="bu">print</span>(ds_nc.coords)</span></code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -590,7 +593,7 @@ containing daily significant wave height data.</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>data_dir <span class="op">=</span> <span class="st">"data/daily_swh/"</span></span>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a>data_dir <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/"</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>file_paths <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">*.nc"</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>urls <span class="op">=</span> [<span class="ss">f"file://</span><span class="sc">{</span>path<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> path <span class="kw">in</span> file_paths]</span></code></pre>
@@ -630,14 +633,13 @@ backed by virtual references rather than copied Zarr chunks.</p>
 <p>The important point is that this does <strong>not</strong> copy the
 data into new Zarr files. It creates a virtual representation that can
 be opened and analysed like a Zarr-style dataset.</p>
-<div id="obstore" class="callout">
-<div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
-</div>
-<span class="callout-header">Callout</span>
-<div id="obstore" class="callout-inner">
-<h3 class="callout-title">Obstore</h3>
-<div class="callout-content">
+<div id="accordionSpoiler1" class="accordion spoiler-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button spoiler-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpoiler1" aria-expanded="false" aria-controls="collapseSpoiler1">
+  <h3 class="accordion-header" id="headingSpoiler1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="eye"></i></div> Obstore </h3>
+</button>
+<div id="collapseSpoiler1" class="accordion-collapse collapse" aria-labelledby="headingSpoiler1" data-bs-parent="#accordionSpoiler1">
+<div class="accordion-body">
 <p><a href="https://developmentseed.org/obstore/latest/" class="external-link"><code>obstore</code></a>
 gives a simple Python interface to cloud object storage that is built
 for speed and works well with safer, more predictable data access
@@ -648,6 +650,7 @@ provider-specific clients or filesystem-style wrappers.</p>
 to explore it further. It is not the focus of this lesson, but it is
 interesting if you want to work with cloud object storage more
 efficiently.</p>
+</div>
 </div>
 </div>
 </div>
@@ -666,18 +669,16 @@ configuration that allows Icechunk to resolve the virtual chunks.</p>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a><span class="co"># This is the path where the Icechunk repository will be created</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>repo_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>storage <span class="op">=</span> ic.local_filesystem_storage(<span class="st">"data/daily_swh_icechunk/"</span>)</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a>storage <span class="op">=</span> ic.local_filesystem_storage(repo_path)</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1" aria-label="code-block-7-8"></a><span class="co"># Because we are using a virtual dataset, we need to tell Icechunk where to find the original NetCDF files when reopening the snapshot. This is done by creating a virtual chunk container that points to the local filesystem store.</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1" aria-label="code-block-7-9"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1" aria-label="code-block-7-10"></a>config.set_virtual_chunk_container(</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1" aria-label="code-block-7-11"></a>    ic.VirtualChunkContainer(<span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>, ic.local_filesystem_store(data_dir))</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1" aria-label="code-block-7-12"></a>)</span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1" aria-label="code-block-7-13"></a></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1" aria-label="code-block-7-14"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1" aria-label="code-block-7-15"></a>repo.save_config()</span></code></pre>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a><span class="co"># Because we are using a virtual dataset, we need to tell Icechunk where to find the original NetCDF files when reopening the snapshot. This is done by creating a virtual chunk container that points to the local filesystem store.</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1" aria-label="code-block-7-8"></a>config.set_virtual_chunk_container(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1" aria-label="code-block-7-9"></a>    ic.VirtualChunkContainer(<span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>, ic.local_filesystem_store(data_dir))</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1" aria-label="code-block-7-10"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1" aria-label="code-block-7-11"></a></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1" aria-label="code-block-7-12"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1" aria-label="code-block-7-13"></a>repo.save_config()</span></code></pre>
 </div>
 <p>Now you have a local Icechunk repository that can store virtual
 datasets. The next step is to write the virtual dataset into the
@@ -732,7 +733,7 @@ for each operation.</p>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="im">import</span> time</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a>pattern <span class="op">=</span> <span class="st">"data/daily_swh/swh_*.nc"</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1" aria-label="code-block-10-3"></a>pattern <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/swh_*.nc"</span></span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1" aria-label="code-block-10-4"></a></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1" aria-label="code-block-10-5"></a>t0 <span class="op">=</span> time.time()</span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1" aria-label="code-block-10-6"></a>ds_nc <span class="op">=</span> xr.open_mfdataset(pattern, combine<span class="op">=</span><span class="st">"by_coords"</span>)</span>
@@ -760,14 +761,14 @@ expect the virtual dataset to be faster than opening all the NetCDF
 files directly. The goal is to show that virtualisation can give you a
 Zarr-like + Icechunk access pattern without fully converting the
 data.</p>
-<div id="exercise-2---open-a-virtual-dataset-from-server-netcdf-files" class="callout challenge">
+<div id="exercise-2---open-a-virtual-dataset-from-local-netcdf-files" class="callout challenge">
 <div class="callout-square">
 <i class="callout-icon" data-feather="zap"></i>
 </div>
 <span class="callout-header">Challenge</span>
-<div id="exercise-2---open-a-virtual-dataset-from-server-netcdf-files" class="callout-inner">
-<h3 class="callout-title">Exercise 2 - Open a virtual dataset from
-server NetCDF files</h3>
+<div id="exercise-2---open-a-virtual-dataset-from-local-netcdf-files" class="callout-inner">
+<h3 class="callout-title">Exercise 2 - Open a virtual dataset from local
+NetCDF files</h3>
 <div class="callout-content">
 <p>Using the NetCDF files related to daily significant wave height from
 ERA5 (<code>data/daily_swh/*.nc</code>):</p>
@@ -799,7 +800,7 @@ virtual dataset.</li>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1" aria-label="code-block-11-4"></a><span class="im">from</span> virtualizarr <span class="im">import</span> open_virtual_mfdataset</span>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1" aria-label="code-block-11-5"></a><span class="im">from</span> virtualizarr.parsers <span class="im">import</span> HDFParser</span>
 <span id="cb11-6"><a href="#cb11-6" tabindex="-1" aria-label="code-block-11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1" aria-label="code-block-11-7"></a>data_dir <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh/"</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1" aria-label="code-block-11-7"></a>data_dir <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/daily_swh/"</span></span>
 <span id="cb11-8"><a href="#cb11-8" tabindex="-1" aria-label="code-block-11-8"></a></span>
 <span id="cb11-9"><a href="#cb11-9" tabindex="-1" aria-label="code-block-11-9"></a>file_paths <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">*.nc"</span>))</span>
 <span id="cb11-10"><a href="#cb11-10" tabindex="-1" aria-label="code-block-11-10"></a>urls <span class="op">=</span> [<span class="ss">f"file://</span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> p <span class="kw">in</span> file_paths]</span>
@@ -856,19 +857,18 @@ the same as before.</li>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="im">import</span> icechunk <span class="im">as</span> ic</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a>repo_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a>storage <span class="op">=</span> ic.local_filesystem_storage(repo_path)</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>config.set_virtual_chunk_container(</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>    ic.VirtualChunkContainer(</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>        ic.local_filesystem_store(data_dir),</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>    )</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a>)</span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a></span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1" aria-label="code-block-12-14"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1" aria-label="code-block-12-15"></a>repo.save_config()</span></code></pre>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a>storage <span class="op">=</span> ic.local_filesystem_storage(<span class="st">"data/daily_swh_icechunk/"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a>config <span class="op">=</span> ic.RepositoryConfig.default()</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a>config.set_virtual_chunk_container(</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a>    ic.VirtualChunkContainer(</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1" aria-label="code-block-12-8"></a>        <span class="ss">f"file://</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1" aria-label="code-block-12-9"></a>        ic.local_filesystem_store(data_dir),</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1" aria-label="code-block-12-10"></a>    )</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1" aria-label="code-block-12-11"></a>)</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1" aria-label="code-block-12-12"></a></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1" aria-label="code-block-12-13"></a>repo <span class="op">=</span> ic.Repository.create(storage, config)</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1" aria-label="code-block-12-14"></a>repo.save_config()</span></code></pre>
 </div>
 <ol start="2" style="list-style-type: decimal"><li>Commit the virtual dataset as a snapshot.</li>
 </ol><div class="codewrapper sourceCode" id="cb13">
@@ -899,11 +899,11 @@ NetCDF files:</li>
 </div>
 </div>
 </div>
-<div id="watch-api-churn" class="callout">
+<div id="watch-api-churn" class="callout caution">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Caution</span>
 <div id="watch-api-churn" class="callout-inner">
 <h3 class="callout-title">Watch API churn</h3>
 <div class="callout-content">
@@ -942,8 +942,8 @@ chosen chunks, access may be less efficient because the virtual store
 still has to read from those files underneath. In practice, the best
 chunk strategy is usually the one that matches your analysis needs while
 staying reasonably aligned with the source layout.</p>
-<p>You can see below a table comparing different approaches to accessing
-large NetCDF archives<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+<p>The table below compares different approaches to accessing large
+NetCDF archives<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
 <div style="background-color: #f9f9f9; border-left: 5px solid #ccc; display:flex; justify-content:center; align-items:center; margin-bottom: 1em;">
 <table class="table"><thead><tr style="color: black;"><th>
 Format
@@ -1145,7 +1145,7 @@ Conference, 2025. Available at <a href="https://www.youtube.com/watch?v=QBkZQ53v
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-virtualizarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/13-virtualizarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

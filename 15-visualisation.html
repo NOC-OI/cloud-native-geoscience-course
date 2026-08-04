@@ -414,7 +414,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Visualization - Multiscale Zarr and GeoZarr</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/15-visualisation.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -519,8 +519,7 @@ local zoom can fetch high-resolution tiles only for the area of
 interest.</p>
 <p>GeoZarr’s multiscales convention formalises how to store and describe
 these pyramids in Zarr.</p>
-<figure><img src="fig/geozarr_multiscale.png" alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy." class="figure mx-auto d-block"><div class="figcaption">Source: <a href="https://www.earthmover.io/blog/multiscales-in-al/" class="external-link uri">https://www.earthmover.io/blog/multiscales-in-al/</a>
-</div>
+<figure><img src="fig/geozarr_multiscale.png" alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy." class="figure mx-auto d-block"><div class="figcaption"><a href="https://www.earthmover.io/blog/multiscales-in-al/" class="external-link">Source</a></div>
 </figure></section><section><h2 class="section-heading" id="geozarr-geospatial-conventions-for-zarr">GeoZarr: geospatial conventions for Zarr<a class="anchor" aria-label="anchor" href="#geozarr-geospatial-conventions-for-zarr"></a></h2>
 <hr class="half-width"><p>GeoZarr is a set of modular conventions for encoding geospatial
 datasets in Zarr. The core conventions include <code>proj</code>,
@@ -553,7 +552,8 @@ Before implementing it, think about your dataset and how you want to
 visualise it. Because it can be resource-intensive to create multiple
 levels, we are going to use a small example dataset for this exercise,
 the <code>data/era5_sst/ocean_temperature.zarr</code>, related to the
-ERA5 reanalysis dataset.</p>
+subset of <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels" class="external-link">ERA5
+Reanalysis dataset</a>.</p>
 <ol style="list-style-type: decimal"><li>Look at your example Zarr dataset (dimensions, spatial resolution,
 domain).</li>
 <li>Propose:
@@ -598,83 +598,131 @@ multiple resolution levels (pyramid) with appropriate metadata.</p>
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
 </div>
-<p>Now, you can choose a variable to visualise (e.g. <code>ssh</code>)
-and use Topozarr to build the multiscale pyramid.</p>
+<p>To generate the multiscale pyramid, you need to set the CRS in the
+dataset attributes. For example, if the dataset uses WGS84 (EPSG:4326),
+you can set it like this:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">import</span> topozarr</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>var <span class="op">=</span> ds[<span class="st">"ssh"</span>]</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1" aria-label="code-block-2-4"></a>    var,</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1" aria-label="code-block-2-5"></a>    levels<span class="op">=</span><span class="dv">4</span>,              <span class="co"># number of resolution levels</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1" aria-label="code-block-2-6"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,   <span class="co"># or 'nearest', etc.</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1" aria-label="code-block-2-7"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)  <span class="co"># spatial chunking</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1" aria-label="code-block-2-8"></a>)</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1" aria-label="code-block-2-9"></a><span class="bu">print</span>(pyramid)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>ds <span class="op">=</span> ds.proj.assign_crs({<span class="st">"EPSG"</span>: <span class="dv">4326</span>})</span></code></pre>
 </div>
-<p>The pyramid object is a datatree that contains multiple levels of
-downsampled data, each with its own group in the Zarr hierarchy. Each
-level can be accessed and visualised separately, and the pyramid can be
-saved to a new Zarr store for use in browser-based visualisation
-tools.</p>
 <div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="cf">for</span> level <span class="kw">in</span> pyramid.levels:</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a>    <span class="bu">print</span>(<span class="ss">f"Level </span><span class="sc">{</span>level<span class="sc">.</span>level<span class="sc">}</span><span class="ss">: shape=</span><span class="sc">{</span>level<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, chunks=</span><span class="sc">{</span>level<span class="sc">.</span>chunks<span class="sc">}</span><span class="ss">"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="im">from</span> topozarr <span class="im">import</span> create_pyramid</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a>pyramid <span class="op">=</span> create_pyramid(</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a>    ds,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a>    levels<span class="op">=</span><span class="dv">2</span>, <span class="co"># number of downsampled levels</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a>    x_dim<span class="op">=</span><span class="st">"longitude"</span>, <span class="co"># x dimension name</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a>    y_dim<span class="op">=</span><span class="st">"latitude"</span>, <span class="co"># y dimension name</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a>    target_chunk_bytes<span class="op">=</span><span class="dv">512</span> <span class="op">*</span> <span class="dv">512</span> <span class="op">*</span> <span class="dv">4</span>,  <span class="co"># target chunk size in bytes (e.g. 512x512 pixels with float32)</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1" aria-label="code-block-3-9"></a>    method<span class="op">=</span><span class="st">"mean"</span>,   <span class="co"># or 'nearest', etc.</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1" aria-label="code-block-3-10"></a>    chunks_per_shard<span class="op">=</span><span class="dv">4</span> <span class="co"># number of chunks per shard for better performance</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1" aria-label="code-block-3-11"></a>)</span></code></pre>
+</div>
+<p>The pyramid is a Pyramid object. In order to take a look at the
+levels and their shapes, you can convert it to a datatree and inspect
+the levels:</p>
+<div class="codewrapper sourceCode" id="cb4">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a>pyramid_tree <span class="op">=</span> pyramid.as_datatree()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="bu">print</span>(pyramid_tree)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a><span class="bu">print</span>(pyramid_tree[<span class="st">"0"</span>])  <span class="co"># Level 0 (full resolution)</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a><span class="bu">print</span>(pyramid_tree[<span class="st">"1"</span>])  <span class="co"># Level 1 (downsampled)</span></span></code></pre>
 </div>
 <p>Instead of saving each pyramid level as a separate dataset, TopoZarr
 can write the entire pyramid to a single multiscale Zarr store that
 follows the GeoZarr conventions. In this example, we will save the
 multiscale dataset directly to an object store so that it can be
 accessed efficiently from a web browser:</p>
-<div class="codewrapper sourceCode" id="cb4">
+<p>First, create a mapper for the Zarr store. You can use
+<code>zarr.storage.FsspecStore</code> to write to an S3 bucket or other
+object storage:</p>
+<div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="im">import</span> fsspec</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a><span class="im">import</span> os</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>store_url <span class="op">=</span> <span class="st">"s3://cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1" aria-label="code-block-4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1" aria-label="code-block-4-7"></a>storage_options <span class="op">=</span> {</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1" aria-label="code-block-4-8"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1" aria-label="code-block-4-9"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1" aria-label="code-block-4-10"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1" aria-label="code-block-4-11"></a>    <span class="st">"config_kwargs"</span>: {</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1" aria-label="code-block-4-12"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1" aria-label="code-block-4-13"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1" aria-label="code-block-4-14"></a>    },</span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1" aria-label="code-block-4-15"></a>}</span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1" aria-label="code-block-4-16"></a></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1" aria-label="code-block-4-17"></a><span class="co"># Create a mapper for the object store</span></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1" aria-label="code-block-4-18"></a>mapper <span class="op">=</span> fsspec.get_mapper(</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1" aria-label="code-block-4-19"></a>    store_url,</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1" aria-label="code-block-4-20"></a>    <span class="op">**</span>storage_options,</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1" aria-label="code-block-4-21"></a>)</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1" aria-label="code-block-4-22"></a></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1" aria-label="code-block-4-23"></a><span class="co"># Write the dataset directly to the object store</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1" aria-label="code-block-4-24"></a>pyramid.to_zarr(</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1" aria-label="code-block-4-25"></a>    mapper,</span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1" aria-label="code-block-4-26"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1" aria-label="code-block-4-27"></a>    consolidated<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1" aria-label="code-block-4-28"></a>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a><span class="im">import</span> zarr</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a><span class="im">import</span> os</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1" aria-label="code-block-5-5"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/ocean_temperature_pyramid.zarr"</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1" aria-label="code-block-5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1" aria-label="code-block-5-7"></a>storage_options <span class="op">=</span> {</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1" aria-label="code-block-5-8"></a>    <span class="st">"key"</span>: os.environ[<span class="st">"AWS_ACCESS_KEY_ID"</span>],</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1" aria-label="code-block-5-9"></a>    <span class="st">"secret"</span>: os.environ[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>],</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1" aria-label="code-block-5-10"></a>    <span class="st">"client_kwargs"</span>: {<span class="st">"endpoint_url"</span>: <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"</span>},</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1" aria-label="code-block-5-11"></a>    <span class="st">"config_kwargs"</span>: {</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1" aria-label="code-block-5-12"></a>        <span class="st">"request_checksum_calculation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1" aria-label="code-block-5-13"></a>        <span class="st">"response_checksum_validation"</span>: <span class="st">"when_required"</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1" aria-label="code-block-5-14"></a>    },</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1" aria-label="code-block-5-15"></a>}</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1" aria-label="code-block-5-16"></a></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1" aria-label="code-block-5-17"></a><span class="co"># Create a reference for the object store</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1" aria-label="code-block-5-18"></a>store <span class="op">=</span> zarr.storage.FsspecStore.from_url(</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1" aria-label="code-block-5-19"></a>    store_url,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1" aria-label="code-block-5-20"></a>    storage_options<span class="op">=</span>storage_options,</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1" aria-label="code-block-5-21"></a>)</span></code></pre>
+</div>
+<p>Because this task can be resource-intensive, you may want to use a
+local cluster:</p>
+<div class="codewrapper sourceCode" id="cb6">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">from</span> dask.distributed <span class="im">import</span> Client</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a>client <span class="op">=</span> Client(n_workers<span class="op">=</span><span class="dv">4</span>, threads_per_worker<span class="op">=</span><span class="dv">2</span>, memory_limit<span class="op">=</span><span class="st">"4GB"</span>)</span></code></pre>
+</div>
+<p>And then save the pyramid to the Zarr store:</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a>pyramid_tree.to_zarr(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a>    store,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>    consolidated<span class="op">=</span><span class="va">True</span>, <span class="co"># You can set to False for performance</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a>    encoding<span class="op">=</span>pyramid.encoding, <span class="co"># You need to set the encoding as the same encoding in the Pyramid object</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a>    align_chunks<span class="op">=</span><span class="va">True</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1" aria-label="code-block-7-7"></a>)</span></code></pre>
 </div>
 <p>Now, you can inspect the Zarr hierarchy in the object store to see
 how the multiscale levels are organised and check for metadata related
 to multiscales. Because it is a datatree, you need to use the
 <code>xr.open_datatree</code> function to open the multiscale Zarr
 store:</p>
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1" aria-label="code-block-5-2"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1" aria-label="code-block-5-3"></a>ds_pyramid <span class="op">=</span> xr.open_datatree(url, engine<span class="op">=</span><span class="st">"zarr"</span>) <span class="co"># remember to use the correct engine for datatree</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1" aria-label="code-block-5-4"></a><span class="bu">print</span>(ds_pyramid)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" tabindex="-1" aria-label="code-block-8-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1" aria-label="code-block-8-2"></a>url <span class="op">=</span> <span class="st">"https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1" aria-label="code-block-8-3"></a>ds_pyramid <span class="op">=</span> xr.open_datatree(url, engine<span class="op">=</span><span class="st">"zarr"</span>) <span class="co"># remember to use the correct engine for datatree</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1" aria-label="code-block-8-4"></a><span class="bu">print</span>(ds_pyramid)</span></code></pre>
+</div>
+<div id="watch-api-churn" class="callout caution">
+<div class="callout-square">
+<i class="callout-icon" data-feather="alert-triangle"></i>
+</div>
+<span class="callout-header">Caution</span>
+<div id="watch-api-churn" class="callout-inner">
+<h3 class="callout-title">Watch API churn</h3>
+<div class="callout-content">
+<p>Support for multiscale pyramids is a relatively recent addition to
+the Zarr ecosystem. One of the libraries providing this functionality is
+<strong>Topozarr</strong>.</p>
+<p>As the Zarr ecosystem continues to evolve, Topozarr is also under
+active development. As a result, the API for creating multiscale
+pyramids may change between releases. Always refer to the documentation
+for the specific version you are using, and consider pinning your
+package versions to ensure reproducible workflows and avoid unexpected
+breakages when upgrading dependencies.</p>
+</div>
+</div>
 </div>
 <div id="exercise-2---build-and-save-a-multiscale-zarr-store" class="callout challenge">
 <div class="callout-square">
@@ -703,31 +751,49 @@ out?</li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb6">
+<div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1" aria-label="code-block-6-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1" aria-label="code-block-6-2"></a><span class="im">import</span> zarr</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1" aria-label="code-block-6-3"></a><span class="im">import</span> topozarr</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1" aria-label="code-block-6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1" aria-label="code-block-6-5"></a><span class="co"># Open the original Zarr dataset</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1" aria-label="code-block-6-6"></a>store_url <span class="op">=</span> <span class="st">"s3://my-bucket/converted.zarr"</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1" aria-label="code-block-6-7"></a>ds <span class="op">=</span> xr.open_zarr(store_url, consolidated<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1" aria-label="code-block-6-8"></a></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1" aria-label="code-block-6-9"></a><span class="co"># Choose a variable to visualise</span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1" aria-label="code-block-6-10"></a>var <span class="op">=</span> ds[<span class="st">"temperature"</span>]</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1" aria-label="code-block-6-11"></a></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1" aria-label="code-block-6-12"></a><span class="co"># Build the multiscale pyramid</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1" aria-label="code-block-6-13"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1" aria-label="code-block-6-14"></a>    var,</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1" aria-label="code-block-6-15"></a>    levels<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1" aria-label="code-block-6-16"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,</span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1" aria-label="code-block-6-17"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)</span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1" aria-label="code-block-6-18"></a>)</span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1" aria-label="code-block-6-19"></a></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1" aria-label="code-block-6-20"></a><span class="co"># Save the multiscale Zarr store</span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1" aria-label="code-block-6-21"></a>mapper <span class="op">=</span> <span class="st">"CREATE THE MAPPER"</span></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1" aria-label="code-block-6-22"></a>pyramid.to_zarr(mapper, consolidated<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1" aria-label="code-block-9-2"></a><span class="im">import</span> zarr</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1" aria-label="code-block-9-3"></a><span class="im">from</span> topozarr <span class="im">import</span> create_pyramid</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1" aria-label="code-block-9-4"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span> <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1" aria-label="code-block-9-7"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>, consolidated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1" aria-label="code-block-9-8"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1" aria-label="code-block-9-9"></a>ds <span class="op">=</span> ds.proj.assign_crs({<span class="st">"EPSG"</span>: <span class="dv">4326</span>})</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1" aria-label="code-block-9-10"></a></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1" aria-label="code-block-9-11"></a>pyramid <span class="op">=</span> create_pyramid(</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1" aria-label="code-block-9-12"></a>    ds,</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1" aria-label="code-block-9-13"></a>    levels<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1" aria-label="code-block-9-14"></a>    x_dim<span class="op">=</span><span class="st">"longitude"</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1" aria-label="code-block-9-15"></a>    y_dim<span class="op">=</span><span class="st">"latitude"</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1" aria-label="code-block-9-16"></a>    method<span class="op">=</span><span class="st">"nearest"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1" aria-label="code-block-9-17"></a>    chunks_per_shard<span class="op">=</span><span class="dv">4</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1" aria-label="code-block-9-18"></a>)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1" aria-label="code-block-9-19"></a><span class="co"># Build the multiscale pyramid</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1" aria-label="code-block-9-20"></a>pyramid <span class="op">=</span> topozarr.build_pyramid(</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1" aria-label="code-block-9-21"></a>    var,</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1" aria-label="code-block-9-22"></a>    levels<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1" aria-label="code-block-9-23"></a>    downsampling<span class="op">=</span><span class="st">"mean"</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1" aria-label="code-block-9-24"></a>    chunk_size<span class="op">=</span>(<span class="dv">256</span>, <span class="dv">256</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1" aria-label="code-block-9-25"></a>)</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1" aria-label="code-block-9-26"></a></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1" aria-label="code-block-9-27"></a>pyramid_tree <span class="op">=</span> pyramid.as_datatree()</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1" aria-label="code-block-9-28"></a></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1" aria-label="code-block-9-29"></a><span class="co"># Save the multiscale Zarr store</span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1" aria-label="code-block-9-30"></a>mapper <span class="op">=</span> <span class="st">"CREATE THE MAPPER"</span></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1" aria-label="code-block-9-31"></a></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1" aria-label="code-block-9-32"></a>client <span class="op">=</span> <span class="st">"CREATE A DASK CLIENT"</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1" aria-label="code-block-9-33"></a></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1" aria-label="code-block-9-34"></a>pyramid_tree.to_zarr(</span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1" aria-label="code-block-9-35"></a>    store,</span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1" aria-label="code-block-9-36"></a>    mode<span class="op">=</span><span class="st">"w"</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1" aria-label="code-block-9-37"></a>    consolidated<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1" aria-label="code-block-9-38"></a>    encoding<span class="op">=</span>pyramid.encoding,</span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1" aria-label="code-block-9-39"></a>    align_chunks<span class="op">=</span><span class="va">True</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1" aria-label="code-block-9-40"></a>)</span></code></pre>
 </div>
 </div>
 </div>
@@ -818,10 +884,10 @@ Zarr store and the variable you want to visualise.</p></li>
 <li>
 <p>Run a local web server in the directory containing the HTML
 file:</p>
-<div class="codewrapper sourceCode" id="cb7">
+<div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000</span></code></pre>
 </div>
 <p>Then open
 <code>http://localhost:8000/zarr-maps-openlayers.html</code> in your
@@ -920,8 +986,8 @@ and Resampling Geospatial Data with Python</em></a>. These tools can
 help prepare datasets for efficient multiscale visualisation,
 particularly when working with irregular grids or non-standard map
 projections.</p>
-<p>You can see below a diagram of the full pipeline, from NetCDF to
-multiscale Zarr pyramid, ready for browser-based visualisation.</p>
+<p>The diagram below shows the full pipeline, from NetCDF to multiscale
+Zarr pyramid, ready for browser-based visualisation.</p>
 <figure><img src="fig/nc_to_zarr_pyramid.png" alt="Pipeline diagram showing the conversion of a NetCDF dataset to a multiscale Zarr pyramid using Topozarr." class="figure mx-auto d-block"></figure></div>
 </div>
 </div>
@@ -1014,7 +1080,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/15-visualisation.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/15-visualisation.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 

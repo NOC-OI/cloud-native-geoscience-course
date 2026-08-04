@@ -412,7 +412,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Parallel Processing for Zarr</h1>
-        <p>Last updated on 2026-08-03 |
+        <p>Last updated on 2026-08-04 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/07-parallel.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -480,8 +480,7 @@ ensemble members.</li>
 the data layout are aligned. Chunked storage such as Zarr lets multiple
 workers read different chunks independently, while Dask can schedule the
 work across those chunks.</p>
-<figure><img src="../fig/parallel_processing.png" alt="Diagram showing parallel vs serial processing." class="figure mx-auto d-block"><div class="figcaption">Parallel vs Serial processing. Source: <a href="https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html" class="external-link uri">https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html</a>
-</div>
+<figure><img src="../fig/parallel_processing.png" alt="Diagram showing parallel vs serial processing." class="figure mx-auto d-block"><div class="figcaption"><a href="https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html" class="external-link">Source</a></div>
 </figure></section><section><h2 class="section-heading" id="dask-distributed-processing-for-python">Dask: distributed processing for Python<a class="anchor" aria-label="anchor" href="#dask-distributed-processing-for-python"></a></h2>
 <hr class="half-width"><p>Dask is a distributed processing library for Python. It enables
 parallel processing of Python code across multiple cores on the same
@@ -691,11 +690,11 @@ Dask threads and see what effect this has on the CPU %.</p>
 </div>
 </div>
 </div>
-<div id="troubleshooting-dask" class="callout">
+<div id="troubleshooting-dask" class="callout checklist">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="check-square"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Checklist</span>
 <div id="troubleshooting-dask" class="callout-inner">
 <h3 class="callout-title">Troubleshooting Dask</h3>
 <div class="callout-content">
@@ -706,11 +705,11 @@ try the following:</p>
 </ul></div>
 </div>
 </div>
-<div id="some-pitfalls-to-watch-out-for" class="callout">
+<div id="some-pitfalls-to-watch-out-for" class="callout caution">
 <div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
+<i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
-<span class="callout-header">Callout</span>
+<span class="callout-header">Caution</span>
 <div id="some-pitfalls-to-watch-out-for" class="callout-inner">
 <h3 class="callout-title">Some pitfalls to watch out for</h3>
 <div class="callout-content">
@@ -809,7 +808,7 @@ datasets?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>For the Zarr dataset:</p>
 <div class="codewrapper sourceCode" id="cb17">
@@ -895,6 +894,18 @@ they depend on each other.</p>
 <span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>global_mean <span class="op">=</span> corrected.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
 <span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a>dask.visualize(global_mean, filename<span class="op">=</span><span class="st">'task_graph.png'</span>)</span></code></pre>
 </div>
+<p>Sometimes the <code>visualize()</code> function fails to find the
+path of graphviz, the library it uses to build the visualisation. If
+this is happening then run the following to fix it. Replace
+“/work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env/bin/”
+with the path of the bin directory in your Conda/Mamba environment if
+you aren’t using the JASMIN environment.</p>
+<div class="codewrapper sourceCode" id="cb20">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="im">import</span> os</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a>os.environ[<span class="st">'PATH'</span>] <span class="op">=</span> <span class="st">"/work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env/bin/:"</span> <span class="op">+</span> os.environ[<span class="st">'PATH'</span>]</span></code></pre>
+</div>
 <p>This will create a PNG file showing the task graph for the
 computation. You can also use <code>global_mean.visualize()</code> to
 see the graph directly in a Jupyter notebook.</p>
@@ -915,13 +926,13 @@ created this in the previous episode) datasets, try the following:</p>
 <ol style="list-style-type: decimal"><li>Open the dataset</li>
 <li>Run one spatial statistic and one time-based statistic.</li>
 </ol><p>For example (but you can choose any statistic you like):</p>
-<div class="codewrapper sourceCode" id="cb20">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1" aria-label="code-block-20-2"></a>spatial_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1" aria-label="code-block-20-3"></a><span class="co"># Time-based statistic: mean over time</span></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1" aria-label="code-block-20-4"></a>time_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a>spatial_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>time_mean <span class="op">=</span> sst.mean(dim<span class="op">=</span><span class="st">"time"</span>)</span></code></pre>
 </div>
 <ol start="3" style="list-style-type: decimal"><li>Repeat the same operation for the other dataset (the one you didn’t
 use in step 1).</li>
@@ -940,38 +951,38 @@ in a Jupyter notebook to time the execution of a cell.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>For the original zarr dataset:</p>
-<div class="codewrapper sourceCode" id="cb21">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" tabindex="-1" aria-label="code-block-21-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1" aria-label="code-block-21-2"></a></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1" aria-label="code-block-21-3"></a><span class="co"># Open the original zarr dataset</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1" aria-label="code-block-21-4"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1" aria-label="code-block-21-5"></a>sst_original <span class="op">=</span> ds_original[<span class="st">"sst"</span>]</span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1" aria-label="code-block-21-6"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1" aria-label="code-block-21-7"></a>spatial_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1" aria-label="code-block-21-8"></a><span class="co"># Time-based statistic: mean over time</span></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1" aria-label="code-block-21-9"></a>time_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1" aria-label="code-block-21-10"></a></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1" aria-label="code-block-21-11"></a><span class="op">%</span>time spatial_mean_original.compute()</span>
-<span id="cb21-12"><a href="#cb21-12" tabindex="-1" aria-label="code-block-21-12"></a><span class="op">%</span>time time_mean_original.compute()</span></code></pre>
-</div>
-<p>For the rechunked zarr dataset:</p>
 <div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="co"># Open the rechunked zarr dataset</span></span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>)</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a>sst_rechunked <span class="op">=</span> ds_rechunked[<span class="st">"sst"</span>]</span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>spatial_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a><span class="co"># Time-based statistic: mean over time</span></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>time_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="op">%</span>time spatial_mean_rechunked.compute()</span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a><span class="op">%</span>time time_mean_rechunked.compute()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" tabindex="-1" aria-label="code-block-22-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1" aria-label="code-block-22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1" aria-label="code-block-22-3"></a><span class="co"># Open the original zarr dataset</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1" aria-label="code-block-22-4"></a>ds_original <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr"</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1" aria-label="code-block-22-5"></a>sst_original <span class="op">=</span> ds_original[<span class="st">"sst"</span>]</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1" aria-label="code-block-22-6"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1" aria-label="code-block-22-7"></a>spatial_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1" aria-label="code-block-22-8"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1" aria-label="code-block-22-9"></a>time_mean_original <span class="op">=</span> sst_original.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1" aria-label="code-block-22-10"></a></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1" aria-label="code-block-22-11"></a><span class="op">%</span>time spatial_mean_original.compute()</span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1" aria-label="code-block-22-12"></a><span class="op">%</span>time time_mean_original.compute()</span></code></pre>
+</div>
+<p>For the rechunked zarr dataset:</p>
+<div class="codewrapper sourceCode" id="cb23">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="co"># Open the rechunked zarr dataset</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a>ds_rechunked <span class="op">=</span> xr.open_zarr(<span class="st">"data/era5_sst/ocean_temperature_rechunked.zarr"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>sst_rechunked <span class="op">=</span> ds_rechunked[<span class="st">"sst"</span>]</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a><span class="co"># Spatial statistic: mean over latitude and longitude</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>spatial_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span>(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>))</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a><span class="co"># Time-based statistic: mean over time</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a>time_mean_rechunked <span class="op">=</span> sst_rechunked.mean(dim<span class="op">=</span><span class="st">"valid_time"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a><span class="op">%</span>time spatial_mean_rechunked.compute()</span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1" aria-label="code-block-23-9"></a><span class="op">%</span>time time_mean_rechunked.compute()</span></code></pre>
 </div>
 <p>When you compute the spatial and time-based statistics for both the
 original and rechunked datasets, you should observe differences in
@@ -992,8 +1003,8 @@ using a Dask cluster on HPC</h3>
 <div class="callout-content">
 <p>Now we are going to explore how to run a parallel workflow using a
 Dask cluster on an HPC system like JASMIN. For this example, we are
-going to use a bigger dataset, the subset of the GLORYS Reanalysis
-dataset, stored in a single Zarr group
+going to use a bigger dataset, the subset of the <a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description" class="external-link">GLORYS
+Reanalysis dataset</a>, stored in a single Zarr group
 (<code>data/glorys/glorys_202605.zarr</code>). This dataset is too large
 to process efficiently on a single core, so we will use Dask to
 parallelise the computation.</p>
@@ -1015,51 +1026,51 @@ multiply by a factor and subtract an offset). For example
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <p>Create a Dask cluster on JASMIN using the Dask Gateway service. You
 can use the following code snippet to set up the cluster and connect to
 it:</p>
-<div class="codewrapper sourceCode" id="cb23">
+<div class="codewrapper sourceCode" id="cb24">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">import</span> dask_gateway</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a></span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a><span class="co"># Create a connection to dask-gateway.</span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a>options <span class="op">=</span> gw.cluster_options()</span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a>options.worker_cores <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1" aria-label="code-block-23-9"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1" aria-label="code-block-23-10"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1" aria-label="code-block-23-11"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/colinsau/esces-env'</span></span>
-<span id="cb23-12"><a href="#cb23-12" tabindex="-1" aria-label="code-block-23-12"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
-<span id="cb23-13"><a href="#cb23-13" tabindex="-1" aria-label="code-block-23-13"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
-<span id="cb23-14"><a href="#cb23-14" tabindex="-1" aria-label="code-block-23-14"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb23-15"><a href="#cb23-15" tabindex="-1" aria-label="code-block-23-15"></a><span class="cf">else</span>:</span>
-<span id="cb23-16"><a href="#cb23-16" tabindex="-1" aria-label="code-block-23-16"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a><span class="im">import</span> dask_gateway</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a><span class="co"># Create a connection to dask-gateway.</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>gw <span class="op">=</span> dask_gateway.Gateway(<span class="st">"https://dask-gateway.jasmin.ac.uk"</span>, auth<span class="op">=</span><span class="st">"jupyterhub"</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1" aria-label="code-block-24-7"></a>options <span class="op">=</span> gw.cluster_options()</span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1" aria-label="code-block-24-8"></a>options.worker_cores <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1" aria-label="code-block-24-9"></a>options.scheduler_cores <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1" aria-label="code-block-24-10"></a>options.account <span class="op">=</span> <span class="st">"workshop"</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1" aria-label="code-block-24-11"></a>options.worker_setup<span class="op">=</span><span class="st">'source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env'</span></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1" aria-label="code-block-24-12"></a>clusters <span class="op">=</span> gw.list_clusters()</span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1" aria-label="code-block-24-13"></a><span class="cf">if</span> <span class="kw">not</span> clusters:</span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1" aria-label="code-block-24-14"></a>    cluster <span class="op">=</span> gw.new_cluster(options, shutdown_on_close<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1" aria-label="code-block-24-15"></a><span class="cf">else</span>:</span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1" aria-label="code-block-24-16"></a>   cluster <span class="op">=</span> gw.<span class="ex">connect</span>(clusters[<span class="dv">0</span>].name)</span></code></pre>
 </div>
 <p>Now that we have a running cluster, we can get a client object from
 the cluster that will behave the same way as the local Dask client
 did.</p>
-<div class="codewrapper sourceCode" id="cb24">
-<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" tabindex="-1" aria-label="code-block-24-1"></a>client <span class="op">=</span> cluster.get_client()</span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1" aria-label="code-block-24-2"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1" aria-label="code-block-24-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="st">"data/glorys/glorys_202605.zarr"</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1" aria-label="code-block-24-4"></a>uo <span class="op">=</span> ds[<span class="st">'uo'</span>]</span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1" aria-label="code-block-24-5"></a>corrected_uo <span class="op">=</span> uo <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1" aria-label="code-block-24-6"></a>corrected_uo.compute()</span>
-<span id="cb24-7"><a href="#cb24-7" tabindex="-1" aria-label="code-block-24-7"></a><span class="bu">print</span>(corrected_uo)</span></code></pre>
-</div>
-<p>Remember to shutdown the cluster when you are done to free up
-resources:</p>
 <div class="codewrapper sourceCode" id="cb25">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" tabindex="-1" aria-label="code-block-25-1"></a>cluster.shutdown()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" tabindex="-1" aria-label="code-block-25-1"></a>client <span class="op">=</span> cluster.get_client()</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1" aria-label="code-block-25-2"></a>cluster.adapt(minimum<span class="op">=</span><span class="dv">1</span>, maximum<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1" aria-label="code-block-25-3"></a>ds <span class="op">=</span> xr.open_zarr(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/glorys/glorys_202605.zarr"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1" aria-label="code-block-25-4"></a>uo <span class="op">=</span> ds[<span class="st">'uo'</span>]</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1" aria-label="code-block-25-5"></a>corrected_uo <span class="op">=</span> uo <span class="op">*</span> <span class="fl">1.1</span> <span class="op">-</span> <span class="fl">1.0</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1" aria-label="code-block-25-6"></a>corrected_uo.compute()</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1" aria-label="code-block-25-7"></a><span class="bu">print</span>(corrected_uo)</span></code></pre>
+</div>
+<p>Remember to shutdown the cluster when you are done to free up
+resources:</p>
+<div class="codewrapper sourceCode" id="cb26">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" tabindex="-1" aria-label="code-block-26-1"></a>cluster.shutdown()</span></code></pre>
 </div>
 </div>
 </div>
@@ -1146,7 +1157,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/07-parallel.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-03",
+  "dateModified": "2026-08-04",
   "datePublished": "2026-08-04"
 }
 
