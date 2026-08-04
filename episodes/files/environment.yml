@@ -26,6 +26,8 @@ dependencies:
   - eccodes
   - rich
   - graphviz
+  - h5py
+  - pooch
   - pip
   - pip:
       - icechunk==2.1.1

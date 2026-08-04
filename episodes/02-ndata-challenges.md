@@ -30,7 +30,7 @@ exercises: 20
 
 In oceanography and meteorology, most core data products are naturally n-dimensional: time, latitude, longitude, height or depth, and often additional dimensions such as ensemble member, forecast lead time, and variable.
 
-![Source: https://desktop.arcgis.com/en/arcmap/latest/manage-data/netcdf/fundamentals-of-netcdf-data-storage.htm](fig/ndimensional.png){alt="Schematic showing a 3D field (latitude, longitude, height) evolving over time, with multiple ensemble members."}
+![[Source](https://desktop.arcgis.com/en/arcmap/latest/manage-data/netcdf/fundamentals-of-netcdf-data-storage.htm)](episodes/fig/ndimensional.png){alt="Schematic showing a 3D field (latitude, longitude, height) evolving over time, with multiple ensemble members."}
 
 Over the last three decades, higher spatial and temporal resolution, more vertical levels, longer archives, and ensembles have pushed typical file sizes from megabytes to gigabytes, and today large collections can reach terabytes or petabytes.
 

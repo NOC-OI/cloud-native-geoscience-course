@@ -41,7 +41,7 @@ A Zarr dataset is usually organised into three main ideas:
 
 A typical climate or ocean dataset might use one group containing arrays such as `temperature`, `salinity`, `u_wind`, and `v_wind`, each organised by dimensions such as `time`, `lat`, `lon`, and `level`. Instead of one monolithic file, each array is split into chunks, and each chunk can be stored and read separately.
 
-![Zarr Organisation. Source: https://tutorial.xarray.dev/intermediate/intro-to-zarr.html](fig/zarr_organisation.png){alt="Zarr organisation, showing groups and arrays with chunked storage."}
+![[Source](https://tutorial.xarray.dev/intermediate/intro-to-zarr.html)](episodes/fig/zarr_organisation.png){alt="Zarr organisation, showing groups and arrays with chunked storage."}
 
 ### Zarr v2
 
@@ -111,7 +111,7 @@ This tells us that the `sst` array is three-dimensional, stored in chunks of siz
 
 A key feature of Zarr v2 is that the metadata is small, human-readable, and easy to inspect without opening the full dataset. That makes it convenient for browsing dataset structure and understanding how the data are organised before any analysis begins.
 
-![Zarr V2. Source: https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/](fig/zarrv2.png){alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files."}
+![[Source](https://aws.amazon.com/pt/blogs/publicsector/decrease-geospatial-query-latency-minutes-seconds-using-zarr-amazon-s3/)](episodes/fig/zarrv2.png){alt="Zarr V2 metadata structure, showing .zgroup, .zarray, and .zattrs files."}
 
 ### Zarr v3
 
@@ -157,7 +157,7 @@ ocean_temperature.zarr/
 
 In this example, the root `zarr.json` describes the top-level group, and each array has its own `zarr.json` file describing its shape, chunk grid, data type, codecs, and other metadata. The chunk data are stored separately under chunk key paths such as `c/0/0/0`.
 
-![Zarr V3. Source: https://earthmover.io/blog/what-is-zarr/](fig/zarrv3.png){alt="Zarr V3 metadata structure, showing zarr.json files"}
+![[Source](https://earthmover.io/blog/what-is-zarr/)](episodes/fig/zarrv3.png){alt="Zarr V3 metadata structure, showing zarr.json files"}
 
 An example of a Zarr v3 metadata file for an array might look like this:
 
@@ -219,7 +219,7 @@ When a user asks for "the temperature time series at this point" or "this region
 
 ![How chunking affects data access.](fig/chunk_effect.png){alt="Effect of chunking on data access."}
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: caution
 
 ## Chunking also has trade-offs
 

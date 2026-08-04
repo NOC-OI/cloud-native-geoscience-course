@@ -42,7 +42,7 @@ Parallel processing helps when your workflow needs to:
 In practice, parallelism works best when both the compute layer and the data layout are aligned. Chunked storage such as Zarr lets multiple workers read different chunks independently, while Dask can schedule the work across those chunks.
 
 
-![Parallel vs Serial processing. Source: https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html](fig/parallel_processing.png){alt="Diagram showing parallel vs serial processing."}
+![[Source](https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/chapter13.01-Parallel-Computing-Basics.html)](episodes/fig/parallel_processing.png){alt="Diagram showing parallel vs serial processing."}
 
 ## Dask: distributed processing for Python
 
@@ -197,7 +197,7 @@ To see the CPU % in a terminal you can use the command `top` or `htop`.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: checklist
 
 ## Troubleshooting Dask
 
@@ -208,7 +208,7 @@ Sometimes Dask can jam up and stop executing tasks. If this happens try the foll
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: caution
 
 ## Some pitfalls to watch out for
 
@@ -345,6 +345,13 @@ global_mean = corrected.mean(dim=("latitude", "longitude"))
 dask.visualize(global_mean, filename='task_graph.png')
 ```
 
+Sometimes the `visualize()` function fails to find the path of graphviz, the library it uses to build the visualisation. If this is happening then run the following to fix it. Replace "/work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env/bin/" with the path of the bin directory in your Conda/Mamba environment if you aren’t using the JASMIN environment.
+
+```python
+import os
+os.environ['PATH'] = "/work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env/bin/:" + os.environ['PATH']
+```
+
 This will create a PNG file showing the task graph for the computation. You can also use `global_mean.visualize()` to see the graph directly in a Jupyter notebook.
 
 ![Dask task graph](fig/task_graph.png){alt="Dask task graph showing the dependencies of tasks for performing calculations in a variable."}
@@ -420,7 +427,7 @@ When you compute the spatial and time-based statistics for both the original and
 
 ## Exercise 3 (Optional) - Parallel workflow using a Dask cluster on HPC
 
-Now we are going to explore how to run a parallel workflow using a Dask cluster on an HPC system like JASMIN. For this example, we are going to use a bigger dataset, the subset of the GLORYS Reanalysis dataset, stored in a single Zarr group (`data/glorys/glorys_202605.zarr`). This dataset is too large to process efficiently on a single core, so we will use Dask to parallelise the computation.
+Now we are going to explore how to run a parallel workflow using a Dask cluster on an HPC system like JASMIN. For this example, we are going to use a bigger dataset, the subset of the [GLORYS Reanalysis dataset](https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description), stored in a single Zarr group (`data/glorys/glorys_202605.zarr`). This dataset is too large to process efficiently on a single core, so we will use Dask to parallelise the computation.
 
 Please follow the steps below:
 
@@ -446,7 +453,7 @@ options = gw.cluster_options()
 options.worker_cores = 2
 options.scheduler_cores = 1
 options.account = "workshop"
-options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/colinsau/esces-env'
+options.worker_setup='source /apps/jasmin/jaspy/miniforge_envs/jaspy3.11/mf3-23.11.0-0/bin/activate /work/scratch-nopw2/tobfer/cloud-native-geoscience-course-env'
 clusters = gw.list_clusters()
 if not clusters:
     cluster = gw.new_cluster(options, shutdown_on_close=False)
@@ -459,7 +466,7 @@ Now that we have a running cluster, we can get a client object from the cluster 
 ```python
 client = cluster.get_client()
 cluster.adapt(minimum=1, maximum=4)
-ds = xr.open_zarr("data/glorys/glorys_202605.zarr")
+ds = xr.open_zarr(f"{base_path}data/glorys/glorys_202605.zarr")
 uo = ds['uo']
 corrected_uo = uo * 1.1 - 1.0
 corrected_uo.compute()

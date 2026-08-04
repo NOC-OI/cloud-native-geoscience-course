@@ -58,7 +58,7 @@ As benefits, this allows for efficient visualisation at different zoom levels wi
 
 GeoZarr's multiscales convention formalises how to store and describe these pyramids in Zarr.
 
-![Source: https://www.earthmover.io/blog/multiscales-in-al/](fig/geozarr_multiscale.png){alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy."}
+![[Source](https://www.earthmover.io/blog/multiscales-in-al/)](episodes/fig/geozarr_multiscale.png){alt="Diagram showing a multiscale pyramid with multiple levels of downsampled data, each level with its own group in the Zarr hierarchy."}
 
 ## GeoZarr: geospatial conventions for Zarr
 
@@ -77,7 +77,7 @@ Useful references:
 
 ## Exercise 1 - Design a multiscale strategy
 
-Creating a multiscale Zarr store requires some design decisions. Before implementing it, think about your dataset and how you want to visualise it. Because it can be resource-intensive to create multiple levels, we are going to use a small example dataset for this exercise, the `data/era5_sst/ocean_temperature.zarr`, related to the ERA5 reanalysis dataset.
+Creating a multiscale Zarr store requires some design decisions. Before implementing it, think about your dataset and how you want to visualise it. Because it can be resource-intensive to create multiple levels, we are going to use a small example dataset for this exercise, the `data/era5_sst/ocean_temperature.zarr`, related to the subset of [ERA5 Reanalysis dataset](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels).
 
 1. Look at your example Zarr dataset (dimensions, spatial resolution, domain).
 2. Propose:
@@ -109,37 +109,50 @@ First, load the zarr dataset using xarray:
 
 ```python
 import xarray as xr
-ds = xr.open_zarr("data/era5_sst/ocean_temperature.zarr", consolidated=True)
+
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr", consolidated=True)
 ```
 
-Now, you can choose a variable to visualise (e.g. `ssh`) and use Topozarr to build the multiscale pyramid.
+To generate the multiscale pyramid, you need to set the CRS in the dataset attributes. For example, if the dataset uses WGS84 (EPSG:4326), you can set it like this:
 
 ```python
-import topozarr
-var = ds["ssh"]
-pyramid = topozarr.build_pyramid(
-    var,
-    levels=4,              # number of resolution levels
-    downsampling="mean",   # or 'nearest', etc.
-    chunk_size=(256, 256)  # spatial chunking
+ds = ds.proj.assign_crs({"EPSG": 4326})
+```
+
+```python
+from topozarr import create_pyramid
+
+pyramid = create_pyramid(
+    ds,
+    levels=2, # number of downsampled levels
+    x_dim="longitude", # x dimension name
+    y_dim="latitude", # y dimension name
+    target_chunk_bytes=512 * 512 * 4,  # target chunk size in bytes (e.g. 512x512 pixels with float32)
+    method="mean",   # or 'nearest', etc.
+    chunks_per_shard=4 # number of chunks per shard for better performance
 )
-print(pyramid)
 ```
-The pyramid object is a datatree that contains multiple levels of downsampled data, each with its own group in the Zarr hierarchy. Each level can be accessed and visualised separately, and the pyramid can be saved to a new Zarr store for use in browser-based visualisation tools.
+The pyramid is a Pyramid object. In order to take a look at the levels and their shapes, you can convert it to a datatree and inspect the levels:
 
 ```python
-for level in pyramid.levels:
-    print(f"Level {level.level}: shape={level.shape}, chunks={level.chunks}")
+pyramid_tree = pyramid.as_datatree()
+print(pyramid_tree)
+print(pyramid_tree["0"])  # Level 0 (full resolution)
+print(pyramid_tree["1"])  # Level 1 (downsampled)
 ```
 
 Instead of saving each pyramid level as a separate dataset, TopoZarr can write the entire pyramid to a single multiscale Zarr store that follows the GeoZarr conventions. In this example, we will save the multiscale dataset directly to an object store so that it can be accessed efficiently from a web browser:
 
+First, create a mapper for the Zarr store. You can use `zarr.storage.FsspecStore` to write to an S3 bucket or other object storage:
+
 ```python
 import xarray as xr
-import fsspec
+import zarr
 import os
 
-store_url = "s3://cloud-native-geoscience-course/ocean_temperature_pyramid.zarr"
+store_url = "s3://my-bucket/ocean_temperature_pyramid.zarr"
 
 storage_options = {
     "key": os.environ["AWS_ACCESS_KEY_ID"],
@@ -151,17 +164,30 @@ storage_options = {
     },
 }
 
-# Create a mapper for the object store
-mapper = fsspec.get_mapper(
+# Create a reference for the object store
+store = zarr.storage.FsspecStore.from_url(
     store_url,
-    **storage_options,
+    storage_options=storage_options,
 )
+```
 
-# Write the dataset directly to the object store
-pyramid.to_zarr(
-    mapper,
+Because this task can be resource-intensive, you may want to use a local cluster:
+
+```python
+from dask.distributed import Client
+
+client = Client(n_workers=4, threads_per_worker=2, memory_limit="4GB")
+```
+
+And then save the pyramid to the Zarr store:
+
+```python
+pyramid_tree.to_zarr(
+    store,
     mode="w",
-    consolidated=True,
+    consolidated=True, # You can set to False for performance
+    encoding=pyramid.encoding, # You need to set the encoding as the same encoding in the Pyramid object
+    align_chunks=True
 )
 ```
 
@@ -173,6 +199,16 @@ url = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/
 ds_pyramid = xr.open_datatree(url, engine="zarr") # remember to use the correct engine for datatree
 print(ds_pyramid)
 ```
+
+:::::::::::::::::::::::::::::::::::::::::: caution
+
+## Watch API churn
+
+Support for multiscale pyramids is a relatively recent addition to the Zarr ecosystem. One of the libraries providing this functionality is **Topozarr**.
+
+As the Zarr ecosystem continues to evolve, Topozarr is also under active development. As a result, the API for creating multiscale pyramids may change between releases. Always refer to the documentation for the specific version you are using, and consider pinning your package versions to ensure reproducible workflows and avoid unexpected breakages when upgrading dependencies.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
@@ -190,15 +226,22 @@ Questions:
 ```python
 import xarray as xr
 import zarr
-import topozarr
+from topozarr import create_pyramid
 
-# Open the original Zarr dataset
-store_url = "s3://my-bucket/converted.zarr"
-ds = xr.open_zarr(store_url, consolidated=True)
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
 
-# Choose a variable to visualise
-var = ds["temperature"]
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr", consolidated=True)
 
+ds = ds.proj.assign_crs({"EPSG": 4326})
+
+pyramid = create_pyramid(
+    ds,
+    levels=2,
+    x_dim="longitude",
+    y_dim="latitude",
+    method="nearest",
+    chunks_per_shard=4
+)
 # Build the multiscale pyramid
 pyramid = topozarr.build_pyramid(
     var,
@@ -207,9 +250,20 @@ pyramid = topozarr.build_pyramid(
     chunk_size=(256, 256)
 )
 
+pyramid_tree = pyramid.as_datatree()
+
 # Save the multiscale Zarr store
 mapper = "CREATE THE MAPPER"
-pyramid.to_zarr(mapper, consolidated=True)
+
+client = "CREATE A DASK CLIENT"
+
+pyramid_tree.to_zarr(
+    store,
+    mode="w",
+    consolidated=False,
+    encoding=pyramid.encoding,
+    align_chunks=True
+)
 ```
 
 :::::::::::::::::::::::::
@@ -322,7 +376,7 @@ For datasets on regular grids, the workflow is relatively straightforward. Howev
 
 Several Python libraries can help with this preprocessing step, including [rioxarray](https://corteva.github.io/rioxarray/stable/), [xESMF](https://xesmf.readthedocs.io/en/latest/), and [rasterio](https://rasterio.readthedocs.io/en/latest/). For a detailed discussion of the available approaches and their performance, see the [Development Seed](https://developmentseed.org/) report, [*Reprojecting and Resampling Geospatial Data with Python*](https://developmentseed.org/warp-resample-profiling/). These tools can help prepare datasets for efficient multiscale visualisation, particularly when working with irregular grids or non-standard map projections.
 
-You can see below a diagram of the full pipeline, from NetCDF to multiscale Zarr pyramid, ready for browser-based visualisation.
+The diagram below shows the full pipeline, from NetCDF to multiscale Zarr pyramid, ready for browser-based visualisation.
 
 ![](fig/nc_to_zarr_pyramid.png){alt="Pipeline diagram showing the conversion of a NetCDF dataset to a multiscale Zarr pyramid using Topozarr."}
 

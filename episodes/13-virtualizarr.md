@@ -86,7 +86,7 @@ A reasonable set of answers is:
 
 The VirtualiZarr workflow is similar to a physical conversion workflow, but with one key difference: instead of copying data into new Zarr chunks, VirtualiZarr creates a virtual Zarr dataset whose chunks reference the original NetCDF files. This avoids duplicating the underlying data while providing a Zarr-compatible interface.
 
-In this lesson, we will use a subset of the ERA5 dataset containing significant wave height data, located in `data/daily_swh/`, which is already available on the server.
+In this lesson, we will use a subset of the [ERA5 Reanalysis dataset](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) containing significant wave height data. The dataset is provided as multiple NetCDF files, one per day, in the `data/daily_swh/` directory.
 
 All examples in this lesson use files stored on the server for simplicity. However, the same workflow also works with NetCDF files stored in an object store.
 
@@ -97,7 +97,9 @@ First, inspect the NetCDF files with xarray so you know what you are working wit
 ```python
 import xarray as xr
 
-ds_nc = xr.open_mfdataset("data/daily_swh/swh_*.nc", combine="by_coords")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/" # or "" if you have the data in your current working directory
+
+ds_nc = xr.open_mfdataset(f"{base_path}data/daily_swh/swh_*.nc", combine="by_coords")
 
 print(ds_nc)
 print(ds_nc.dims)
@@ -122,7 +124,7 @@ from virtualizarr.parsers import HDFParser
 Next, collect the NetCDF file paths. Here we use a local directory containing daily significant wave height data.
 
 ```python
-data_dir = "data/daily_swh/"
+data_dir = f"{base_path}data/daily_swh/"
 
 file_paths = sorted(glob.glob(f"{data_dir}*.nc"))
 urls = [f"file://{path}" for path in file_paths]
@@ -157,7 +159,7 @@ print(vds)
 
 The important point is that this does **not** copy the data into new Zarr files. It creates a virtual representation that can be opened and analysed like a Zarr-style dataset.
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: spoiler
 
 ## Obstore
 
@@ -177,9 +179,7 @@ First you need to create a local Icechunk repository. This is done by specifying
 import icechunk as ic
 
 # This is the path where the Icechunk repository will be created
-repo_path = "/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"
-
-storage = ic.local_filesystem_storage(repo_path)
+storage = ic.local_filesystem_storage("data/daily_swh_icechunk/")
 
 # Because we are using a virtual dataset, we need to tell Icechunk where to find the original NetCDF files when reopening the snapshot. This is done by creating a virtual chunk container that points to the local filesystem store.
 config = ic.RepositoryConfig.default()
@@ -232,7 +232,7 @@ Let's compare a simple analysis on the original NetCDF files and on the virtual 
 ```python
 import time
 
-pattern = "data/daily_swh/swh_*.nc"
+pattern = f"{base_path}data/daily_swh/swh_*.nc"
 
 t0 = time.time()
 ds_nc = xr.open_mfdataset(pattern, combine="by_coords")
@@ -260,7 +260,7 @@ The exact timings will depend on the dataset and environment, but we expect the 
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 2 - Open a virtual dataset from server NetCDF files
+## Exercise 2 - Open a virtual dataset from local NetCDF files
 
 Using the NetCDF files related to daily significant wave height from ERA5 (`data/daily_swh/*.nc`):
 
@@ -280,7 +280,7 @@ from obspec_utils.registry import ObjectStoreRegistry
 from virtualizarr import open_virtual_mfdataset
 from virtualizarr.parsers import HDFParser
 
-data_dir = "/gws/ssde/j25b/atlantis_vis/inpo/daily_swh/"
+data_dir = f"{base_path}data/daily_swh/"
 
 file_paths = sorted(glob.glob(f"{data_dir}*.nc"))
 urls = [f"file://{p}" for p in file_paths]
@@ -325,8 +325,7 @@ A typical workflow is:
 ```python
 import icechunk as ic
 
-repo_path = "/gws/ssde/j25b/atlantis_vis/inpo/daily_swh_icechunk/"
-storage = ic.local_filesystem_storage(repo_path)
+storage = ic.local_filesystem_storage("data/daily_swh_icechunk/")
 
 config = ic.RepositoryConfig.default()
 config.set_virtual_chunk_container(
@@ -367,7 +366,7 @@ print(ds_main)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: caution
 
 ## Watch API churn
 
@@ -385,7 +384,7 @@ The same idea works not only for local NetCDF files, but also for NetCDF files t
 
 A small caveat is that performance still depends on the layout of the original files. If the underlying files are poorly aligned with your chosen chunks, access may be less efficient because the virtual store still has to read from those files underneath. In practice, the best chunk strategy is usually the one that matches your analysis needs while staying reasonably aligned with the source layout.
 
-You can see below a table comparing different approaches to accessing large NetCDF archives[^nicholas].
+The table below compares different approaches to accessing large NetCDF archives[^nicholas].
 
 <div style="background-color: #f9f9f9; border-left: 5px solid #ccc; display:flex; justify-content:center; align-items:center; margin-bottom: 1em;">
   <table>

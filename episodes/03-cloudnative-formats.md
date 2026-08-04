@@ -47,7 +47,7 @@ For multidimensional environmental data, this usually means chunked arrays, ligh
 
 ![Difference between traditional files and cloud-native objects](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: caution
 
 ## Cloud-native does not just mean "stored in the cloud"
 
@@ -69,7 +69,7 @@ There is no single cloud-native solution for all environmental data, and the com
 In practice, these approaches support different needs. Some workflows rewrite data into a new cloud-native layout such as Zarr, while others keep legacy files and expose them through references for cloud-friendly access.
 
 
-![Source: https://guide.cloudnativegeo.org/](fig/cogf.png){alt="Cloud-Optimized Geospatial Formats."}
+![[Source](https://guide.cloudnativegeo.org/)](episodes/fig/cogf.png){alt="Cloud-Optimized Geospatial Formats."}
 
 ## Why not rely only on traditional formats?
 

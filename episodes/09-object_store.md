@@ -49,7 +49,7 @@ Object storage takes a different approach:
 
 For scientific datasets, this makes it practical to store millions of independent objects, such as NetCDF files, image tiles, or Zarr chunks. Because each object can be accessed independently, applications running on HPC systems, cloud platforms, or local infrastructure can efficiently process data in parallel while accessing the same shared dataset.
 
-![File vs Object Storage. Source: https://www.datacore.com/blog/file-object-storage-differences/](fig/file_object.png){alt="File vs Object Storage."}
+![[Source](https://www.datacore.com/blog/file-object-storage-differences/)](episodes/fig/file_object.png){alt="File vs Object Storage."}
 
 ## Advantages of object storage
 
@@ -92,7 +92,7 @@ Cloud providers typically offer multiple storage classes for different access pa
 
 Selecting the appropriate storage class helps balance cost and performance according to how often the data are used.
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: discussion
 
 ### Deployment trade-offs
 
@@ -344,6 +344,7 @@ storage_options = {
     "key": os.environ["AWS_ACCESS_KEY_ID"],
     "secret": os.environ["AWS_SECRET_ACCESS_KEY"],
     "client_kwargs": {"endpoint_url": "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk"},
+    # these are JASMIN-specific options to avoid checksum errors on some datasets
     "config_kwargs": {
         "request_checksum_calculation": "when_required",
         "response_checksum_validation": "when_required",
@@ -382,7 +383,7 @@ A production-ready object store is more than "just a server with a disk". For a 
 - Stable power, cooling, and physical security.
 - A plan for identity, access control, and certificate management.
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: spoiler
 
 ### Minimal MinIO deployment with Docker Compose
 
