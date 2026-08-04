@@ -204,7 +204,7 @@ You will need:
 - Python 3.12 or newer.
 - Conda or mamba installed.
 - At least 8 GB of RAM, with 16 GB preferred.
-- At least 10 GB of free disk space for the environment.
+- At least 4 GB of free disk space for the environment.
 - At least 30 GB of free disk space for the example data and for data that will be generated during the workshop.
 - A stable internet connection for downloading packages and data.
 - A terminal application (e.g., Terminal on macOS, Console or Terminal in Linux, or [Git Bash](https://git-scm.com/downloads) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) on Windows).
