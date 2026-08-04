@@ -92,7 +92,7 @@ A **dataset** is a collection of related scientific data and metadata in differe
 
 **Object storage** keeps data as independent objects in a storage system, often accessed through APIs such as S3. A **bucket** is a top-level container for objects in object storage.
 
-![Source: https://blog.itkonekt.com/](fig/bucket_and_object_store.png){alt="A diagram showing a bucket containing objects in object storage."}
+![[Source](https://blog.itkonekt.com/)](episodes/fig/bucket_and_object_store.png){alt="A diagram showing a bucket containing objects in object storage."}
 
 ### POSIX and Object-Store file system
 
@@ -108,7 +108,7 @@ A **cloud-native format** is designed to work efficiently with object storage an
 
 **STAC** is a standard for describing and organizing geospatial assets.
 
-![STAC example. Source: https://stacspec.org/](fig/stac_example.png){alt="An example of a STAC catalog."}
+![[Source](https://stacspec.org/)](episodes/fig/stac_example.png){alt="An example of a STAC catalog."}
 
 ### Icechunk
 
@@ -209,7 +209,7 @@ You will need:
 - A stable internet connection for downloading packages and data.
 - A terminal application (e.g., Terminal on macOS, Console or Terminal in Linux, or [Git Bash](https://git-scm.com/downloads) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) on Windows).
 
-I will show below the steps to install Python and conda/mamba on your own computer. If you already have a working Python 3.12 installation with conda or mamba, you can skip to the next section.
+The steps below describe how to install Python and conda/mamba on your own computer. If you already have a working Python 3.12 installation with conda or mamba, you can skip to the next section.
 
 ### Install Miniforge
 
@@ -333,23 +333,23 @@ mkdir -p ~/cloud-native-geoscience-course/data
 
 ### Install the environment
 
-Download the `environment.yaml` file from the lesson repository:
+Download the [`environment.yml`](files/environment.yml) file from the lesson repository:
 
 ```bash
 cd ~/cloud-native-geoscience-course/environment
 
-curl -L https://raw.githubusercontent.com/NOC-OI/cloud-native-geoscience-course/refs/heads/main/episodes/files/environment.yml -o environment.yaml
+curl -L https://raw.githubusercontent.com/NOC-OI/prep-work-cloud-native-geoscience-course/refs/heads/main/episodes/files/environment.yml -o environment.yml
 ```
 
 Then create the environment:
 
 ```bash
-conda env create -f environment.yaml
+conda env create -f environment.yml
 ```
 
 **Note:* This command can take several minutes to complete, depending on your internet connection and computer speed.**
 
-This will create a new environment with all the required packages. The environment name is defined in the `environment.yaml` file, and it is **cloud-native-geoscience-course** for this workshop.
+This will create a new environment with all the required packages. The environment name is defined in the `environment.yml` file, and it is **cloud-native-geoscience-course** for this workshop.
 Now activate the environment:
 
 ```bash
@@ -373,7 +373,7 @@ Download the zip file from the lesson repository, then unzip it into your `cloud
 
 ```bash
 curl -L https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/cloud-native-geoscience-course-data.tar.gz -o data.tar.gz
-tar -xzf data.tar.gz -C ~/cloud-native-geoscience-course/data/
+tar -xzf data.tar.gz -C ~/cloud-native-geoscience-course/
 ```
 
 **Note:** The extraction process can take some time, because we are extracting a large number of files. You can check the progress by running `ls -lh ~/cloud-native-geoscience-course/data/` in another terminal window.
@@ -452,6 +452,8 @@ import topozarr
 import boto3
 import shapely
 import obstore
+import eccodes
+import cfgrib
 
 print("numpy:", numpy.__version__)
 print("pandas:", pandas.__version__)
@@ -502,15 +504,15 @@ cfgrib: 0.9.15.1
 
 ## About the example data
 
-The workshop uses several example datasets that represent common environmental data products in the ocean and atmosphere domains. These examples are provided in different formats, including NetCDF, GRIB, and Zarr, so you can see how the same scientific data can be organised and accessed in different ways.
+This workshop uses example ocean and atmospheric datasets in **NetCDF**, **GRIB**, and **Zarr** formats to demonstrate different approaches for storing and accessing scientific data.
 
-The data come from public or widely used sources such as:
+The datasets are derived from widely used public products, including:
 
-- ERA5 reanalysis fields from the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) (ECMWF), including wave and surface variables.
-- GLORYS reanalysis products from the [Copernicus Marine Service](https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description).
+* **ERA5 hourly data on single levels** from the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) (ECMWF). ERA5 is the fifth-generation global atmospheric reanalysis, providing hourly estimates of atmospheric, land-surface, and ocean-wave variables from 1940 to the present. It combines numerical weather prediction models with observations through data assimilation to produce a consistent, high-quality record for weather and climate applications. For this workshop, we use NetCDF, GRIB, and Zarr files containing the significant wave height (`swh`) and sea surface temperature (`sst`) variables.
 
+* **GLORYS12V1 Ocean Reanalysis** from the [Copernicus Marine Service](https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description). GLORYS12V1 is a global, high-resolution ocean reanalysis based on the NEMO ocean model, combining numerical simulations with satellite and in situ observations through data assimilation to provide a consistent representation of the ocean state. For this workshop, we use NetCDF and Zarr files containing sea surface height (`ssh`), potential temperature (`thetao`), salinity (`so`), and the zonal and meridional current velocity (`uo` and `vo`) variables.
 
-The data are chunked, so you can work with small parts of the dataset instead of loading everything at once.
+These datasets provide realistic examples for exploring cloud-native geoscience workflows throughout the workshop.
 
 ### What to expect
 

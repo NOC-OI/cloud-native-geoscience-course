@@ -71,12 +71,14 @@ Each workload benefits from certain chunk layouts:
 
 There is no single "best" chunking: it depends on which workloads are most important for your users.
 
-![Chunk strategy. Source: Matt Piagge (UKCEH)](fig/chunk_strategy.png){alt="Diagram showing how different chunking strategies affect performance for different workloads."}
+![[Source](https://zenodo.org/records/17968159)](fig/chunk_strategy.png){alt="Diagram showing how different chunking strategies affect performance for different workloads."}
 
 
 ## Inspecting chunk shapes in a Zarr store
 
-Let's take a look on one of our example Zarr datasets to see how chunks are laid out. Now we are using a subset of the GLORYS Reanalysis dataset (https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description), stored in a single Zarr group:
+Let's take a look on one of our example Zarr datasets to see how chunks are laid out. Now we are using a subset of the [GLORYS12V1 Ocean Reanalysis dataset](https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/description). The GLORYS12V1 product is the CMEMS global ocean eddy-resolving (1/12° horizontal resolution, 50 vertical levels) reanalysis covering the altimetry period from 1993 onward.
+
+The subset is stored in a single Zarr group, and it is available in the `data/glorys/` directory.
 
 ```python
 import xarray as xr
@@ -104,7 +106,7 @@ Seeing `shape` and `dims` helps you reason about how the current chunking might 
 
 ## Exercise 1 - Relate current chunking to workloads
 
-Using the GLORYS Reanalysis example Zarr dataset (`data/glorys/glorys_202605.zarr`), answer the following:
+Using the GLORYS12V1 Ocean Reanalysis example Zarr dataset (`data/glorys/glorys_202605.zarr`), answer the following:
 
 1. Inspect the `so` (Salinity) array's `shape` and `chunks` using `xarray`.
 2. Map the dimensions to names (e.g. interpret `(time, lat, lon, depth)` from context or attributes and following the CF conventions).
@@ -545,7 +547,7 @@ Using this approach, you should see that the sharded dataset has fewer files/obj
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: caution
 
 ## Remember:Chunking and sharding are not the same
 
@@ -568,4 +570,4 @@ A dataset may use small chunks for flexible analysis, but store those chunks ins
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-[^nguyean_etal2023]: Nguyean, T., et al. (2023). *Impact of Chunk Size on Read Performance of Zarr Data in Cloud-based Object Stores*. https://essopenarchive.org/doi/pdf/10.1002/essoar.10511054.2?download=true
+[^nguyean_etal2023]: Nguyean, T., et al. (2023). *Impact of Chunk Size on Read Performance of Zarr Data in Cloud-based Object Stores*. https://essopenarchive.org/doi/full/10.1002/essoar.10511054.2

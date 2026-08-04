@@ -38,7 +38,7 @@ The core STAC objects are:
 
 The actual data files (e.g. Zarr stores, NetCDF files, Cloud Optimized GeoTIFFs) are referenced as `assets` in the Item. Each asset has a URL (or Object Store path), media type, and optional roles (e.g. "data", "thumbnail", "metadata").
 
-![Source: https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/](fig/stac_organisation.png){alt="STAC organisation diagram showing Catalog, Collection, Item, and Asset relationships."}
+![[Source](https://sparkgeo.com/blog/introducing-stac-fastapi-indexed-low-overhead-stac-metadata-support/)](episodes/fig/stac_organisation.png){alt="STAC organisation diagram showing Catalog, Collection, Item, and Asset relationships."}
 
 For cloud‑native workflows, STAC is important because:
 
@@ -192,12 +192,15 @@ Here, we will create a Collection for the significant wave height (`swh`) datase
 import xarray as xr
 
 url = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/cloud-native-geoscience-course/daily_swh"
-ds = xr.open_zarr(url, consolidated=False)
+ds = xr.open_zarr(url, consolidated=True)
 # Get spatial extent (bounding box)
 lon_min, lon_max = float(ds.longitude.min()), float(ds.longitude.max())
 lat_min, lat_max = float(ds.latitude.min()), float(ds.latitude.max())
 # Get temporal extent (start and end time)
 time_min, time_max = ds.time.min().values, ds.time.max().values
+
+print(f"Spatial extent: lon [{lon_min}, {lon_max}], lat [{lat_min}, {lat_max}]")
+print(f"Temporal extent: time [{time_min}, {time_max}]")
 ```
 
 For this tutorial, we will define the Collection as covering the years 2000–2026, even though the example dataset represents only a subset of that period.
@@ -346,7 +349,7 @@ Static STAC is ideal for simple, low-maintenance publishing, while database-back
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: checklist
 
 ## Visualising your catalog with STAC Browser
 

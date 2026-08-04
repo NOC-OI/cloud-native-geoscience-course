@@ -27,7 +27,7 @@ exercises: 35
 
 In this lesson, we work hands‑on with several open Zarr datasets:
 
-- [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS (I will explain later what Icechunk is and how it relates to Zarr).
+- [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS (Icechunk and its relationship to Zarr are explained later in this lesson).
 - [**ERA5 ARCO**](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) reanalysis in Zarr on Climate Data Store - global atmospheric data ready for analysis.
 - [**Sofar Spotter drifters**](https://registry.opendata.aws/sofar-spotter-archive/) - global Spotter wave drifter buoys from 2019-2023 stored as ragged array in Zarr.
 - **Additional examples** such as CMIP6, CarbonPlan datasets, Earthmover Marketplace and NEMO Near-Present-Day, depending on your interests.
@@ -39,7 +39,7 @@ Each dataset illustrates different aspects:
 - Non-regular or irregular grids.
 - Ensembles with `member` dimensions.
 
-All these datasets are hosted in cloud object storage (Google Cloud, AWS S3, or HTTPS) and can be accessed programmatically with Python tools like `xarray` and `zarr`. I will explain later what object storage is and how it differs from traditional file systems.
+All these datasets are hosted in cloud object storage (Google Cloud, AWS S3, or HTTPS) and can be accessed programmatically with Python tools like `xarray` and `zarr`. Object storage and how it differs from traditional file systems are explained later in this lesson.
 
 These datasets can be several terabytes in size. **DO NOT DOWNLOAD THEM LOCALLY.**
 
@@ -121,7 +121,7 @@ If you want to have access to more datasets, you can explore the [dynamical.org 
 
 ## Integrate cartopy for better visualisation
 
-You can see below an example of the integration of cartopy to visualise the sea zonal wind at 10 meters above the surface from the ECMWF AIFS SINGLE dataset:
+The following example integrates cartopy to visualise the sea zonal wind at 10 meters above the surface from the ECMWF AIFS SINGLE dataset:
 
 ```python
 import xarray as xr
@@ -129,7 +129,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 ds = xr.open_zarr("https://data.dynamical.org/ecmwf/aifs-single/forecast/latest.zarr")
-wind_u_10m = ds['wind_u_10m'].isel(init_time="2025-01-01",method="nearest").isel(lead_time=0)
+wind_u_10m = ds['wind_u_10m'].sel(init_time="2025-01-01",method="nearest").isel(lead_time=0)
 
 plt.figure(figsize=(12, 6))
 ax = plt.axes(projection=ccrs.PlateCarree())
@@ -228,7 +228,7 @@ For a full list of available variables, see the [ERA5 ARCO documentation](https:
 
 ### Create a plot of a variable
 
-You can see below an example of how to create a plot of the significant wave height (swh) variable at a single time step using matplotlib:
+The following example shows how to create a plot of the significant wave height (swh) variable at a single time step using matplotlib:
 
 ```python
 import matplotlib.pyplot as plt
@@ -267,11 +267,9 @@ swh = swh.sel(latitude=-23.0, longitude=-43.0, method="nearest")
 swh.plot()
 ```
 
-
 ### Additional resources
 
 To see a full list of available datasets and examples, you can explore the [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/) and the  [ECMWF Training datasets repository](https://github.com/ecmwf-training/dss-notebooks/tree/main/datasets).
-
 
 ## Sofar Spotter drifters - ragged arrays
 
@@ -321,7 +319,7 @@ Attributes:
 
 ### Dataset structure
 
-This dataset was designed to follow the conventions used by NOAA for a similar dataset: [Global Drifter Program (GDP)](https://www.aoml.noaa.gov/global-drifter-program/) Drifter data. The explanation below about this dataset was extracted and adapted from the [OHW 2024 Tutorials - collocating_noaa_gfs_sofar_spotter_during_hurricane](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane).
+This dataset was designed to follow the conventions used by NOAA for a similar dataset: [Global Drifter Program (GDP)](https://www.aoml.noaa.gov/global-drifter-program/) Drifter data. The explanation below about this dataset was extracted and adapted from the [OHW 2024 Tutorials](https://github.com/oceanhackweek/ohw-tutorials/tree/OHW24/us/01-Tue/collocating_noaa_gfs_sofar_spotter_during_hurricane).
 
 Each Spotter buoy records a different number of observations because of factors such as deployment time, reporting frequency, instrument lifetime, and missing measurements. One way to represent these observations is as an incomplete multidimensional array, where each column corresponds to a Spotter:
 
@@ -338,6 +336,7 @@ In a contiguous ragged array, observations from all Spotters are stored sequenti
 Get the data for a single drifter:
 
 ```python
+import numpy as np
 # choose a drifter by ID
 spotter_id = 'SPOT-0164'
 
@@ -543,7 +542,7 @@ plt.show()
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-:::::::::::::::::::::::::::::::::::::::::: callout
+:::::::::::::::::::::::::::::::::::::::::: spoiler
 
 ## Other open Zarr datasets to explore
 

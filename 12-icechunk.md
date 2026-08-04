@@ -28,7 +28,7 @@ Zarr is a strong format for cloud and parallel data access, but by itself it doe
 
 [Icechunk](https://icechunk.io/en/stable/) adds version control on top of Zarr. It lets you manage data in a repository with transactions, snapshots, branches, and tags, so you can update data atomically, recover from mistakes, and refer to exact versions in future analysis.
 
-![Zarr without Icechunk. Source: https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/](fig/zarr_without_icechunk.png){alt="Zarr without Icechunk."}
+![[Source](https://www.earthmover.io/blog/multi-player-mode-why-teams-that-use-zarr-need-icechunk/)](episodes/fig/zarr_without_icechunk.png){alt="Zarr without Icechunk."}
 
 ## Icechunk concepts
 
@@ -103,7 +103,7 @@ plt.show()
 
 This shows that Icechunk provides a safe, consistent, and reproducible way to manage evolving Zarr datasets, making it suitable for collaborative scientific workflows.
 
-![Happy and sad shark!](fig/shark.jpg){alt="Happy and sad shark!"}
+![](episodes/fig/sharks.png){alt="Happy, sad and mix sharks!"}
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -169,12 +169,12 @@ storage_options = {
 
 ### Step 2 - Opening the local Zarr store
 
-Open the local Zarr dataset with xarray. We are going to use the `data/era5_sst/ocean_temperature.zarr` dataset as an example.
+Open the local Zarr dataset with xarray. We are going to use the `data/era5_sst/ocean_temperature.zarr` (ERA5 Reanalysis) dataset as an example.
 
 ```python
-local_zarr = "data/era5_sst/ocean_temperature.zarr"
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
 
-ds = xr.open_zarr(local_zarr)
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 
 print(ds)
 ```
@@ -217,14 +217,16 @@ repo = ic.Repository.open_or_create(storage, config=repo_config)
 When I do the above, I can see that the repository is created in the object store. Now I can start a writable session on the `main` branch and add the dataset to it.
 
 ```python
+# Import the `to_icechunk` function from the `icechunk.xarray` module
+from icechunk.xarray import to_icechunk
+
 # Create a writable session on the main branch
 session = repo.writable_session("main")
 
 # Save the dataset to the Icechunk repository
-ds.to_zarr(
-    session.store,
-    mode="w",
-    consolidated=True,
+to_icechunk(
+    ds,
+    session,
 )
 ```
 
@@ -256,6 +258,8 @@ ds_main = xr.open_zarr(
 
 print(ds_main)
 ```
+
+You can also use
 
 This is the standard way to read data from an Icechunk repository. Opening a read-only session on the `main` branch gives you a consistent snapshot of the dataset, ensuring that analyses always use a well-defined version of the data.
 
@@ -302,7 +306,9 @@ Open the local zarr store:
 
 ```python
 # Open the local Zarr store
-ds = xr.open_zarr("data/era5_sst/ocean_temperature.zarr")
+base_path = "/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"  # or "" if you have the data in your current working directory
+
+ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
 ```
 
 Create an Icechunk repository in the object store:
@@ -330,12 +336,13 @@ repo = ic.Repository.open_or_create(storage, config=repo_config)
 Import the dataset into Icechunk and commit it:
 
 ```python
+from icechunk.xarray import to_icechunk
+
 session = repo.writable_session("main")
 
-ds.to_zarr(
-    session.store,
-    mode="w",
-    consolidated=True,
+to_icechunk(
+    ds,
+    session,
 )
 
 snapshot = session.commit("Initial import of ocean_temperature.zarr")
@@ -569,7 +576,9 @@ print(mean_sst)
 
 This makes it easy to say exactly which version of the data was used, and to reopen that same version later for verification or reruns.
 
-![Git Workflow, which is similar to Icechunk Workflow. Source: https://yakiloo.com/getting-started-git-flow/](fig/git_workflow.png){alt="Git Workflow, which is similar to Icechunk Workflow."}
+The diagram below shows the Git workflow, which is similar to Icechunk's workflow. You can create branches for development, commit changes to snapshots, and tag important versions for reproducibility.
+
+![[Source](https://yakiloo.com/getting-started-git-flow/)](episodes/fig/git_workflow.png){alt="Git Workflow, which is similar to Icechunk Workflow."}
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 

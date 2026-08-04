@@ -106,7 +106,7 @@ In the marine and atmospheric domains, common metadata elements include:
 
 Standards such as [ISO 19115](https://www.iso.org/standard/53798.html) for geographic information define sets of metadata elements covering identification, extent, quality, spatial and temporal schema, reference systems and distribution. These are used in catalogues and portals to support dataset discovery and evaluation.
 
-![Source: https://www.seadatanet.org/Standards](fig/metadata_words.png){alt="Word cloud of common metadata elements, including title, abstract, keywords, contact, spatial extent, temporal extent, units, standard_name, cell_methods, coordinates, bounds, grid_mapping, quality flags, provenance."}
+![[Source](https://www.seadatanet.org/Standards)](episodes/fig/metadata_words.png){alt="Word cloud of common metadata elements, including title, abstract, keywords, contact, spatial extent, temporal extent, units, standard_name, cell_methods, coordinates, bounds, grid_mapping, quality flags, provenance."}
 
 ### Controlled vocabularies and vocabulary services
 
