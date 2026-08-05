@@ -15,7 +15,7 @@ abstract: >-
   and meteorology data at multi-terabyte scale. Topics include Zarr,
   chunking, object storage, conversion from traditional formats,
   parallel processing, Icechunk, VirtualiZarr, STAC, and visualization.
-license: CC-BY-4.0
+license: CC-BY-NC 4.0
 url: "https://github.com/NOC-OI/cloud-native-geoscience-course"
 repository-code: "https://github.com/NOC-OI/cloud-native-geoscience-course"
 keywords:
