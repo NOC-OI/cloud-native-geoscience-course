@@ -1,5 +1,5 @@
 ---
-title: Parallel Processing for Zarr
+title: Parallel Processing with Zarr
 teaching: 35
 exercises: 30
 ---

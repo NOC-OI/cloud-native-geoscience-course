@@ -1,5 +1,5 @@
 ---
-title: Object Storage - Concepts, Remote Access, and Data Organization in the Cloud
+title: Object Storage and Cloud Data Organization
 teaching: 30
 exercises: 25
 ---

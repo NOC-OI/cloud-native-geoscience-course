@@ -1,5 +1,5 @@
 ---
-title: Invited Case Studies
+title: Case Studies
 teaching: 45
 exercises: 0
 ---

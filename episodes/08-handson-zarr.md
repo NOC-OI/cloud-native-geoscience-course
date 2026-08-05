@@ -1,5 +1,5 @@
 ---
-title: Hands-On with Open Zarr Datasets Using Python
+title: Reading Real-World Zarr Datasets in Python
 teaching: 30
 exercises: 35
 ---

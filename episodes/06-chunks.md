@@ -1,5 +1,5 @@
 ---
-title: How to Choose Chunks for Analysis and Processing at Scale
+title: Choosing Chunks at Scale
 teaching: 35
 exercises: 30
 ---

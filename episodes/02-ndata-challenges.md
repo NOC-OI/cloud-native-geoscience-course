@@ -1,5 +1,5 @@
 ---
-title: Challenges of N-dimensional Data
+title: Challenges of N-Dimensional Data
 teaching: 25
 exercises: 20
 ---

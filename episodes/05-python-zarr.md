@@ -1,5 +1,5 @@
 ---
-title: Python Tools for Working with Zarr
+title: Python for Zarr
 teaching: 25
 exercises: 25
 ---

@@ -1,5 +1,5 @@
 ---
-title: What Are Cloud-Native Formats?
+title: Cloud-Native Formats
 teaching: 15
 exercises: 10
 ---

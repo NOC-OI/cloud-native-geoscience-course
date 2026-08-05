@@ -1,5 +1,5 @@
 ---
-title: Zarr Data Organization in the Cloud with STAC
+title: Organizing Cloud Zarr Data with STAC
 teaching: 30
 exercises: 25
 ---
