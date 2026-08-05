@@ -62,29 +62,3 @@ jobs:
           sandpaper::package_cache_trigger(TRUE)
           sandpaper:::ci_deploy(reset = reset)
         shell: Rscript {0}
-
-      - name: "Patch mobile navbar on gh-pages"
-        run: |
-          set -eu
-
-          git fetch origin gh-pages:gh-pages
-          git checkout gh-pages
-
-          style='<style id="mobile-hide-aio-search">@media (max-width: 767.98px){#search-button{display:none!important;}}</style>'
-
-          find . -type f -name "*.html" -print0 | while IFS= read -r -d '' file; do
-            if ! grep -q 'mobile-hide-aio-search' "$file"; then
-              sed -i "s#</head>#${style}</head>#" "$file"
-            fi
-          done
-
-          if ! git diff --quiet; then
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git add -A
-            git commit -m "[skip ci] hide all-in-one search button on mobile"
-            git push origin gh-pages
-          else
-            echo "No mobile navbar patch changes to commit"
-          fi
-        shell: bash
