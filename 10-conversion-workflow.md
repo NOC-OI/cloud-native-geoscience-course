@@ -1,5 +1,5 @@
 ---
-title: Conversion Workflow of Traditional Formats to Zarr
+title: Converting Traditional Formats to Zarr
 teaching: 30
 exercises: 40
 ---

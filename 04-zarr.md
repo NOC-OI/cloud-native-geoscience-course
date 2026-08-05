@@ -1,5 +1,5 @@
 ---
-title: Zarr - Data Model, Metadata, and Chunked Storage
+title: Zarr Data Model and Chunked Storage
 teaching: 30
 exercises: 20
 ---

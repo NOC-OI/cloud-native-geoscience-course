@@ -1,5 +1,5 @@
 ---
-title: Data Versioning with Icechunk
+title: Versioning Data with Icechunk
 teaching: 35
 exercises: 35
 ---

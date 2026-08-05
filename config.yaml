@@ -11,7 +11,7 @@
 carpentry: 'dc'
 
 # Overall title for pages.
-title: 'Cloud-Native Architectures and Modern Data Formats for Geoscience.'
+title: 'Cloud-Native Geoscience Data Workflows'
 
 # Date the lesson was created (YYYY-MM-DD, this is empty by default)
 created: '2026-07-01'

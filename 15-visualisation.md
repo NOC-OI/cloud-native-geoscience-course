@@ -1,5 +1,5 @@
 ---
-title: Visualization - Multiscale Zarr and GeoZarr
+title: Visualizing Multiscale Zarr and GeoZarr
 teaching: 25
 exercises: 30
 ---

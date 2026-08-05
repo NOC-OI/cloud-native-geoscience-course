@@ -1,5 +1,5 @@
 ---
-title: Creating Virtual Zarr Stores with Virtualizarr
+title: Virtual Zarr with Virtualizarr
 teaching: 25
 exercises: 25
 ---

@@ -1,5 +1,5 @@
 ---
-title: Introduction to Data Formats, Metadata, and Vocabulary
+title: Data Formats, Metadata, and Vocabulary
 teaching: 30
 exercises: 15
 ---

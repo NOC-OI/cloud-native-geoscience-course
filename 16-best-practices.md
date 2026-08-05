@@ -1,5 +1,5 @@
 ---
-title: Architectures and Best Practices
+title: Architecture and Best Practices
 teaching: 10
 exercises: 25
 ---
