@@ -30,7 +30,8 @@ In this lesson, we work hands‑on with several open Zarr datasets:
 - [**IFS ensemble forecasts**](https://dynamical.org/catalog/) in Icechunk/Zarr from dynamical.org - global ensemble forecasts on AWS (Icechunk and its relationship to Zarr are explained later in this lesson).
 - [**ERA5 ARCO**](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=analysis_ready_data) reanalysis in Zarr on Climate Data Store - global atmospheric data ready for analysis.
 - [**Sofar Spotter drifters**](https://registry.opendata.aws/sofar-spotter-archive/) - global Spotter wave drifter buoys from 2019-2023 stored as ragged array in Zarr.
-- **Additional examples** such as CMIP6, CarbonPlan datasets, Earthmover Marketplace and NEMO Near-Present-Day, depending on your interests.
+- [**NEMO Near-Present-Day**](https://noc-msm.github.io/NOC_Near_Present_Day/) - global ocean multi-decadal Near-Present-Day simulations, developed by the National Oceanography Centre (NOC) in the UK.
+- **Additional examples** such as CMIP6, CarbonPlan datasets and Earthmover Marketplace, depending on your interests.
 
 Each dataset illustrates different aspects:
 
@@ -397,6 +398,43 @@ plt.show()
 
 ![Trajectory of SPOT-0164](fig/trajectory_spot0164.png){alt="Trajectory of SPOT-0164"}
 
+## NEMO Near-Present-Day simulations
+
+The [NOC Near-Present-Day (NPD) simulations](https://noc-msm.github.io/NOC_Near_Present_Day/) are multi-decadal global ocean and sea-ice simulations produced with NEMO. They include a hierarchy of model configurations at nominal resolutions of 1 degree, 1/4 degree, and 1/12 degree. The outputs are kept close to the present day and are made available through NOC's cloud data catalog. The data is stored in Icechunk format (we will talk more about it later).
+
+NOC created a python package called [`OceanDataStore`](https://noc-msm.github.io/OceanDataStore/) to facilitate access to the NPD simulations and other datasets. The package provides a simple interface to search and open datasets from the catalog, which is built on top of STAC (SpatioTemporal Asset Catalog) metadata.
+
+The `OceanDataStore` API lets us search the catalog by metadata rather than needing to know a Zarr store URL. In this example, we find annual output containing sea surface temperature:
+
+```python
+from OceanDataStore import OceanDataCatalog
+catalog = OceanDataCatalog(catalog_name="noc-stac") # open the catalog "noc-stac" from NOC's STAC server
+
+# Search for datasets in the catalog with specific metadata
+catalog.search(
+    collection="noc-npd-era5",
+    standard_name="sea_surface_temperature",
+)
+```
+
+Now, let's open the first item in the catalog only for the years 1980-1990:
+
+```python
+ds_npd = catalog.open_dataset(
+    id=catalog.available_items[0],
+    start_datetime="1980-01",
+    end_datetime="1990-12",
+)
+```
+
+With the dataset open, you can plot the time mean:
+
+```python
+ds_npd["tos_con"].mean(dim="time_counter").plot(cmap="RdBu_r")
+```
+
+See the full [OceanDataCatalog example](https://noc-msm.github.io/OceanDataStore/OceanDataCatalog_example/) to explore other model resolutions, variables, pre-calculated diagnostics, and model-domain data.
+
 ::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise 1 - ECMWF AIFS SINGLE
@@ -542,6 +580,45 @@ plt.show()
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+::::::::::::::::::::::::::::::::::::::::::: challenge
+
+## Exercise 4 - Exploring the Near-Present-Day simulations
+
+1. Create an `OceanDataCatalog` and search the `noc-npd-era5` collection for `sea_surface_temperature`.
+2. Inspect `catalog.available_items` and identify the item for annual 1-degree eORCA1 output.
+3. Open the item for 2000-2010 and inspect its dimensions, variables, and chunking.
+4. Plot the mean sea surface temperature over this period. Remember that the catalog returns lazy data: avoid loading the complete simulation.
+
+::::::::::::::: solution
+
+```python
+from OceanDataStore import OceanDataCatalog
+
+catalog = OceanDataCatalog(catalog_name="noc-stac")
+catalog.search(
+    collection="noc-npd-era5",
+    standard_name="sea_surface_temperature",
+)
+print(catalog.available_items)
+
+ds_npd = catalog.open_dataset(
+    id="noc-npd-era5/npd-eorca1-era5v1/r1i1c1f1/gn/T1y",
+    start_datetime="2000-01",
+    end_datetime="2010-12",
+)
+
+print(ds_npd.dims)
+print(ds_npd.data_vars)
+print(ds_npd["tos_con"].chunks)
+
+ds_npd["tos_con"].mean(dim="time_counter").plot(cmap="RdBu_r")
+```
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
 :::::::::::::::::::::::::::::::::::::::::: spoiler
 
 ## Other open Zarr datasets to explore
@@ -551,14 +628,13 @@ You can broaden the lesson with other open Zarr datasets:
 - [**CMIP6 Zarr on AWS**](https://registry.opendata.aws/cmip6/) - global climate model output in Zarr format in the AWS open data.
 - [**CarbonPlan Zarr datasets**](https://carbonplan.org/data) - downscaled climate and other datasets accessible via HTTPS-friendly Zarr URLs.
 - [Earthmover Marketplace](https://app.earthmover.io/marketplace) - a collection of open geoscience datasets, some of which are available in Zarr format.
-- [NEMO Near-Present-Day](https://noc-msm.github.io/OceanDataStore/catalog/) - ocean model output in Zarr format, including near-present-day simulations.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 4 (Optional) - Build your own mini project
+## Exercise 5 (Optional) - Build your own mini project
 
 Choose one of the datasets (ERA5, Spotter, AIFS, CMIP6, NEMO, or another Zarr dataset you know) and design a mini project:
 
