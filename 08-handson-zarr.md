@@ -619,8 +619,6 @@ ds_npd["tos_con"].mean(dim="time_counter").plot(cmap="RdBu_r")
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-:::::::::::::::::::::::::::::::::::::::::: spoiler
-
 ## Other open Zarr datasets to explore
 
 You can broaden the lesson with other open Zarr datasets:
@@ -628,8 +626,6 @@ You can broaden the lesson with other open Zarr datasets:
 - [**CMIP6 Zarr on AWS**](https://registry.opendata.aws/cmip6/) - global climate model output in Zarr format in the AWS open data.
 - [**CarbonPlan Zarr datasets**](https://carbonplan.org/data) - downscaled climate and other datasets accessible via HTTPS-friendly Zarr URLs.
 - [Earthmover Marketplace](https://app.earthmover.io/marketplace) - a collection of open geoscience datasets, some of which are available in Zarr format.
-
-::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 ::::::::::::::::::::::::::::::::::::::: challenge
