@@ -22,6 +22,10 @@ The course covers the end-to-end pipeline for n-dimensional scientific data, inc
 Rendered lesson website:
 <https://noc-oi.github.io/cloud-native-geoscience-course/>
 
+Reference setup and prep-work website:
+<https://noc-oi.github.io/prep-work-cloud-native-geoscience-course/>
+
+
 Reference workshop page (timing source):
 <https://noc-oi.github.io/2026-brazil/en/>
 
@@ -63,7 +67,7 @@ The lesson maintainer is [Tobias Ferreira](https://github.com/soutobias).
 ## License
 
 Instructional material is available under the
-[Creative Commons Attribution 4.0 International][cc-by-human] license.
+[Creative Commons Attribution-NonCommercial 4.0 International][cc-by-nc-human] license.
 
 Except where otherwise noted, example programs and software are available under the
 [MIT License][mit-license].
@@ -92,4 +96,4 @@ To cite this lesson, see [CITATION.cff](CITATION.cff).
 [episode16]: episodes/16-best-practices.md
 
 [mit-license]: https://opensource.org/licenses/mit-license.html
-[cc-by-human]: https://creativecommons.org/licenses/by/4.0/
+[cc-by-nc-human]: https://creativecommons.org/licenses/by-nc/4.0/
