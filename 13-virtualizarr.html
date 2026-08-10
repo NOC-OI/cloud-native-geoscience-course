@@ -410,7 +410,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Virtual Zarr with Virtualizarr</h1>
-        <p>Last updated on 2026-08-05 |
+        <p>Last updated on 2026-08-10 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/13-virtualizarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -464,7 +464,8 @@ Zarr-like way without copying all the data. Instead of writing new chunk
 files, <a href="https://virtualizarr.readthedocs.io/en/stable/" class="external-link">Virtualizarr</a>
 builds a virtual dataset that points back to the original NetCDF
 data.</p>
-<figure><img src="fig/fake_zarr.png" alt="An illustration NetCDF files trying to looking like a Zarr Store." class="figure mx-auto d-block"></figure><div class="section level3">
+<figure><img src="fig/fake_zarr.png" alt="An illustration NetCDF files trying to looking like a Zarr Store." class="figure mx-auto d-block"><div class="figcaption"><a href="https://www.youtube.com/watch?v=QBkZQ53vE6o" class="external-link">Source</a></div>
+</figure><div class="section level3">
 <h3 id="when-to-use-virtualizarr-instead-of-physical-conversion">When to use Virtualizarr instead of physical conversion<a class="anchor" aria-label="anchor" href="#when-to-use-virtualizarr-instead-of-physical-conversion"></a></h3>
 <p>Common scenarios:</p>
 <ul><li>You have a large archive of NetCDF/GRIB files and want fast, chunked
@@ -631,13 +632,14 @@ backed by virtual references rather than copied Zarr chunks.</p>
 <p>The important point is that this does <strong>not</strong> copy the
 data into new Zarr files. It creates a virtual representation that can
 be opened and analysed like a Zarr-style dataset.</p>
-<div id="accordionSpoiler1" class="accordion spoiler-accordion accordion-flush">
-<div class="accordion-item">
-<button class="accordion-button spoiler-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpoiler1" aria-expanded="false" aria-controls="collapseSpoiler1">
-  <h3 class="accordion-header" id="headingSpoiler1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="eye"></i></div> Obstore </h3>
-</button>
-<div id="collapseSpoiler1" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler1" aria-labelledby="headingSpoiler1">
-<div class="accordion-body">
+<div id="obstore" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<span class="callout-header">Callout</span>
+<div id="obstore" class="callout-inner">
+<h3 class="callout-title">Obstore</h3>
+<div class="callout-content">
 <p><a href="https://developmentseed.org/obstore/latest/" class="external-link"><code>obstore</code></a>
 gives a simple Python interface to cloud object storage that is built
 for speed and works well with safer, more predictable data access
@@ -648,7 +650,6 @@ provider-specific clients or filesystem-style wrappers.</p>
 to explore it further. It is not the focus of this lesson, but it is
 interesting if you want to work with cloud object storage more
 efficiently.</p>
-</div>
 </div>
 </div>
 </div>
@@ -1143,8 +1144,8 @@ Conference, 2025. Available at <a href="https://www.youtube.com/watch?v=QBkZQ53v
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/13-virtualizarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/13-virtualizarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-05",
-  "datePublished": "2026-08-07"
+  "dateModified": "2026-08-10",
+  "datePublished": "2026-08-10"
 }
 
   </script><script>

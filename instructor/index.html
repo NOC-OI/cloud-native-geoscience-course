@@ -402,21 +402,25 @@
 
 <section><h2 class="section-heading" id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a></h2>
 <hr class="half-width"><p>This workshop introduces practical tools and workflows for working
-with large environmental datasets in a cloud-friendly way. Over the
-course of the lesson, you will set up a Python environment, access
-example data, and explore formats such as NetCDF, Zarr, and STAC that
-are designed for scalable analysis. You will also learn key concepts
-such as chunking, metadata, parallel processing, and versioned data
-storage. The aim is to help you understand not only how these tools
-work, but also why they are useful for analysing, sharing, and managing
+with large n-dimensional scientific datasets used in oceanography,
+climate, and meteorology in a cloud-friendly way.</p>
+<p>You’ll learn to: - Migrate environmental data from traditional
+formats such as NetCDF to cloud-native formats like Zarr and
+VirtualiZarr - Store, process, and access multi-terabyte datasets
+efficiently using object storage and parallel processing tools such as
+Dask - Build scalable and reproducible cloud-native workflows for
+environmental data - Visualise and explore large datasets efficiently in
+the cloud</p>
+<p>The aim is to help you understand not only how these tools work, but
+also why they are useful for analysing, sharing, and managing
 environmental data more efficiently.</p>
-<div id="what-do-you-work-with" class="callout discussion">
+<div id="what-data-do-you-work-with" class="callout discussion">
 <div class="callout-square">
 <i class="callout-icon" data-feather="message-circle"></i>
 </div>
 <span class="callout-header">Discussion</span>
-<div id="what-do-you-work-with" class="callout-inner">
-<h3 class="callout-title">What do you work with?</h3>
+<div id="what-data-do-you-work-with" class="callout-inner">
+<h3 class="callout-title">What data do you work with?</h3>
 <div class="callout-content">
 <p>Before we start, take a moment to think about your own experience
 with environmental data. This short activity will help us understand the
@@ -463,7 +467,7 @@ instructions and performs calculations. A <strong>core</strong> is one
 processing unit inside a CPU, while a <strong>process</strong> is one
 running instance of a program and a <strong>thread</strong> is a smaller
 unit of work inside that process.</p>
-</div>
+<figure><img src="../fig/cpu_core_process_thread.png" alt="A diagram showing the relationship between CPU, core, process, and thread." class="figure mx-auto d-block"></figure></div>
 <div class="section level3">
 <h3 id="parallel-processing-and-dask">Parallel processing and Dask<a class="anchor" aria-label="anchor" href="#parallel-processing-and-dask"></a></h3>
 <p><strong>Parallel processing</strong> means splitting work so that
@@ -485,7 +489,9 @@ work together, and a <strong>node</strong> is one computer within that
 cluster. <strong>High-performance computing (HPC)</strong> refers to
 large shared systems designed for heavy computation and large data
 processing.</p>
-<figure><img src="../fig/hpc.png" alt="A picture of the JASMIN HPC system." class="figure mx-auto d-block"></figure></div>
+<figure><img src="../fig/hpc.png" alt="A picture of the JASMIN HPC system." class="figure mx-auto d-block"><div class="figcaption">Jasmin HPC Cluster. <a href="https://www.jasmin.ac.uk/about/evolution/" class="external-link">Source</a>
+</div>
+</figure></div>
 <div class="section level3">
 <h3 id="jasmin-and-ssh">JASMIN and SSH<a class="anchor" aria-label="anchor" href="#jasmin-and-ssh"></a></h3>
 <p><a href="https://jasmin.ac.uk" class="external-link">JASMIN</a> is the UK’s data analysis
@@ -936,8 +942,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/index.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/index.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-07",
-  "datePublished": "2026-08-07"
+  "dateModified": "2026-08-10",
+  "datePublished": "2026-08-10"
 }
 
   </script><script>
