@@ -28,7 +28,7 @@ Converting all archival data to Zarr is sometimes impractical. Archives may cont
 
 A virtual Zarr store gives you a way to access those files in a Zarr-like way without copying all the data. Instead of writing new chunk files, [Virtualizarr](https://virtualizarr.readthedocs.io/en/stable/) builds a virtual dataset that points back to the original NetCDF data.
 
-![](fig/fake_zarr.png){alt="An illustration NetCDF files trying to looking like a Zarr Store."}
+![[Source](https://www.youtube.com/watch?v=QBkZQ53vE6o)](fig/fake_zarr.png){alt="An illustration NetCDF files trying to looking like a Zarr Store."}
 
 
 ### When to use Virtualizarr instead of physical conversion
@@ -159,7 +159,7 @@ print(vds)
 
 The important point is that this does **not** copy the data into new Zarr files. It creates a virtual representation that can be opened and analysed like a Zarr-style dataset.
 
-:::::::::::::::::::::::::::::::::::::::::: spoiler
+:::::::::::::::::::::::::::::::::::::::::: callout
 
 ## Obstore
 
