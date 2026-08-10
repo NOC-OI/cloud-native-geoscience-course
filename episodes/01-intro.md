@@ -61,7 +61,7 @@ The World Meteorological Organization maintains binary formats optimised for exc
 
 These WMO "table‑driven code forms" are widely adopted for transmitting satellite products and model fields between operational centres and can also be used for storage. You will often encounter reanalysis products and forecast grids available as GRIB or NetCDF, sometimes convertible between them.
 
-### Other and emerging formats you may meet
+### Other and emerging formats you may come across
 
 Alongside the array formats above, you will often work with:
 
@@ -70,7 +70,7 @@ Alongside the array formats above, you will often work with:
 - [**GeoJSON**](https://geojson.org/): a JSON‑based format for vector geometries and attributes, often used for footprints, regions of interest, and feature‑based metadata in web APIs and STAC items.
 - [**Shapefiles**](https://doc.arcgis.com/en/arcgis-online/reference/shapefiles.htm): an older but still common vector format in GIS for points, lines and polygons describing stations, coastlines, regions, etc.
 - **[Parquet](https://parquet.apache.org/) / [GeoParquet](https://geoparquet.org/)**: columnar, compressed table formats increasingly used in cloud‑native analytics. GeoParquet adds conventions for storing vector geometries alongside tabular attributes, making large point or polygon datasets efficient to query in data lakes and lakehouses.
-- **XML / JSON**: often used for metadata documents, catalog records or service responses, rather than bulk gridded data.
+- **[XML](https://www.w3.org/TR/xml/) / [JSON](https://www.json.org/)**: often used for metadata documents, catalog records or service responses, rather than bulk gridded data.
 
 ::::::::::::::::::::::::::::::::::::::::::  callout
 

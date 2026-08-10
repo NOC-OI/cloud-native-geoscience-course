@@ -383,7 +383,7 @@ A production-ready object store is more than "just a server with a disk". For a 
 - Stable power, cooling, and physical security.
 - A plan for identity, access control, and certificate management.
 
-:::::::::::::::::::::::::::::::::::::::::: spoiler
+:::::::::::::::::::::::::::::::::::::::::: callout
 
 ### Minimal MinIO deployment with Docker Compose
 

@@ -5,11 +5,19 @@ site: sandpaper::sandpaper_site
 
 ## Introduction
 
-This workshop introduces practical tools and workflows for working with large environmental datasets in a cloud-friendly way. Over the course of the lesson, you will set up a Python environment, access example data, and explore formats such as NetCDF, Zarr, and STAC that are designed for scalable analysis. You will also learn key concepts such as chunking, metadata, parallel processing, and versioned data storage. The aim is to help you understand not only how these tools work, but also why they are useful for analysing, sharing, and managing environmental data more efficiently.
+This workshop introduces practical tools and workflows for working with large n-dimensional scientific datasets used in oceanography, climate, and meteorology in a cloud-friendly way.
+
+You’ll learn to:
+- Migrate environmental data from traditional formats such as NetCDF to cloud-native formats like Zarr and VirtualiZarr
+- Store, process, and access multi-terabyte datasets efficiently using object storage and parallel processing tools such as Dask
+- Build scalable and reproducible cloud-native workflows for environmental data
+- Visualise and explore large datasets efficiently in the cloud
+
+The aim is to help you understand not only how these tools work, but also why they are useful for analysing, sharing, and managing environmental data more efficiently.
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## What do you work with?
+## What data do you work with?
 
 Before we start, take a moment to think about your own experience with environmental data. This short activity will help us understand the kinds of datasets and challenges you bring to the workshop.
 
@@ -45,6 +53,8 @@ Here are some of the main terms that appear throughout the workshop.
 
 The **CPU** is the Central Processing Unit that executes instructions and performs calculations. A **core** is one processing unit inside a CPU, while a **process** is one running instance of a program and a **thread** is a smaller unit of work inside that process.
 
+![](fig/cpu_core_process_thread.png){alt="A diagram showing the relationship between CPU, core, process, and thread."}
+
 ### Parallel processing and Dask
 
 **Parallel processing** means splitting work so that different parts run at the same time, often across cores, processes, or workers. **Dask** is a Python library that facilitates parallel computing by breaking down large computations into smaller tasks that can be executed concurrently.
@@ -57,7 +67,7 @@ The **CPU** is the Central Processing Unit that executes instructions and perfor
 
 A **cluster** is a group of connected computers that work together, and a **node** is one computer within that cluster. **High-performance computing (HPC)** refers to large shared systems designed for heavy computation and large data processing.
 
-![](episodes/fig/hpc.png){alt="A picture of the JASMIN HPC system."}
+![Jasmin HPC Cluster. [Source](https://www.jasmin.ac.uk/about/evolution/)](episodes/fig/hpc.png){alt="A picture of the JASMIN HPC system."}
 
 ### JASMIN and SSH
 
