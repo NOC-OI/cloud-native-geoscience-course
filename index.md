@@ -8,6 +8,7 @@ site: sandpaper::sandpaper_site
 This workshop introduces practical tools and workflows for working with large n-dimensional scientific datasets used in oceanography, climate, and meteorology in a cloud-friendly way.
 
 You’ll learn to:
+
 - Migrate environmental data from traditional formats such as NetCDF to cloud-native formats like Zarr and VirtualiZarr
 - Store, process, and access multi-terabyte datasets efficiently using object storage and parallel processing tools such as Dask
 - Build scalable and reproducible cloud-native workflows for environmental data
@@ -40,7 +41,7 @@ In this workshop, we will use:
 - `icechunk` for versioning
 - `virtualizarr` for virtual Zarr stores
 - `stac` for cataloging
-- `topozarr` for multiscale Zarr visualization
+- `topozarr` for generating multiscale Zarr
 - others...
 
 The exact environment is provided in the course repository as an [environment.yml file for creating a conda environment](episodes/files/environment.yml).
