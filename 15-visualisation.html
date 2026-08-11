@@ -414,7 +414,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Visualizing Multiscale Zarr and GeoZarr</h1>
-        <p>Last updated on 2026-08-05 |
+        <p>Last updated on 2026-08-11 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/15-visualisation.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -575,7 +575,7 @@ the next exercise.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>The multiscale strategy will depend on the dataset’s spatial
 resolution and the desired zoom levels for visualisation. For example,
@@ -749,7 +749,7 @@ out?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb9">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -841,28 +841,29 @@ dedicated tile server, but it means the browser has to do more work.</p>
 <p>Examples include:</p>
 <ul><li>
 <a href="https://github.com/noc-oi/zarr-maps" class="external-link"><strong>zarr-maps</strong></a>:
-a client-side layer for Leaflet and OpenLayers-style web maps.</li>
+a client-side layer for <a href="https://leafletjs.com/" class="external-link">Leaflet</a> and
+<a href="https://openlayers.org/" class="external-link">OpenLayers</a>-style web maps.</li>
 <li>
 <a href="https://github.com/noc-oi/zarr-cesium" class="external-link"><strong>zarr-cesium</strong></a>:
-client-side visualisation for 2D and 3D in CesiumJS.</li>
+client-side visualisation for 2D and 3D in <a href="https://cesium.com/cesiumjs/" class="external-link">CesiumJS</a>.</li>
 <li>
 <a href="https://github.com/carbonplan/zarr-layer" class="external-link"><strong>zarr-layer</strong></a>
 / <a href="https://github.com/developmentseed/deck.gl-raster" class="external-link"><strong>deck.gl-raster</strong></a>:
 browser rendering built around Zarr chunk loading and GPU display. For
-Mapbox and Maplibre.</li>
+<a href="https://www.mapbox.com/" class="external-link">Mapbox</a> and <a href="https://maplibre.org/" class="external-link">Maplibre</a>.</li>
 </ul><p>These tools usually rely on a Zarr JavaScript reader such as <a href="https://zarrita.dev/" class="external-link"><strong>Zarrita</strong></a> to fetch chunk
 data from object storage. The browser then combines that data with <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API" class="external-link"><strong>WebGL</strong></a>
 and the <strong>GPU</strong> to render images, surfaces, or map tiles
 efficiently.</p>
-</div>
+<figure><img src="fig/zarr_cesium_workflow.png" alt="Diagram showing the workflow for visualising a multiscale Zarr dataset in the browser using zarr-cesium." class="figure mx-auto d-block"><div class="figcaption"><a href="https://www.youtube.com/watch?v=yPe4MZ2XIWs" class="external-link">Source</a></div>
+</figure></div>
 <div class="section level3">
 <h3 id="simple-html-example">Simple HTML example<a class="anchor" aria-label="anchor" href="#simple-html-example"></a></h3>
 <p>In this lesson, we will not go deep into front-end code, but we will
 show a simple browser example that you can run locally and point at
 their own multiscale Zarr store. It is the <a href="files/zarr-maps-openlayers.html">zarr-maps-openlayers.html</a>,
-which is a minimal HTML page that uses <strong>zarr-maps</strong> with
-<strong>OpenLayers</strong> to visualise a multiscale zarr dataset in
-the browser.</p>
+which is a minimal HTML page that uses <a href="https://github.com/noc-oi/zarr-maps" class="external-link">zarr-maps</a> with <a href="https://openlayers.org/" class="external-link">OpenLayers</a> to visualise a multiscale
+zarr dataset in the browser.</p>
 <p>The lesson renders the same example inline below so you can inspect
 it directly in the page:</p>
 <iframe src="files/zarr-maps-openlayers.html" title="Zarr-maps OpenLayers example" style="width: 100%; height: 800px; border: 1px solid #d0d7de; border-radius: 0.75rem;" loading="lazy">
@@ -908,7 +909,7 @@ size) to improve performance?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <p>You should experience direct browser-based visualisation of your
 multiscale Zarr data. You will see how multiscale pyramids and chunking
@@ -944,7 +945,7 @@ datasets.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Show me the solution </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
 <p>You should experience direct browser-based visualisation of your
 multiscale Zarr data in 3D. You will see how multiscale pyramids and
@@ -974,14 +975,15 @@ multiscale processing step before visualisation.</p>
 <p>For datasets on regular grids, the workflow is relatively
 straightforward. However, many geoscience datasets use irregular or
 curvilinear grids, where the relationship between Zarr chunks and map
-tiles is not direct. In these cases, it is often necessary to reproject
-or resample the data onto a regular grid before generating the
-multiscale pyramid.</p>
+tiles is not direct. The <a href="https://noc-msm.github.io/NOC_Near_Present_Day/" class="external-link">NEMO
+Near-Present-Day</a> dataset is a good example of this. In these cases,
+it is often necessary to reproject or resample the data onto a regular
+grid before generating the multiscale pyramid.</p>
 <p>Several Python libraries can help with this preprocessing step,
 including <a href="https://corteva.github.io/rioxarray/stable/" class="external-link">rioxarray</a>, <a href="https://xesmf.readthedocs.io/en/latest/" class="external-link">xESMF</a>, and <a href="https://rasterio.readthedocs.io/en/latest/" class="external-link">rasterio</a>. For a
 detailed discussion of the available approaches and their performance,
 see the <a href="https://developmentseed.org/" class="external-link">Development Seed</a>
-report, <a href="https://developmentseed.org/warp-resample-profiling/" class="external-link"><em>Reprojecting
+report: <a href="https://developmentseed.org/warp-resample-profiling/" class="external-link"><em>Reprojecting
 and Resampling Geospatial Data with Python</em></a>. These tools can
 help prepare datasets for efficient multiscale visualisation,
 particularly when working with irregular grids or non-standard map
@@ -1080,7 +1082,7 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/15-visualisation.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/15-visualisation.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-05",
+  "dateModified": "2026-08-11",
   "datePublished": "2026-08-11"
 }
 
