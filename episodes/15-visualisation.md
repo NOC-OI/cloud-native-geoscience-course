@@ -293,15 +293,17 @@ In the client-side approach, the browser reads Zarr chunks directly from object 
 
 Examples include:
 
-- [**zarr-maps**](https://github.com/noc-oi/zarr-maps): a client-side layer for Leaflet and OpenLayers-style web maps.
-- [**zarr-cesium**](https://github.com/noc-oi/zarr-cesium): client-side visualisation for 2D and 3D in CesiumJS.
-- [**zarr-layer**](https://github.com/carbonplan/zarr-layer) / [**deck.gl-raster**](https://github.com/developmentseed/deck.gl-raster): browser rendering built around Zarr chunk loading and GPU display. For Mapbox and Maplibre.
+- [**zarr-maps**](https://github.com/noc-oi/zarr-maps): a client-side layer for [Leaflet](https://leafletjs.com/) and [OpenLayers](https://openlayers.org/)-style web maps.
+- [**zarr-cesium**](https://github.com/noc-oi/zarr-cesium): client-side visualisation for 2D and 3D in [CesiumJS](https://cesium.com/cesiumjs/).
+- [**zarr-layer**](https://github.com/carbonplan/zarr-layer) / [**deck.gl-raster**](https://github.com/developmentseed/deck.gl-raster): browser rendering built around Zarr chunk loading and GPU display. For [Mapbox](https://www.mapbox.com/) and [Maplibre](https://maplibre.org/).
 
 These tools usually rely on a Zarr JavaScript reader such as [**Zarrita**](https://zarrita.dev/) to fetch chunk data from object storage. The browser then combines that data with [**WebGL**](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) and the **GPU** to render images, surfaces, or map tiles efficiently.
 
+![[Source](https://www.youtube.com/watch?v=yPe4MZ2XIWs)](episodes/fig/zarr_cesium_workflow.png){alt="Diagram showing the workflow for visualising a multiscale Zarr dataset in the browser using zarr-cesium."}
+
 ### Simple HTML example
 
-In this lesson, we will not go deep into front-end code, but we will show a simple browser example that you can run locally and point at their own multiscale Zarr store. It is the [zarr-maps-openlayers.html](files/zarr-maps-openlayers.html), which is a minimal HTML page that uses **zarr-maps** with **OpenLayers** to visualise a multiscale zarr dataset in the browser.
+In this lesson, we will not go deep into front-end code, but we will show a simple browser example that you can run locally and point at their own multiscale Zarr store. It is the [zarr-maps-openlayers.html](files/zarr-maps-openlayers.html), which is a minimal HTML page that uses [zarr-maps](https://github.com/noc-oi/zarr-maps) with [OpenLayers](https://openlayers.org/) to visualise a multiscale zarr dataset in the browser.
 
 The lesson renders the same example inline below so you can inspect it directly in the page:
 
@@ -372,9 +374,9 @@ In [Lesson 10](./10-conversion-workflow.html), we converted a NetCDF dataset int
 
 This extends the original conversion pipeline with an additional multiscale processing step before visualisation.
 
-For datasets on regular grids, the workflow is relatively straightforward. However, many geoscience datasets use irregular or curvilinear grids, where the relationship between Zarr chunks and map tiles is not direct. In these cases, it is often necessary to reproject or resample the data onto a regular grid before generating the multiscale pyramid.
+For datasets on regular grids, the workflow is relatively straightforward. However, many geoscience datasets use irregular or curvilinear grids, where the relationship between Zarr chunks and map tiles is not direct. The [NEMO Near-Present-Day](https://noc-msm.github.io/NOC_Near_Present_Day/) dataset is a good example of this. In these cases, it is often necessary to reproject or resample the data onto a regular grid before generating the multiscale pyramid.
 
-Several Python libraries can help with this preprocessing step, including [rioxarray](https://corteva.github.io/rioxarray/stable/), [xESMF](https://xesmf.readthedocs.io/en/latest/), and [rasterio](https://rasterio.readthedocs.io/en/latest/). For a detailed discussion of the available approaches and their performance, see the [Development Seed](https://developmentseed.org/) report, [*Reprojecting and Resampling Geospatial Data with Python*](https://developmentseed.org/warp-resample-profiling/). These tools can help prepare datasets for efficient multiscale visualisation, particularly when working with irregular grids or non-standard map projections.
+Several Python libraries can help with this preprocessing step, including [rioxarray](https://corteva.github.io/rioxarray/stable/), [xESMF](https://xesmf.readthedocs.io/en/latest/), and [rasterio](https://rasterio.readthedocs.io/en/latest/). For a detailed discussion of the available approaches and their performance, see the [Development Seed](https://developmentseed.org/) report: [*Reprojecting and Resampling Geospatial Data with Python*](https://developmentseed.org/warp-resample-profiling/). These tools can help prepare datasets for efficient multiscale visualisation, particularly when working with irregular grids or non-standard map projections.
 
 The diagram below shows the full pipeline, from NetCDF to multiscale Zarr pyramid, ready for browser-based visualisation.
 
