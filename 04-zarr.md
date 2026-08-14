@@ -89,6 +89,8 @@ ocean_temperature_v2.zarr/
     └── 0
 ```
 
+**Note: Windows users may need to create an alias to make the `tree` command work. Please run the following command: `echo "alias tree='cmd //c tree //F'" >> ~/.bashrc && source ~/.bashrc`.**
+
 In this example, `sst` is one data variable, while `valid_time`, `longitude`, and `latitude` are coordinate arrays. Each array has its own `.zarray` file describing the array shape, data type, chunk layout, fill value, and other storage settings.
 
 To see the `.zgroup`, `.zattrs`, and `.zmetadata` of this zarr dataset, you can run the following command in a terminal:
