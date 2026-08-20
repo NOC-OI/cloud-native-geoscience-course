@@ -116,9 +116,9 @@ The [NERC Vocabulary Server (NVS)](https://vocab.nerc.ac.uk/), operated by the [
 
 - Populate drop‑down lists in metadata editors, ensuring consistent choice of parameter names, platforms, and methods.
 - Mark up metadata with stable URIs rather than free text, enabling machine‑readable search and semantic cross‑walks between different metadata schemas.
-- Support "smart search" and semantic web services in marine data portals, including collections specifically for MEDIN controlled vocabularies and SeaDataNet common vocabularies.
+- Support "smart search" and semantic web services in marine data portals, including collections specifically for Marine Environmental Data and Information Network (MEDIN) controlled vocabularies and SeaDataNet common vocabularies.
 
-[MEDIN's Discovery Metadata Standard](https://medin.org.uk/data-standards/medin-discovery-metadata-standard) is a marine profile of the UK government's GEMINI standard and is aligned with INSPIRE and ISO 19115, providing a consistent template for describing marine datasets in the UK context. This profile focuses on "discovery metadata", the core elements needed for catalogues and portals to help users find and evaluate datasets.
+[MEDIN's Discovery Metadata Standard](https://medin.org.uk/data-standards/medin-discovery-metadata-standard) is a marine profile of the UK government's Geo-spatial Metadata Interoperability Initiative (GEMINI) standard and is aligned with Infrastructure for Spatial Information in Europe (INSPIRE) and ISO 19115, providing a consistent template for describing marine datasets in the UK context. This profile focuses on "discovery metadata", the core elements needed for catalogues and portals to help users find and evaluate datasets.
 
 
 ::::::::::::::::::::::::::::::::::::::::::  callout
