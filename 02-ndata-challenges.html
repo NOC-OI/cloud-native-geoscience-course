@@ -606,7 +606,7 @@ complex?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>This dataset has dimensions for “time” (<code>valid_time</code>),
 “lat” (<code>latitude</code>), and “lon” (<code>longitude</code>), with
@@ -666,7 +666,7 @@ originating centre, parameter names)?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>Both files expose a very similar data model when opened with xarray.
 They contain the same spatial grid (721 × 1440), 120 time steps, and a
@@ -695,7 +695,7 @@ organisation</h3>
 <p>Using the <code>data/era5_sst/ocean_temperature.nc</code> NetCDF
 file, imagine that:</p>
 <ul><li>Spatial resolution doubles in each horizontal direction.</li>
-<li>Output frequency increases from monthly to hourly.</li>
+<li>Output frequency increases from hourly to 10-minute intervals.</li>
 <li>We add more time steps to cover a 30‑year period.</li>
 <li>Several colleagues also need to analyse this dataset, possibly from
 different institutions.</li>
@@ -719,13 +719,13 @@ dimensions, size, organisation, and sharing.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Show me the solution </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>Doubling the horizontal resolution would increase the number of
 latitude and longitude points, giving about four times more grid cells
-at each time step. Changing the output from monthly to hourly and
-extending the dataset to 30 years would greatly increase the number of
-time steps, making the dataset much larger overall.</p>
+at each time step. Changing the output from hourly to 10-minute
+intervals and extending the dataset to 30 years would greatly increase
+the number of time steps, making the dataset much larger overall.</p>
 <p>A single file would become difficult to store, move, and analyse, so
 it would be better to split the data into smaller files. Opening and
 working with the full dataset would also become slower and could require
