@@ -167,7 +167,7 @@ Both files expose a very similar data model when opened with xarray. They contai
 Using the `data/era5_sst/ocean_temperature.nc` NetCDF file, imagine that:
 
 - Spatial resolution doubles in each horizontal direction.
-- Output frequency increases from monthly to hourly.
+- Output frequency increases from hourly to 10-minute intervals.
 - We add more time steps to cover a 30‑year period.
 - Several colleagues also need to analyse this dataset, possibly from different institutions.
 
@@ -182,7 +182,7 @@ You do not need to implement anything. Focus on reasoning about dimensions, size
 
 ::::::::::::::: solution
 
-Doubling the horizontal resolution would increase the number of latitude and longitude points, giving about four times more grid cells at each time step. Changing the output from monthly to hourly and extending the dataset to 30 years would greatly increase the number of time steps, making the dataset much larger overall.
+Doubling the horizontal resolution would increase the number of latitude and longitude points, giving about four times more grid cells at each time step. Changing the output from hourly to 10-minute intervals and extending the dataset to 30 years would greatly increase the number of time steps, making the dataset much larger overall.
 
 A single file would become difficult to store, move, and analyse, so it would be better to split the data into smaller files. Opening and working with the full dataset would also become slower and could require more memory than is available on a typical computer.
 
