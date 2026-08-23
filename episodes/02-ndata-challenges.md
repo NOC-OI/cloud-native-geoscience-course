@@ -47,7 +47,7 @@ From the user's point of view, NetCDF provides an intuitive way to represent n-d
 
 ### GRIB: compact operational exchange
 
-GRIB (GRIdded Binary) is a World Meteorological Organization format designed for efficient transmission and storage of gridded meteorological fields, especially numerical weather prediction outputs.
+GRIB (GRIdded Binary) is a World Meteorological Organization (WMO) format designed for efficient transmission and storage of gridded meteorological fields, especially numerical weather prediction outputs.
 It uses many "messages", each containing a field plus encoded metadata, and is governed by WMO tables that define parameters, levels, and other descriptors.
 
 GRIB was declared operational as a standard in the early 2000s with GRIB2, providing more flexible metadata, additional compression methods, and improved support for missing values compared to the original GRIB.
