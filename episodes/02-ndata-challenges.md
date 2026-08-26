@@ -216,9 +216,9 @@ Even when chunking is used inside NetCDF‑4/HDF5, the file is still treated as 
 
 ## POSIX file systems and object storage
 
-A **POSIX file system** is a traditional file-system model with directories, files, and paths that are accessed through a local or mounted storage interface. It is commonly used for shared filesystems and local disks.
+A **POSIX file system** is a traditional file-system model with directories, files, and paths that are accessed through a local or mounted storage interface. It is commonly used for shared file systems and local disks.
 
-An **object-store file system** is a storage interface that exposes object storage through filesystem-like operations, often used in cloud workflows. It is different from a traditional POSIX filesystem because data are accessed through object APIs rather than a normal directory tree.
+An **object-store file system** is a storage interface that exposes object storage through file system-like operations, often used in cloud workflows. It is different from a traditional POSIX file system because data are accessed through object APIs rather than a normal directory tree.
 
 ::::::::::::::::::::::::::::::::::::::::::
 
@@ -232,7 +232,7 @@ Storing large archives on traditional networked file systems or shared servers c
 
 In this lesson we do not go into technical details of object stores or cloud pricing, but it is useful to recognise that:
 
-- Growing data volumes make it expensive to keep multiple full copies on local disks or HPC filesystems.
+- Growing data volumes make it expensive to keep multiple full copies on local disks or HPC file systems.
 - Centralised archives and object storage are attractive for long‑term, shared access.
 - Formats and access patterns that support subsetting and streaming (rather than whole‑file downloads) will become more important as archives grow.
 
