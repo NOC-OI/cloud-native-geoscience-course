@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Cloud-Native Formats</h1>
-        <p>Last updated on 2026-08-05 |
+        <p>Last updated on 2026-08-26 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/03-cloudnative-formats.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -477,10 +477,10 @@ shared by many users.</p>
 <h3 id="from-files-to-cloud-objects">From files to cloud objects<a class="anchor" aria-label="anchor" href="#from-files-to-cloud-objects"></a></h3>
 <p>Traditional scientific formats such as NetCDF, GRIB, and HDF5 were
 designed mainly for file-based storage systems: local disks, shared
-servers, and HPC filesystems. In that world, the standard workflow is
+servers, and HPC file systems. In that world, the standard workflow is
 often “download the file, open the file, analyse the file”.</p>
-<p>Cloud storage works differently. Instead of one large file on a
-filesystem, data is commonly stored as many independent objects accessed
+<p>Cloud storage works differently. Instead of one large file on a file
+system, data is commonly stored as many independent objects accessed
 over HTTP or S3-style APIs. In this setting, performance depends not
 just on how data is encoded, but also on how many requests are needed,
 where metadata lives, and whether small subsets can be fetched
@@ -499,7 +499,7 @@ one.</li>
 the underlying data.</li>
 </ul><p>For multidimensional environmental data, this usually means chunked
 arrays, lightweight metadata access, and layouts that work well with
-object storage rather than assuming a POSIX filesystem. The goal is not
+object storage rather than assuming a POSIX file system. The goal is not
 to change the meaning of the data, but to change how efficiently we can
 discover, access, and process it.</p>
 <figure><img src="../fig/traditional_vs_cloud_native.png" alt="Difference between traditional files and cloud-native objects, with metadata and chunks." class="figure mx-auto d-block"><div class="figcaption">Difference between traditional files and
@@ -708,7 +708,7 @@ Zarr datasets.</p>
 <div class="callout-inner">
 <div class="callout-content">
 <ul><li>“Cloud-native formats are designed for efficient access over object
-storage and web protocols, not just for local filesystems.”</li>
+storage and web protocols, not just for local file systems.”</li>
 <li>“A cloud-native layout usually combines lightweight metadata with
 addressable chunks so that tools can read only the data they need.”</li>
 <li>“Simply storing NetCDF or HDF5 files in the cloud does not
@@ -792,8 +792,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/03-cloudnative-formats.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-05",
-  "datePublished": "2026-08-25"
+  "dateModified": "2026-08-26",
+  "datePublished": "2026-08-26"
 }
 
   </script><script>
