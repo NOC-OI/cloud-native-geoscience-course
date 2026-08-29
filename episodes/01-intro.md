@@ -6,22 +6,20 @@ exercises: 15
 
 ::::::::::::::::::::::::::::::::::::::::::  objectives
 
-- "Recognize common data formats used in oceanography and meteorology (e.g. NetCDF, GRIB, BUFR, Zarr)."
-- "Explain what metadata is and why it is essential for discovery and reuse."
-- "Describe what controlled vocabularies are and how they support consistent metadata."
-- "Identify key international and community standards (CF conventions, ISO 19115/INSPIRE, MEDIN, NERC NVS)."
-- "Relate traditional formats and standards to emerging cloud‑native formats such as Zarr."
-
+- Recognize common data formats used in oceanography and meteorology (e.g. NetCDF, GRIB, BUFR, Zarr).
+- Explain what metadata is and why it is essential for discovery and reuse.
+- Describe what controlled vocabularies are and how they support consistent metadata.
+- Identify key international and community standards (CF conventions, ISO 19115/INSPIRE, MEDIN, NERC NVS).
+- Relate traditional formats and standards to emerging cloud‑native formats such as Zarr.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :::::::::::::::::::::::::::::::::::::::::::  questions
 
-- "What are the main data formats used to store ocean and atmosphere data?"
-- "What is metadata, and how does it help other people find and understand my data?"
-- "What is a controlled vocabulary, and why is it better than free text?"
-- "Which international standards should I be aware of when publishing environmental data?"
-- "How do these standards connect to modern cloud‑native formats like Zarr?"
-
+- What are the main data formats used to store ocean and atmosphere data?
+- What is metadata, and how does it help other people find and understand my data?
+- What is a controlled vocabulary, and why is it better than free text?
+- Which international standards should I be aware of when publishing environmental data?
+- How do these standards connect to modern cloud‑native formats like Zarr?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -42,15 +40,18 @@ Environmental scientists use several families of formats. Here we focus on those
 
 ![](fig/file_formats.png){alt="Common file formats in environmental data, including NetCDF, HDF5, Zarr, GRIB, BUFR, GeoTIFF, GeoJSON, Shapefile, Parquet/GeoParquet, and CSV."}
 
-### Self‑describing array formats
+### Self-describing array formats
 
-These formats store both array data and structural metadata (dimensions, variables, units, coordinate systems) in the same file or object:
+These formats store both the array data and the structural metadata needed to interpret it—such as dimensions, variables, units, coordinates, and attributes—within the same file or dataset:
 
-- [**NetCDF (Network Common Data Form)**](https://www.unidata.ucar.edu/software/netcdf) is a machine‑independent, binary, self‑describing format designed for array‑oriented scientific data, widely used to store gridded climate, ocean and meteorological variables.
-- [**HDF5 (Hierarchical Data Format)**](https://www.hdfgroup.org/solutions/hdf5/) is another self‑describing format supporting large, complex datasets with a "directory‑like" internal structure. It is used for satellite products, model output and other multidimensional data.
-- [**Zarr**](https://zarr.dev/) is a newer, cloud‑native format for chunked, N‑dimensional arrays. The GeoZarr standard describes how to represent geospatial datasets in Zarr using concepts from the Unidata Common Data Model, including dimensions, coordinate variables, attributes and metadata style.
+- [**NetCDF (Network Common Data Form)**](https://www.unidata.ucar.edu/software/netcdf) is a machine-independent, binary, self-describing format designed for array-oriented scientific data. It is widely used for gridded climate, oceanographic, and meteorological datasets. Example: `sea_surface_temperature.nc`, containing latitude, longitude, time, sea-surface temperature values, units, and other metadata.
 
-This "self‑describing" property is particularly important for large climate model outputs, reanalysis products and ocean observing systems, where many different tools need to interpret the same files without bespoke documentation.
+- [**HDF5 (Hierarchical Data Format)**](https://www.hdfgroup.org/solutions/hdf5/) is another self-describing format designed for large and complex datasets. It supports a hierarchical, "directory-like" internal structure containing groups, datasets, and attributes. HDF5 is widely used for satellite products, model output, and other multidimensional scientific data Example: `satellite_observations.h5`, containing separate groups for geolocation, measurements, quality flags, and metadata.
+
+- [**Zarr**](https://zarr.dev/) is a newer format for chunked, N-dimensional arrays, designed to work particularly well with cloud and object-storage environments. The GeoZarr standard describes how geospatial datasets can be represented in Zarr using concepts from the Unidata Common Data Model, including dimensions, coordinate variables, attributes, and metadata conventions. Example: `ocean_model.zarr`, containing chunked temperature, salinity, and velocity arrays indexed by time, depth, latitude, and longitude.
+
+This self-describing property is particularly important for large climate model outputs, reanalysis products, satellite observations, and ocean observing systems, where many different tools and users need to understand and process the same datasets without relying on separate, bespoke documentation.
+
 
 ### WMO exchange formats
 
@@ -135,13 +136,40 @@ A single measured variable (e.g. "sea water temperature at 5 m") might be descri
 
 The [Climate and Forecast (CF) metadata conventions](https://cfconventions.org/) define how to describe Earth science data in self‑describing formats (originally NetCDF) so that files from different sources can be processed and compared consistently. CF specifies attributes such as `standard_name`, `units`, `cell_methods`, `coordinates`, `bounds` and `grid_mapping`, plus rules for how to represent grids, time coordinates and climatological statistics.
 
-CF has been widely adopted for atmosphere and ocean data, including climate model output for major intercomparison projects, and is considered a recommended standard for gridded data in programmes like [IOOS](https://ioos.noaa.gov/).
+CF is widely adopted across atmospheric, oceanographic, and climate datasets, including model outputs used by major climate intercomparison projects.
+
+Example: A sea-surface temperature variable in a NetCDF file might contain:
+
+```text
+sea_surface_temperature:
+    standard_name = "sea_surface_temperature"
+    units = "K"
+    coordinates = "time latitude longitude"
+```
+
+These attributes allow software such as xarray to understand what the variable represents and how it relates to the coordinates of the dataset.
 
 ### ISO 19115, INSPIRE, and profiles
 
-ISO 19115 is the international standard for describing geographic information and services, covering identification, extent, quality, spatial/temporal schema, spatial reference and distribution. The INSPIRE Metadata Implementing Rules define how to implement discovery metadata using ISO 19115 and related standards for spatial data sets and services in the European context.
+ISO 19115 is an international standard for describing geographic datasets and services. It defines metadata describing aspects such as dataset identification, geographic and temporal extent, data quality, coordinate reference systems, responsible organisations, and distribution mechanisms.
 
-MEDIN's Discovery Metadata Standard is an ISO 19115‑based UK profile, ensuring that marine metadata records are compliant with INSPIRE and ISO while tailored to national practice. Other marine communities, such as [SeaDataNet](https://www.seadatanet.org/), also use ISO 19115‑based community profiles for their portals.
+The INSPIRE Metadata Implementing Rules define how ISO-based discovery metadata should be used for spatial datasets and services in the European context.
+
+Community-specific profiles can further specialise these standards. For example, MEDIN's Discovery Metadata Standard is a UK marine profile based on ISO 19115, while communities such as [SeaDataNet](https://www.seadatanet.org/) use similar ISO-based profiles for marine data discovery.
+
+Example: A metadata record for a CTD survey might describe:
+
+```text
+Title: CTD observations from the North Atlantic, 2025
+Organisation: National Oceanography Centre
+Geographic extent: 45°N–60°N, 30°W–10°W
+Temporal extent: 10–25 June 2025
+Keywords: ocean temperature, salinity, CTD
+Coordinate reference system: WGS 84
+Distribution format: NetCDF
+```
+
+Unlike CF metadata, which primarily describes variables *inside* a scientific dataset, ISO metadata generally describes the dataset as a whole so that users can discover and understand it.
 
 ### WMO code forms and operational formats
 
@@ -237,12 +265,11 @@ Example answers:
 
 ::::::::::::::::::::::::::::::::::::::::::  keypoints
 
-- "Oceanography and meteorology rely on self‑describing array formats (NetCDF, HDF5, Zarr) and WMO exchange formats (GRIB, BUFR) for gridded and observational data."
-- "Metadata is 'data about data' and lives both inside files (e.g. CF attributes) and in separate discovery records based on standards such as ISO 19115, INSPIRE and MEDIN."
-- "Controlled vocabularies, delivered through services like the NERC Vocabulary Server, provide standardised terms and identifiers that make metadata consistent and machine‑actionable."
-- "CF metadata conventions define how to describe Earth science variables, grids and coordinates in self‑describing formats and underpin many ocean and climate data tools."
-- "Discovery profiles such as the MEDIN Discovery Metadata Standard align national practice with international standards (ISO 19115, INSPIRE), supporting data discovery across portals and organisations."
-- "STAC catalogs (Catalogs, Collections, Items) provide a modern, JSON‑based way to organise and expose geospatial assets, including NetCDF and Zarr stores, in cloud‑native workflows."
-- "Cloud‑native formats like Zarr become interoperable when combined with established metadata and vocabulary standards (CF, Unidata CDM, ISO profiles, NVS) and can be complemented by STAC for discovery."
-
+- Oceanography and meteorology rely on self‑describing array formats (NetCDF, HDF5, Zarr) and WMO exchange formats (GRIB, BUFR) for gridded and observational data.
+- Metadata is 'data about data' and lives both inside files (e.g. CF attributes) and in separate discovery records based on standards such as ISO 19115, INSPIRE and MEDIN.
+- Controlled vocabularies, delivered through services like the NERC Vocabulary Server, provide standardised terms and identifiers that make metadata consistent and machine‑actionable.
+- CF metadata conventions define how to describe Earth science variables, grids and coordinates in self‑describing formats and underpin many ocean and climate data tools.
+- Discovery profiles such as the MEDIN Discovery Metadata Standard align national practice with international standards (ISO 19115, INSPIRE), supporting data discovery across portals and organisations.
+- STAC catalogs (Catalogs, Collections, Items) provide a modern, JSON‑based way to organise and expose geospatial assets, including NetCDF and Zarr stores, in cloud‑native workflows.
+- Cloud‑native formats like Zarr become interoperable when combined with established metadata and vocabulary standards (CF, Unidata CDM, ISO profiles, NVS) and can be complemented by STAC for discovery.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

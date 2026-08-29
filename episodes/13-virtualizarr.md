@@ -6,20 +6,18 @@ exercises: 25
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain what a virtual Zarr store is."
-- "Create a virtual Zarr dataset from local NetCDF files."
-- "Open the virtual dataset with xarray and inspect its structure."
-- "Compare virtual access with direct NetCDF access."
-
+- Explain what a virtual Zarr store is.
+- Create a virtual Zarr dataset from local NetCDF files.
+- Open the virtual dataset with xarray and inspect its structure.
+- Compare virtual access with direct NetCDF access.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "Why might we prefer a virtual Zarr store over fully converting data to Zarr?"
-- "How do we create a virtual dataset from NetCDF files already on the server?"
-- "How does a virtual Zarr store look when opened with xarray?"
-- "What do we gain by virtualising instead of copying all the data?"
-
+- Why might we prefer a virtual Zarr store over fully converting data to Zarr?
+- How do we create a virtual dataset from NetCDF files already on the server?
+- How does a virtual Zarr store look when opened with xarray?
+- What do we gain by virtualising instead of copying all the data?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Why virtual Zarr stores?
@@ -446,12 +444,11 @@ The table below compares different approaches to accessing large NetCDF archives
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Virtualizarr creates virtual Zarr datasets without copying the data."
-- "It is useful when full conversion is impractical or unnecessary."
-- "You can create a virtual dataset directly from NetCDF files already on the server."
-- "xarray can open the virtual dataset and analyse it like a familiar dataset."
-- "Virtualisation is a useful bridge between NetCDF archives and Zarr-style workflows."
-
+- Virtualizarr creates virtual Zarr datasets without copying the data.
+- It is useful when full conversion is impractical or unnecessary.
+- You can create a virtual dataset directly from NetCDF files already on the server.
+- xarray can open the virtual dataset and analyse it like a familiar dataset.
+- Virtualisation is a useful bridge between NetCDF archives and Zarr-style workflows.
 ::::::::::::::::::::::::::::::::::::::::::
 
 [^nicholas]: Nicholas, T. VirtualiZarr + Icechunk: Build Cloud-Optimised DataCube of Archival Files. Cloud-Native Geospatial Conference, 2025. Available at [https://www.youtube.com/watch?v=QBkZQ53vE6o](https://www.youtube.com/watch?v=QBkZQ53vE6o), 2025.

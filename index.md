@@ -54,7 +54,7 @@ Here are some of the main terms that appear throughout the workshop.
 
 The **CPU** is the Central Processing Unit that executes instructions and performs calculations. A **core** is one processing unit inside a CPU, while a **process** is one running instance of a program and a **thread** is a smaller unit of work inside that process.
 
-![](fig/cpu_core_process_thread.png){alt="A diagram showing the relationship between CPU, core, process, and thread."}
+![](episodes/fig/cpu_core_process_thread.png){alt="A diagram showing the relationship between CPU, core, process, and thread."}
 
 ### Parallel processing and Dask
 
@@ -74,7 +74,7 @@ A **cluster** is a group of connected computers that work together, and a **node
 
 [JASMIN](https://jasmin.ac.uk) is the UK's data analysis facility for data-intensive environmental science. It provides notebook services, shared storage, and computing resources for environmental data work. **SSH** (Secure Shell) is a secure way to connect to a remote computer over a network.
 
-![](episodes/fig/jasmin.png){alt="An image illustrating the JASMIN system."}
+![[Source](https://help.jasmin.ac.uk/docs/batch-computing/lotus-overview/)](episodes/fig/jasmin.png){alt="An image illustrating the JASMIN system."}
 
 ### Group workspace
 
@@ -104,7 +104,7 @@ A **dataset** is a collection of related scientific data and metadata in differe
 
 **Object storage** keeps data as independent objects in a storage system, often accessed through APIs such as S3. A **bucket** is a top-level container for objects in object storage.
 
-![[Source](https://blog.itkonekt.com/)](episodes/fig/bucket_and_object_store.png){alt="A diagram showing a bucket containing objects in object storage."}
+![[Source](https://blog.itkonekt.com/2018/08/27/aws-s3-2/)](episodes/fig/bucket_and_object_store.png){alt="A diagram showing a bucket containing objects in object storage."}
 
 ### POSIX and Object-Store file system
 

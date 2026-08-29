@@ -6,22 +6,20 @@ exercises: 25
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Import the core Python libraries for working with Zarr data."
-- "Inspect a Zarr store directly with the `zarr` library."
-- "Open a Zarr dataset with xarray and explore variables, dimensions, and coordinates."
-- "Understand lazy loading and why it matters for large datasets."
-- "Use a few basic xarray operations on environmental Zarr data."
-
+- Import the core Python libraries for working with Zarr data.
+- Inspect a Zarr store directly with the `zarr` library.
+- Open a Zarr dataset with xarray and explore variables, dimensions, and coordinates.
+- Understand lazy loading and why it matters for large datasets.
+- Use a few basic xarray operations on environmental Zarr data.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What Python packages are commonly used to work with Zarr data?"
-- "How can I inspect a Zarr store directly with the `zarr` library?"
-- "How does xarray represent Zarr datasets as labelled N-dimensional data?"
-- "When does the data actually get loaded into memory?"
-- "What basic xarray operations are useful for oceanography, climate, and meteorology?"
-
+- What Python packages are commonly used to work with Zarr data?
+- How can I inspect a Zarr store directly with the `zarr` library?
+- How does xarray represent Zarr datasets as labelled N-dimensional data?
+- When is the data actually loaded into memory?
+- What basic xarray operations are useful for oceanography, climate, and meteorology?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Python ecosystem for Zarr
@@ -132,7 +130,7 @@ While `zarr` is ideal for low-level inspection and manipulation, xarray is usual
 - **Coordinates** - explicit arrays for latitude, longitude, time, etc.
 - **High-level operations** - selection (`.sel`), reduction (`.mean`, `.sum`), resampling, plotting, etc.
 
-![Xarray](fig/xarray.png){alt="Xarray logo."}
+![](fig/xarray.png){alt="Xarray logo."}
 
 xarray can open NetCDF, GRIB (via backends), and Zarr data. Because of this, it makes Zarr datasets accessible in a familiar, analysis-ready format. And it also makes it really easy to update workflows to use cloud-native Zarr stores without changing the analysis code.
 
@@ -142,10 +140,15 @@ For Zarr it uses `xr.open_zarr`, which understands the Zarr metadata and convent
 import xarray as xr
 
 ds = xr.open_zarr(f"{base_path}data/era5_sst/ocean_temperature.zarr")
-print(ds)           # Overview of variables and coordinates
-print(ds.dims)      # Dimensions
-print(ds.data_vars) # Data variables
-print(ds.coords)    # Coordinate variables
+ds                  # Overview of variables and coordinates
+```
+
+To see the dimensions, data variables, and coordinates:
+
+```python
+print("Dimensions: ", ds.dims)      # Dimensions
+print("Data variables: ", ds.data_vars) # Data variables
+print("Coordinates: ", ds.coords)    # Coordinate variables
 ```
 
 Important points:
@@ -214,13 +217,13 @@ You will see that the structure is very similar to the Zarr version. The main di
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-### Basic xarray operations
+### Basic Xarray Operations
 
 In oceanography, climate, and meteorology, we often want to select data by coordinates, compute means over dimensions, and plot results. Xarray provides a simple interface for these operations:
 
 - Select data with `.sel()` using coordinate values.
 - Use `.isel()` when you want numeric positions.
-- Compute a mean over one or more dimensions (e.g. `.mean(dim=("latitude", "longitude"))`).
+- Compute a mean over one or more dimensions (e.g. `.mean(dim=("latitude", "longitude"))`). And remember that longitude is usually 0-360 in ERA5.
 - Plot a slice quickly with `.plot()`.
 
 ```python
@@ -353,10 +356,9 @@ We can open a huge dataset and still process only a small portion of it. This is
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "The zarr Python package provides low-level access to Zarr stores, including groups, arrays, and attributes."
-- "xarray is the main high-level tool for working with environmental Zarr datasets as labelled N-dimensional data."
-- "Opening Zarr with xarray (`xr.open_zarr`) gives you variables, dimensions, and coordinates in a familiar `Dataset` structure."
-- "Data values are loaded only when they are selected or used in a computation."
-- "Basic xarray operations such as selection, reduction, and plotting work the same on Zarr data as on NetCDF data."
-
+- The zarr Python package provides low-level access to Zarr stores, including groups, arrays, and attributes.
+- xarray is the main high-level tool for working with environmental Zarr datasets as labelled N-dimensional data.
+- Opening Zarr with xarray (`xr.open_zarr`) gives you variables, dimensions, and coordinates in a familiar `Dataset` structure.
+- Data values are loaded only when they are selected or used in a computation.
+- Basic xarray operations such as selection, reduction, and plotting work the same on Zarr data as on NetCDF data.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

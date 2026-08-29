@@ -7,22 +7,20 @@ exercises: 20
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Describe how NetCDF, GRIB, and HDF5 organise n-dimensional data and impact file size."
-- "Explain why meteorological and oceanographic datasets have grown so large over the last 30 years."
-- "Recognise practical challenges when opening, sharing, and inspecting NetCDF and GRIB files."
-- "Explain why we do not want to download whole files all the time, and how partial access and chunking help."
-- "Gain hands-on experience exploring file structure and chunks with xarray as a first step toward cloud-native solutions."
-
+- Describe how NetCDF, GRIB, and HDF5 organise n-dimensional data and impact file size.
+- Explain why meteorological and oceanographic datasets have grown so large over the last 30 years.
+- Recognise practical challenges when opening, sharing, and inspecting NetCDF and GRIB files.
+- Explain why we do not want to download whole files all the time, and how partial access and chunking help.
+- Gain hands-on experience exploring file structure and chunks with xarray as a first step toward cloud-native solutions.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "How do NetCDF, GRIB, and HDF5 organise large n-dimensional arrays?"
-- "Why have typical datasets in meteorology and oceanography grown so much in size?"
-- "What happens when we open these files in standard tools like xarray?"
-- "Why is it important to share data in a way that supports partial access rather than whole-file downloads?"
-- "How do chunking and parallel processing affect performance, scalability, and memory use?"
-
+- How do NetCDF, GRIB, and HDF5 organise large n-dimensional arrays?
+- Why have typical datasets in meteorology and oceanography grown so much in size?
+- What happens when we open these files in standard tools like xarray?
+- Why is it important to share data in a way that supports partial access rather than whole-file downloads?
+- How do chunking and parallel processing affect performance, scalability, and memory use?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -256,13 +254,12 @@ Today, tools such as xarray allow us to open both NetCDF and GRIB as labelled n�
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "NetCDF provides a self‑describing, array‑oriented data model for n‑dimensional scientific datasets and is widely used in meteorology and oceanography."
-- "GRIB is a compact, message‑based WMO format designed for operational transmission of gridded meteorological fields, using tables and codes to represent metadata."
-- "Data volumes have grown dramatically with higher resolution, more frequent output, longer archives, and ensembles over the last three decades."
-- "In many current workflows, large NetCDF and GRIB files are still downloaded in full to local or shared servers, even when only subsets are needed."
-- "Server‑side subsetting (e.g. OPeNDAP) and centralised archives can reduce duplication, but long‑term storage on traditional file systems becomes costly at scale compared to object storage."
-- "Understanding how existing formats organise n‑dimensional data, and where they strain under growth in size and shared use, prepares us to learn about chunking and cloud‑native solutions in later lessons."
-
+- NetCDF provides a self‑describing, array‑oriented data model for n‑dimensional scientific datasets and is widely used in meteorology and oceanography.
+- GRIB is a compact, message‑based WMO format designed for operational transmission of gridded meteorological fields, using tables and codes to represent metadata.
+- Data volumes have grown dramatically with higher resolution, more frequent output, longer archives, and ensembles over the last three decades.
+- In many current workflows, large NetCDF and GRIB files are still downloaded in full to local or shared servers, even when only subsets are needed.
+- Server‑side subsetting (e.g. OPeNDAP) and centralised archives can reduce duplication, but long‑term storage on traditional file systems becomes costly at scale compared to object storage.
+- Understanding how existing formats organise n‑dimensional data, and where they strain under growth in size and shared use, prepares us to learn about chunking and cloud‑native solutions in later lessons.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 [^overpeck_etal2011]: Overpeck, J., Meehl, G., Bony, S., & Easterling, D. (2011). Climate Data Challenges in the 21st Century. Science, 331(6018), 700-702. https://doi.org/10.1126/science.1197869

@@ -6,22 +6,20 @@ exercises: 30
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Understand what chunks are and how they affect performance for large datasets."
-- "Relate common analysis workflows (time series, spatial averages, ensembles) to chunk layouts."
-- "Use Python (zarr and xarray) to inspect chunk shapes in a Zarr store."
-- "Rechunk a Zarr dataset, save it, and observe how analysis performance changes."
-- "Understand the concept of sharding and how it can reduce overhead in cloud object storage."
-
+- Understand what chunks are and how they affect performance for large datasets.
+- Relate common analysis workflows (time series, spatial averages, ensembles) to chunk layouts.
+- Use Python (zarr and xarray) to inspect chunk shapes in a Zarr store.
+- Rechunk a Zarr dataset, save it, and observe how analysis performance changes.
+- Understand the concept of sharding and how it can reduce overhead in cloud object storage.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What is a chunk, and why does its shape matter for performance?"
-- "How should I choose chunk sizes for different types of analysis?"
-- "What are the trade-offs between large and small chunks?"
-- "How can I rechunk a Zarr dataset and save it for future use?"
-- "What is sharding, and how does it help reduce overhead during storage and access of many small chunks?"
-
+- What is a chunk, and why does its shape matter for performance?
+- How should I choose chunk sizes for different types of analysis?
+- What are the trade-offs between large and small chunks?
+- How can I rechunk a Zarr dataset and save it for future use?
+- What is sharding, and how does it help reduce overhead during storage and access of many small chunks?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -67,7 +65,7 @@ Each workload benefits from certain chunk layouts:
 - Spatial averages per time step: chunks that include complete spatial slices (or large spatial blocks) for a small number of time steps.
 - Ensemble statistics: chunks that include multiple ensemble members together, if members are frequently used together.
 - Cloud/web visualisation: use smaller, spatially aligned chunks, often around 256×256 or 512×512 pixels (~100-1000 KB size), so that map tiles can be read efficiently and only the needed region is transferred.
-- Large HPC analysis: use larger chunks that reduce scheduler overhead and work well with parallel processing, but still fit in memory comfortably (e.g. 10-100 MB size).
+- Large HPC analysis: use larger chunks that reduce scheduler overhead and work well with parallel processing, but still fit in memory comfortably. Although you can use larger chunks, a good rule of thumb is to keep chunks in the range of 10-100 MB.
 
 There is no single "best" chunking: it depends on which workloads are most important for your users.
 
@@ -532,6 +530,8 @@ print(ds_sharded["sst"].chunks)
 To calculate the number of files/objects in each dataset, you can use the following code:
 
 ```python
+from pathlib import Path
+
 original = Path(f"{base_path}data/era5_sst/ocean_temperature.zarr/sst/c")
 rechunked = Path(f"data/era5_sst/ocean_temperature_rechunked.zarr/sst/c")
 sharded = Path(f"data/era5_sst/ocean_temperature_sharded.zarr/sst/c")
@@ -561,12 +561,11 @@ A dataset may use small chunks for flexible analysis, but store those chunks ins
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Chunks are N-dimensional blocks that control how data is stored and accessed in Zarr."
-- "Chunk shapes should be chosen based on dominant workloads (time series, spatial averages, ensembles) and practical constraints like chunk size in bytes."
-- "Rechunking can reorganise a dataset to better match performance needs, at the cost of an initial rewrite step."
-- "Tools like zarr and xarray make it possible to inspect chunk layouts, design new schemes, and save rechunked Zarr stores for analysis at scale."
-- "Sharding is a technique that groups multiple chunks into larger storage objects, reducing overhead while keeping the benefits of chunked access."
-
+- Chunks are N-dimensional blocks that control how data is stored and accessed in Zarr.
+- Chunk shapes should be chosen based on dominant workloads (time series, spatial averages, ensembles) and practical constraints like chunk size in bytes.
+- Rechunking can reorganise a dataset to better match performance needs, at the cost of an initial rewrite step.
+- Tools like zarr and xarray make it possible to inspect chunk layouts, design new schemes, and save rechunked Zarr stores for analysis at scale.
+- Sharding is a technique that groups multiple chunks into larger storage objects, reducing overhead while keeping the benefits of chunked access.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

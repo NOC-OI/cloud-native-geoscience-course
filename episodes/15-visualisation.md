@@ -6,21 +6,19 @@ exercises: 30
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain how geospatial Zarr datasets can be visualised efficiently in the browser and in desktop tools."
-- "Describe why chunking and multiscale pyramids are important for interactive visualisation."
-- "Introduce the GeoZarr conventions for geospatial, multiscale Zarr datasets."
-- "Use Topozarr to build a multiscale Zarr dataset from an existing Zarr store."
-- "Understand how browser clients (e.g. OpenLayers, zarrita, zarr-cesium) can render multiscale GeoZarr without a dedicated tiling server."
-
+- Explain how geospatial Zarr datasets can be visualised efficiently in the browser and in desktop tools.
+- Describe why chunking and multiscale pyramids are important for interactive visualisation.
+- Introduce the GeoZarr conventions for geospatial, multiscale Zarr datasets.
+- Use Topozarr to build a multiscale Zarr dataset from an existing Zarr store.
+- Understand how browser clients (e.g. OpenLayers, zarrita, zarr-cesium) can render multiscale GeoZarr without a dedicated tiling server.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "How does chunking affect interactive visualisation of Zarr data in the cloud?"
-- "What is a multiscale pyramid, and why does it come from Cloud-Optimized GeoTIFF ideas?"
-- "What does GeoZarr add on top of Zarr for geospatial visualisation?"
-- "How can we use Topozarr to create multiscale Zarr from our example dataset and explore it in a browser?"
-
+- How does chunking affect interactive visualisation of Zarr data in the cloud?
+- What is a multiscale pyramid, and why does it come from Cloud-Optimized GeoTIFF ideas?
+- What does GeoZarr add on top of Zarr for geospatial visualisation?
+- How can we use Topozarr to create multiscale Zarr from our example dataset and explore it in a browser?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Introduction
@@ -387,10 +385,9 @@ The diagram below shows the full pipeline, from NetCDF to multiscale Zarr pyrami
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Chunking and multiscale pyramids are central to interactive visualisation of geospatial Zarr datasets, allowing efficient tile-based access at different zoom levels."
-- "GeoZarr defines modular conventions (proj, spatial, multiscales) for encoding geospatial metadata and multiscale layouts on top of Zarr."
-- "Topozarr can be used to build multiscale Zarr stores from existing datasets, preparing them for efficient visualisation."
-- "Browser clients such as OpenLayers (GeoZarr source), zarrita, and zarr-cesium can render Zarr data directly from object storage using WebGL and GPU acceleration, without a dedicated tiling server."
-- "By combining GeoZarr conventions, multiscale Zarr, and simple HTML/JS clients, you can build fully cloud-native visualisation workflows for your geospatial datasets."
-
+- Chunking and multiscale pyramids are central to interactive visualisation of geospatial Zarr datasets, allowing efficient tile-based access at different zoom levels.
+- GeoZarr defines modular conventions (proj, spatial, multiscales) for encoding geospatial metadata and multiscale layouts on top of Zarr.
+- Topozarr can be used to build multiscale Zarr stores from existing datasets, preparing them for efficient visualisation.
+- Browser clients such as OpenLayers (GeoZarr source), zarrita, and zarr-cesium can render Zarr data directly from object storage using WebGL and GPU acceleration, without a dedicated tiling server.
+- By combining GeoZarr conventions, multiscale Zarr, and simple HTML/JS clients, you can build fully cloud-native visualisation workflows for your geospatial datasets.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
