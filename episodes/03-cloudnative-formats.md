@@ -28,9 +28,9 @@ Cloud-native and cloud-optimized formats aim to support more direct access to th
 
 ### From files to cloud objects
 
-Traditional scientific formats such as NetCDF, GRIB, and HDF5 were designed mainly for file-based storage systems: local disks, shared servers, and HPC filesystems. In that world, the standard workflow is often "download the file, open the file, analyse the file".
+Traditional scientific formats such as NetCDF, GRIB, and HDF5 were designed mainly for file-based storage systems: local disks, shared servers, and HPC file systems. In that world, the standard workflow is often "download the file, open the file, analyse the file".
 
-Cloud storage works differently. Instead of one large file on a filesystem, data is commonly stored as many independent objects accessed over HTTP or S3-style APIs. In this setting, performance depends not just on how data is encoded, but also on how many requests are needed, where metadata lives, and whether small subsets can be fetched efficiently.
+Cloud storage works differently. Instead of one large file on a file system, data is commonly stored as many independent objects accessed over HTTP or S3-style APIs. In this setting, performance depends not just on how data is encoded, but also on how many requests are needed, where metadata lives, and whether small subsets can be fetched efficiently.
 
 ### What makes a format cloud-native?
 
@@ -41,7 +41,7 @@ A useful community description from the Cloud-Native Geospatial Formats Guide[^c
 - All metadata can be loaded with a small number of reads, ideally one.
 - Libraries can use that metadata to read only the required subset of the underlying data.
 
-For multidimensional environmental data, this usually means chunked arrays, lightweight metadata access, and layouts that work well with object storage rather than assuming a POSIX filesystem. The goal is not to change the meaning of the data, but to change how efficiently we can discover, access, and process it.
+For multidimensional environmental data, this usually means chunked arrays, lightweight metadata access, and layouts that work well with object storage rather than assuming a POSIX file system. The goal is not to change the meaning of the data, but to change how efficiently we can discover, access, and process it.
 
 ![](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
 
@@ -162,6 +162,7 @@ Different analyses benefit from different chunk layouts, so choosing an appropri
 - Simply storing NetCDF or HDF5 files in the cloud does not automatically make them cloud-native.
 - In Earth system science, common approaches include Zarr, cloud-optimized NetCDF/HDF5 layouts, Kerchunk, VirtualiZarr, GeoParquet, and FlatGeobuf.
 - Cloud-native approaches can reduce data movement, improve sharing, and support scalable analysis of large environmental datasets.
+
 ::::::::::::::::::::::::::::::::::::::::::
 
 [^cheipesh2018]: Cheipesh, E. 2018. Available at: https://pt.slideshare.net/slideshow/cloud-optimized-geottiffs-enabling-efficient-cloud-workflows/97510557

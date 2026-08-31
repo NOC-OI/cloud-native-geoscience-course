@@ -90,7 +90,7 @@ An **environment.yml** file is used to define a Conda environment, specifying th
 
 ### Dataset, array, coordinate, and data variable
 
-A **dataset** is a collection of related scientific data and metadata in different formats. An **array** is a multi-dimensional grid of values, while a **coordinate** is a named axis such as time, latitude, longitude, or depth. A **data variable** is the main measured or modelled value, such as temperature or salinity.
+A **dataset** is a collection of related scientific data and metadata in different formats. An **array** is a multi-dimensional grid/matrix of values, while a **coordinate** is a named axis such as time, latitude, longitude, or depth/altitude. A **data variable** is the main measured or modeled value, such as temperature or salinity.
 
 ### Metadata and controlled vocabulary
 
