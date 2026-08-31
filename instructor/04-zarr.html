@@ -404,7 +404,7 @@
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="../instructor/03-cloudnative-formats.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Cloud-Native Formats
+          Previous: Cloud-Native Formats...
         </a>
         <a class="chapter-link float-end" href="../instructor/05-python-zarr.html" rel="next">
           Next: Python for Zarr...
@@ -413,7 +413,7 @@
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Zarr Data Model and Chunked Storage</h1>
-        <p>Last updated on 2026-08-14 |
+        <p>Last updated on 2026-08-31 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/04-zarr.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -434,13 +434,13 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>“What is Zarr, and how does its data model differ from formats like
-NetCDF or HDF5?”</li>
-<li>“How does Zarr store metadata about arrays and groups?”</li>
-<li>“What is chunked storage in Zarr, and why is it useful for large
-multidimensional datasets?”</li>
-<li>“How is Zarr changing the way ocean, climate, and meteorological
-data are stored and accessed?”</li>
+<ul><li>What is Zarr, and how does its data model differ from formats like
+NetCDF or HDF5?</li>
+<li>How does Zarr store metadata about arrays and groups?</li>
+<li>What is chunked storage in Zarr, and why is it useful for large
+multidimensional datasets?</li>
+<li>How is Zarr changing the way ocean, climate, and meteorological data
+are stored and accessed?</li>
 </ul></div>
 </div>
 </div>
@@ -448,14 +448,14 @@ data are stored and accessed?”</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>“Explain Zarr’s core data model: groups, arrays, stores, and
-chunks.”</li>
-<li>“Describe how Zarr metadata works and how conventions build on
-it.”</li>
-<li>“Understand Zarr’s chunked storage and why it matters for
-oceanography, climate, and meteorology.”</li>
-<li>“Practice opening a Zarr store with Python and xarray to see the
-structure in practice.”</li>
+<ul><li>Explain Zarr’s core data model: groups, arrays, stores, and
+chunks.</li>
+<li>Describe how Zarr metadata works and how conventions build on
+it.</li>
+<li>Understand Zarr’s chunked storage and why it matters for
+oceanography, climate, and meteorology.</li>
+<li>Practice opening a Zarr store with Python and xarray to see the
+structure in practice.</li>
 </ul></div>
 </div>
 </div>
@@ -571,16 +571,22 @@ command in a terminal:</p>
 </h3>
 <pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="co"># run the following commands in a terminal</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zgroup"</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zattrs"</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zmetadata"</span></span></code></pre>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a><span class="bu">echo</span> <span class="st">"Contents of .zgroup:"</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zgroup"</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a><span class="bu">echo</span> <span class="st">"Contents of .zattrs:"</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zattrs"</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1" aria-label="code-block-3-9"></a><span class="bu">echo</span> <span class="st">"Contents of .zmetadata:"</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1" aria-label="code-block-3-10"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/.zmetadata"</span></span></code></pre>
 </div>
 <p>To see the <code>.zarray</code> metadata for the <code>sst</code>
 array, you can run:</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/sst/.zarray"</span></span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="bu">echo</span> <span class="st">"Contents of sst/.zarray:"</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_v2.zarr/sst/.zarray"</span></span></code></pre>
 </div>
 <p>This tells us that the <code>sst</code> array is three-dimensional,
 stored in chunks of size <code>10 × 100 × 100</code>, and encoded as
@@ -790,35 +796,58 @@ itself.</p>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1" aria-label="code-block-9-5"></a>store <span class="op">=</span> zarr.open_group(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature_with_groups.zarr"</span>, mode<span class="op">=</span><span class="st">"r"</span>)</span>
 <span id="cb9-6"><a href="#cb9-6" tabindex="-1" aria-label="code-block-9-6"></a><span class="bu">print</span>(store)</span></code></pre>
 </div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>&lt;Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr&gt;</code></pre>
+</div>
 <p>To see the arrays and groups inside the store, we can list them:</p>
-<div class="codewrapper sourceCode" id="cb10">
+<div class="codewrapper sourceCode" id="cb11">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" tabindex="-1" aria-label="code-block-10-1"></a><span class="bu">print</span>(<span class="bu">list</span>(store.arrays()))  <span class="co"># List arrays</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1" aria-label="code-block-10-2"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))  <span class="co"># List groups</span></span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="bu">print</span>(<span class="bu">list</span>(store.arrays()))  <span class="co"># List arrays</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))  <span class="co"># List groups</span></span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>[]
+[('0', &lt;Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/0&gt;), ('1', &lt;Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1&gt;)]</code></pre>
 </div>
 <p>Because this Zarr store uses groups, the arrays are not directly in
 the root group. Instead, they are inside child groups. To see the arrays
 inside a specific group, we can access that group and list its
 arrays:</p>
-<div class="codewrapper sourceCode" id="cb11">
+<div class="codewrapper sourceCode" id="cb13">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="co"># Show arrays inside group "1"</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1" aria-label="code-block-11-2"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="co"># Show arrays inside group "1"</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>[('number', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/number shape=() dtype=int64&gt;), ('spatial_ref', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/spatial_ref shape=() dtype=int64&gt;), ('latitude', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/latitude shape=(360,) dtype=float64&gt;), ('sst', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/sst shape=(10, 360, 720) dtype=float32&gt;), ('longitude', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/longitude shape=(720,) dtype=float64&gt;), ('valid_time', &lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/valid_time shape=(10,) dtype=int64&gt;)]</code></pre>
 </div>
 <p>To see the information about the array <code>sst</code>, we can
 access it and print its shape, chunk shape, and data type:</p>
-<div class="codewrapper sourceCode" id="cb12">
+<div class="codewrapper sourceCode" id="cb15">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" tabindex="-1" aria-label="code-block-12-1"></a><span class="co"># Inspect a specific array</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1" aria-label="code-block-12-2"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1" aria-label="code-block-12-3"></a><span class="bu">print</span>(sst)</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1" aria-label="code-block-12-4"></a><span class="bu">print</span>(sst.shape, sst.chunks, sst.dtype)</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1" aria-label="code-block-12-5"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1" aria-label="code-block-12-6"></a><span class="co"># Access attributes</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1" aria-label="code-block-12-7"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="co"># Inspect a specific array</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a><span class="bu">print</span>(sst)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a><span class="bu">print</span>(sst.shape, sst.chunks, sst.dtype)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a><span class="co"># Access attributes</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>&lt;Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/sst shape=(10, 360, 720) dtype=float32&gt;
+(10, 360, 720) (1, 360, 360) float32
+{'GRIB_paramId': 34, 'GRIB_dataType': 'an', 'GRIB_numberOfPoints': 1038240, 'GRIB_typeOfLevel': 'surface', 'GRIB_stepUnits': 1, 'GRIB_stepType': 'instant', 'GRIB_gridType': 'regular_ll', 'GRIB_uvRelativeToGrid': 0, 'GRIB_NV': 0, 'GRIB_Nx': 1440, 'GRIB_Ny': 721, 'GRIB_cfName': 'unknown', 'GRIB_cfVarName': 'sst', 'GRIB_gridDefinitionDescription': 'Latitude/Longitude Grid', 'GRIB_iDirectionIncrementInDegrees': 0.25, 'GRIB_iScansNegatively': 0, 'GRIB_jDirectionIncrementInDegrees': 0.25, 'GRIB_jPointsAreConsecutive': 0, 'GRIB_jScansPositively': 0, 'GRIB_latitudeOfFirstGridPointInDegrees': 90.0, 'GRIB_latitudeOfLastGridPointInDegrees': -90.0, 'GRIB_longitudeOfFirstGridPointInDegrees': 0.0, 'GRIB_longitudeOfLastGridPointInDegrees': 359.75, 'GRIB_missingValue': 3.4028234663852886e+38, 'GRIB_name': 'Sea surface temperature', 'GRIB_shortName': 'sst', 'GRIB_units': 'K', 'long_name': 'Sea surface temperature', 'units': 'K', 'standard_name': 'unknown', 'GRIB_surface': 0.0, 'coordinates': 'number spatial_ref'}</code></pre>
 </div>
 <div id="exercise-1---inspecting-a-zarr-store-with-python" class="callout challenge">
 <div class="callout-square">
@@ -859,56 +888,56 @@ structure?</li>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>Code to inspect the Zarr store:</p>
-<div class="codewrapper sourceCode" id="cb13">
+<div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a><span class="im">import</span> zarr</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>store <span class="op">=</span> zarr.open_group(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature_with_groups.zarr"</span>, mode<span class="op">=</span><span class="st">"r"</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a><span class="bu">print</span>(store)</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a><span class="bu">print</span>(sst.shape)</span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a><span class="bu">print</span>(sst.dtype)</span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1" aria-label="code-block-13-14"></a></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1" aria-label="code-block-13-15"></a><span class="bu">print</span>(<span class="bu">dict</span>(store.attrs))</span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1" aria-label="code-block-13-16"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" tabindex="-1" aria-label="code-block-17-1"></a><span class="im">import</span> zarr</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1" aria-label="code-block-17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1" aria-label="code-block-17-3"></a>base_path <span class="op">=</span> <span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1" aria-label="code-block-17-4"></a></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1" aria-label="code-block-17-5"></a>store <span class="op">=</span> zarr.open_group(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature_with_groups.zarr"</span>, mode<span class="op">=</span><span class="st">"r"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1" aria-label="code-block-17-6"></a></span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1" aria-label="code-block-17-7"></a><span class="bu">print</span>(store)</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1" aria-label="code-block-17-8"></a><span class="bu">print</span>(<span class="bu">list</span>(store.groups()))</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1" aria-label="code-block-17-9"></a><span class="bu">print</span>(<span class="bu">list</span>(store[<span class="st">"1"</span>].arrays()))</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1" aria-label="code-block-17-10"></a></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1" aria-label="code-block-17-11"></a>sst <span class="op">=</span> store[<span class="st">"1"</span>][<span class="st">"sst"</span>]</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1" aria-label="code-block-17-12"></a><span class="bu">print</span>(sst.shape)</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1" aria-label="code-block-17-13"></a><span class="bu">print</span>(sst.dtype)</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1" aria-label="code-block-17-14"></a></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1" aria-label="code-block-17-15"></a><span class="bu">print</span>(<span class="bu">dict</span>(store.attrs))</span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1" aria-label="code-block-17-16"></a><span class="bu">print</span>(<span class="bu">dict</span>(sst.attrs))</span></code></pre>
 </div>
 <p>Code to list the files and to see the content of the metadata files
 (as this is a Zarr v3 store, the metadata files are
 <code>zarr.json</code>):</p>
-<div class="codewrapper sourceCode" id="cb14">
+<div class="codewrapper sourceCode" id="cb18">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1" aria-label="code-block-14-1"></a><span class="co"># These commands are meant to be run in a terminal, not in Python.</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1" aria-label="code-block-14-2"></a><span class="bu">export</span> <span class="va">BASE_DATA_PATH</span><span class="op">=</span><span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1" aria-label="code-block-14-3"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1" aria-label="code-block-14-4"></a><span class="ex">tree</span> <span class="at">-L</span> 2 <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr"</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1" aria-label="code-block-14-5"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr/zarr.json"</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1" aria-label="code-block-14-6"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr/1/sst/zarr.json"</span></span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" tabindex="-1" aria-label="code-block-18-1"></a><span class="co"># These commands are meant to be run in a terminal, not in Python.</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1" aria-label="code-block-18-2"></a><span class="bu">export</span> <span class="va">BASE_DATA_PATH</span><span class="op">=</span><span class="st">"/gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/"</span>  <span class="co"># or "" if you have the data in your current working directory</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1" aria-label="code-block-18-3"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1" aria-label="code-block-18-4"></a><span class="ex">tree</span> <span class="at">-L</span> 2 <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr"</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1" aria-label="code-block-18-5"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr/zarr.json"</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1" aria-label="code-block-18-6"></a><span class="fu">cat</span> <span class="st">"</span><span class="va">${BASE_DATA_PATH}</span><span class="st">data/era5_sst/ocean_temperature_with_groups.zarr/1/sst/zarr.json"</span></span></code></pre>
 </div>
 <p>The Zarr store is organised as a hierarchical container. In this
 example, the root group does not contain any arrays directly:</p>
-<div class="codewrapper sourceCode" id="cb15">
+<div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1" aria-label="code-block-15-1"></a><span class="ex">ocean_temperature_with_groups.zarr</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1" aria-label="code-block-15-2"></a><span class="ex">├──</span> 0/</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1" aria-label="code-block-15-3"></a>    <span class="ex">├──</span> sst</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1" aria-label="code-block-15-4"></a>    <span class="ex">├──</span> valid_time</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1" aria-label="code-block-15-5"></a>    <span class="ex">├──</span> latitude</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1" aria-label="code-block-15-6"></a>    <span class="ex">├──</span> longitude</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1" aria-label="code-block-15-7"></a>    <span class="ex">├──</span> spatial_ref</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1" aria-label="code-block-15-8"></a>    <span class="ex">├──</span> number</span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1" aria-label="code-block-15-9"></a>    <span class="ex">└──</span> zarr.json</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1" aria-label="code-block-15-10"></a><span class="ex">├──</span> 1/</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1" aria-label="code-block-15-11"></a>    <span class="ex">└──</span> ...</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1" aria-label="code-block-15-12"></a><span class="ex">└──</span> zarr.json</span></code></pre>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" tabindex="-1" aria-label="code-block-19-1"></a><span class="ex">ocean_temperature_with_groups.zarr</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1" aria-label="code-block-19-2"></a><span class="ex">├──</span> 0/</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1" aria-label="code-block-19-3"></a>    <span class="ex">├──</span> sst</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1" aria-label="code-block-19-4"></a>    <span class="ex">├──</span> valid_time</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1" aria-label="code-block-19-5"></a>    <span class="ex">├──</span> latitude</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1" aria-label="code-block-19-6"></a>    <span class="ex">├──</span> longitude</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1" aria-label="code-block-19-7"></a>    <span class="ex">├──</span> spatial_ref</span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1" aria-label="code-block-19-8"></a>    <span class="ex">├──</span> number</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1" aria-label="code-block-19-9"></a>    <span class="ex">└──</span> zarr.json</span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1" aria-label="code-block-19-10"></a><span class="ex">├──</span> 1/</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1" aria-label="code-block-19-11"></a>    <span class="ex">└──</span> ...</span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1" aria-label="code-block-19-12"></a><span class="ex">└──</span> zarr.json</span></code></pre>
 </div>
 <p>The root <code>Group</code> contains two child groups (<code>0</code>
 and <code>1</code>). The <code>sst</code> variable is stored inside each
@@ -962,10 +991,10 @@ workloads would you optimise for when choosing chunk shapes?</li>
 <div class="accordion-body">
 <p>To explore the chunk shape of the <code>sst</code> array, you can
 run:</p>
-<div class="codewrapper sourceCode" id="cb16">
+<div class="codewrapper sourceCode" id="cb20">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" tabindex="-1" aria-label="code-block-16-1"></a><span class="bu">print</span>(sst.chunks)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" tabindex="-1" aria-label="code-block-20-1"></a><span class="bu">print</span>(sst.chunks)</span></code></pre>
 </div>
 <p>A chunk shape such as <code>(10, 100, 100)</code> represents 10 time
 steps over a 100×100 spatial block. Chunk shapes that are “tall in time”
@@ -988,19 +1017,18 @@ Virtualizarr).</p>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>“Zarr organises data into groups and arrays stored as addressable
-chunks, which supports efficient partial reads and writes.”</li>
-<li>“Metadata in Zarr describes array structure, chunking, and
+<ul><li>Zarr organises data into groups and arrays stored as addressable
+chunks, which supports efficient partial reads and writes.</li>
+<li>Metadata in Zarr describes array structure, chunking, and
 attributes, and can be extended through shared conventions for
-geoscience workflows.”</li>
-<li>“Chunked storage is central to Zarr performance because it lets
-tools read only the pieces needed for a given query or
-computation.”</li>
-<li>“Inspecting a Zarr store with Python and xarray helps distinguish
-cheap metadata exploration from actual data loading.”</li>
-<li>“Understanding data model, metadata, and chunk layout is the
+geoscience workflows.</li>
+<li>Chunked storage is central to Zarr performance because it lets tools
+read only the pieces needed for a given query or computation.</li>
+<li>Inspecting a Zarr store with Python and xarray helps distinguish
+cheap metadata exploration from actual data loading.</li>
+<li>Understanding data model, metadata, and chunk layout is the
 foundation for later lessons on rechunking, parallel processing, and
-cloud-native analysis.”</li>
+cloud-native analysis.</li>
 </ul></div>
 </div>
 </div>
@@ -1017,7 +1045,7 @@ any links that you are not going to use.
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="../instructor/03-cloudnative-formats.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Cloud-Native Formats
+          Previous: Cloud-Native Formats...
         </a>
         <a class="chapter-link float-end" href="../instructor/05-python-zarr.html" rel="next">
           Next: Python for Zarr...
@@ -1046,7 +1074,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.21.0" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.2" class="external-link">varnish (1.1.2)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -1068,8 +1096,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-zarr.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/04-zarr.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-14",
-  "datePublished": "2026-08-26"
+  "dateModified": "2026-08-31",
+  "datePublished": "2026-08-31"
 }
 
   </script><script>

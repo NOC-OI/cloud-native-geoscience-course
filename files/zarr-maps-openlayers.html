@@ -192,7 +192,7 @@
     import TileLayer from "https://esm.sh/ol@10.6.1/layer/Tile.js";
     import OSM from "https://esm.sh/ol@10.6.1/source/OSM.js";
     import { fromLonLat } from "https://esm.sh/ol@10.6.1/proj.js";
-    import { ZarrLayer } from "https://esm.sh/zarr-maps/ol?bundle";
+    import { ZarrLayer } from "https://esm.sh/zarr-maps-ol@0.2.0?deps=ol@10.6.1";
 
     const DEFAULT_URL = "https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/noc-npd-era5-demo/npd-eorca025-era5v1/gn/T1y_4d/thetao_con";
     const DEFAULT_VARIABLE = "thetao_con";
@@ -228,12 +228,6 @@
       statusEl.classList.toggle("error", isError);
     };
 
-    const refreshLayer = () => {
-      if (zarrLayer && typeof zarrLayer.changed === "function") {
-        zarrLayer.changed();
-      }
-    };
-
     const clearDimensionControls = () => {
       dimensionsContainer.innerHTML = "";
     };
@@ -244,7 +238,8 @@
       const dimensionValues = zarrLayer.provider?.dimensionValues ?? {};
 
       for (const [dimension, values] of Object.entries(dimensionValues)) {
-        if (!Array.isArray(values) || values.length <= 1) {
+        // dimensionValues may be a regular Array or Float64Array in zarr-maps-ol 0.2.0.
+        if (!values || typeof values.length !== "number" || values.length <= 1) {
           continue;
         }
 
@@ -262,7 +257,7 @@
         const select = document.createElement("select");
         select.id = `dimension-${dimension}`;
 
-        values.forEach((value, index) => {
+        Array.from(values).forEach((value, index) => {
           const option = document.createElement("option");
           option.value = String(index);
           option.textContent = typeof value === "string" ? value : String(value);
@@ -280,8 +275,7 @@
             type: "index",
             selected: Number(target.value)
           };
-          await zarrLayer.updateSelectors(currentSelectors);
-          refreshLayer();
+          zarrLayer.updateSelectors(currentSelectors);
         });
 
         control.append(label, select);
@@ -298,11 +292,13 @@
         const scale = [Number(scaleMinInput.value), Number(scaleMaxInput.value)];
 
         const options = {
+          id: `zarr-${variable}`,
           url,
           variable,
           colormap,
           scale,
-          crs: "EPSG:3857",
+          // Do not set crs unless you need to override the dataset CRS.
+          // The OpenLayers view can remain EPSG:3857 independently.
           maxZoom: 12,
           opacity: 0.85
         };
@@ -346,7 +342,6 @@
       if (!(target instanceof HTMLSelectElement) || !zarrLayer) return;
 
       zarrLayer.updateStyle({ colormap: target.value });
-      refreshLayer();
     });
 
     const applyScale = async () => {
@@ -357,7 +352,6 @@
       if (Number.isNaN(min) || Number.isNaN(max)) return;
 
       zarrLayer.updateStyle({ scale: [min, max] });
-      refreshLayer();
     };
 
     scaleMinInput.addEventListener("change", applyScale);

@@ -404,16 +404,16 @@
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="../instructor/05-python-zarr.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Python for Zarr
+          Previous: Python for Zarr...
         </a>
         <a class="chapter-link float-end" href="../instructor/07-parallel.html" rel="next">
-          Next: Parallel Processing...
+          Next: Parallel Processing with Zarr...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Choosing Chunks at Scale</h1>
-        <p>Last updated on 2026-08-05 |
+        <p>Last updated on 2026-08-31 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/06-chunks.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -434,14 +434,13 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>“What is a chunk, and why does its shape matter for
-performance?”</li>
-<li>“How should I choose chunk sizes for different types of
-analysis?”</li>
-<li>“What are the trade-offs between large and small chunks?”</li>
-<li>“How can I rechunk a Zarr dataset and save it for future use?”</li>
-<li>“What is sharding, and how does it help reduce overhead during
-storage and access of many small chunks?”</li>
+<ul><li>What is a chunk, and why does its shape matter for performance?</li>
+<li>How should I choose chunk sizes for different types of
+analysis?</li>
+<li>What are the trade-offs between large and small chunks?</li>
+<li>How can I rechunk a Zarr dataset and save it for future use?</li>
+<li>What is sharding, and how does it help reduce overhead during
+storage and access of many small chunks?</li>
 </ul></div>
 </div>
 </div>
@@ -449,16 +448,16 @@ storage and access of many small chunks?”</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>“Understand what chunks are and how they affect performance for
-large datasets.”</li>
-<li>“Relate common analysis workflows (time series, spatial averages,
-ensembles) to chunk layouts.”</li>
-<li>“Use Python (zarr and xarray) to inspect chunk shapes in a Zarr
-store.”</li>
-<li>“Rechunk a Zarr dataset, save it, and observe how analysis
-performance changes.”</li>
-<li>“Understand the concept of sharding and how it can reduce overhead
-in cloud object storage.”</li>
+<ul><li>Understand what chunks are and how they affect performance for large
+datasets.</li>
+<li>Relate common analysis workflows (time series, spatial averages,
+ensembles) to chunk layouts.</li>
+<li>Use Python (zarr and xarray) to inspect chunk shapes in a Zarr
+store.</li>
+<li>Rechunk a Zarr dataset, save it, and observe how analysis
+performance changes.</li>
+<li>Understand the concept of sharding and how it can reduce overhead in
+cloud object storage.</li>
 </ul></div>
 </div>
 </div>
@@ -533,7 +532,8 @@ tiles can be read efficiently and only the needed region is
 transferred.</li>
 <li>Large HPC analysis: use larger chunks that reduce scheduler overhead
 and work well with parallel processing, but still fit in memory
-comfortably (e.g. 10-100 MB size).</li>
+comfortably. Although you can use larger chunks, a good rule of thumb is
+to keep chunks in the range of 10-100 MB.</li>
 </ul><p>There is no single “best” chunking: it depends on which workloads are
 most important for your users.</p>
 <figure><img src="../fig/chunk_strategy.png" alt="Diagram showing how different chunking strategies affect performance for different workloads." class="figure mx-auto d-block"><div class="figcaption"><a href="https://zenodo.org/records/17968159" class="external-link">Source</a></div>
@@ -965,9 +965,7 @@ multiple chunks together in fewer, larger objects.</p>
 <p>This means you can keep chunks small for efficient analysis, while
 using sharding to avoid creating an excessive number of files or
 objects.</p>
-<figure><img src="../fig/sharding2.png" alt="A sharded Zarr showing how chunk data is grouped into shard files." class="figure mx-auto d-block"><div class="figcaption">A sharded Zarr showing how chunk data is grouped
-into shard files. Source: <a href="https://element84.com/software-engineering/is-zarr-the-new-cog/" class="external-link uri">https://element84.com/software-engineering/is-zarr-the-new-cog/</a>
-</div>
+<figure><img src="../fig/sharding2.png" alt="A sharded Zarr showing how chunk data is grouped into shard files." class="figure mx-auto d-block"><div class="figcaption"><a href="https://element84.com/software-engineering/is-zarr-the-new-cog/" class="external-link">Source</a></div>
 </figure><div class="section level3">
 <h3 id="benefits">Benefits<a class="anchor" aria-label="anchor" href="#benefits"></a></h3>
 <p>Sharding can be useful when:</p>
@@ -1166,12 +1164,14 @@ the following code:</p>
 <div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a>original <span class="op">=</span> Path(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr/sst/c"</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a>rechunked <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_rechunked.zarr/sst/c"</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>sharded <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_sharded.zarr/sst/c"</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a><span class="bu">print</span>(<span class="st">"Original:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> original.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a><span class="bu">print</span>(<span class="st">"Rechunked:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> rechunked.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a><span class="bu">print</span>(<span class="st">"Sharded:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> sharded.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" tabindex="-1" aria-label="code-block-23-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1" aria-label="code-block-23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1" aria-label="code-block-23-3"></a>original <span class="op">=</span> Path(<span class="ss">f"</span><span class="sc">{</span>base_path<span class="sc">}</span><span class="ss">data/era5_sst/ocean_temperature.zarr/sst/c"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1" aria-label="code-block-23-4"></a>rechunked <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_rechunked.zarr/sst/c"</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1" aria-label="code-block-23-5"></a>sharded <span class="op">=</span> Path(<span class="ss">f"data/era5_sst/ocean_temperature_sharded.zarr/sst/c"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1" aria-label="code-block-23-6"></a><span class="bu">print</span>(<span class="st">"Original:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> original.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1" aria-label="code-block-23-7"></a><span class="bu">print</span>(<span class="st">"Rechunked:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> rechunked.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1" aria-label="code-block-23-8"></a><span class="bu">print</span>(<span class="st">"Sharded:"</span>, <span class="bu">sum</span>(<span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> sharded.rglob(<span class="st">"*"</span>) <span class="cf">if</span> p.is_file()))</span></code></pre>
 </div>
 <p>Using this approach, you should see that the sharded dataset has
 fewer files/objects than the original and rechunked datasets, while
@@ -1205,19 +1205,19 @@ chunks inside larger shards to make cloud storage more efficient.</p>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>“Chunks are N-dimensional blocks that control how data is stored and
-accessed in Zarr.”</li>
-<li>“Chunk shapes should be chosen based on dominant workloads (time
+<ul><li>Chunks are N-dimensional blocks that control how data is stored and
+accessed in Zarr.</li>
+<li>Chunk shapes should be chosen based on dominant workloads (time
 series, spatial averages, ensembles) and practical constraints like
-chunk size in bytes.”</li>
-<li>“Rechunking can reorganise a dataset to better match performance
-needs, at the cost of an initial rewrite step.”</li>
-<li>“Tools like zarr and xarray make it possible to inspect chunk
+chunk size in bytes.</li>
+<li>Rechunking can reorganise a dataset to better match performance
+needs, at the cost of an initial rewrite step.</li>
+<li>Tools like zarr and xarray make it possible to inspect chunk
 layouts, design new schemes, and save rechunked Zarr stores for analysis
-at scale.”</li>
-<li>“Sharding is a technique that groups multiple chunks into larger
+at scale.</li>
+<li>Sharding is a technique that groups multiple chunks into larger
 storage objects, reducing overhead while keeping the benefits of chunked
-access.”</li>
+access.</li>
 </ul></div>
 </div>
 </div>
@@ -1242,10 +1242,10 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="../instructor/05-python-zarr.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Python for Zarr
+          Previous: Python for Zarr...
         </a>
         <a class="chapter-link float-end" href="../instructor/07-parallel.html" rel="next">
-          Next: Parallel Processing...
+          Next: Parallel Processing with Zarr...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
@@ -1271,7 +1271,7 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
         <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.21.0" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.2" class="external-link">varnish (1.1.2)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -1293,8 +1293,8 @@ Read Performance of Zarr Data in Cloud-based Object Stores</em>. <a href="https:
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-chunks.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/06-chunks.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-05",
-  "datePublished": "2026-08-26"
+  "dateModified": "2026-08-31",
+  "datePublished": "2026-08-31"
 }
 
   </script><script>

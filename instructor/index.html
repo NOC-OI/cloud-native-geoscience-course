@@ -395,7 +395,7 @@
       </div>
       <!-- content for large screens -->
       <div class="d-none d-sm-none d-md-block">
-        <a class="chapter-link float-end" href="../instructor/01-intro.html" rel="next">Next: Data Formats,... <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
+        <a class="chapter-link float-end" href="../instructor/01-intro.html" rel="next">Next: Data Formats, Metadata, and Vocabulary... <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
       </div>
     </nav><main id="main-content" class="main-content"><h1 class="schedule-heading">Summary and Schedule</h1>
       
@@ -415,11 +415,11 @@ environmental data</li>
 </ul><p>The aim is to help you understand not only how these tools work, but
 also why they are useful for analysing, sharing, and managing
 environmental data more efficiently.</p>
-<div id="what-data-do-you-work-with" class="callout discussion">
+<div id="what-data-do-you-work-with" class="callout challenge">
 <div class="callout-square">
-<i class="callout-icon" data-feather="message-circle"></i>
+<i class="callout-icon" data-feather="zap"></i>
 </div>
-<span class="callout-header">Discussion</span>
+<span class="callout-header">Challenge</span>
 <div id="what-data-do-you-work-with" class="callout-inner">
 <h3 class="callout-title">What data do you work with?</h3>
 <div class="callout-content">
@@ -500,7 +500,8 @@ facility for data-intensive environmental science. It provides notebook
 services, shared storage, and computing resources for environmental data
 work. <strong>SSH</strong> (Secure Shell) is a secure way to connect to
 a remote computer over a network.</p>
-<figure><img src="../fig/jasmin.png" alt="An image illustrating the JASMIN system." class="figure mx-auto d-block"></figure></div>
+<figure><img src="../fig/jasmin.png" alt="An image illustrating the JASMIN system." class="figure mx-auto d-block"><div class="figcaption"><a href="https://help.jasmin.ac.uk/docs/batch-computing/lotus-overview/" class="external-link">Source</a></div>
+</figure></div>
 <div class="section level3">
 <h3 id="group-workspace">Group workspace<a class="anchor" aria-label="anchor" href="#group-workspace"></a></h3>
 <p>A <strong>group workspace</strong> is shared storage on JASMIN for
@@ -550,7 +551,7 @@ when a dataset is opened; they are loaded only when needed.</p>
 a storage system, often accessed through APIs such as S3. A
 <strong>bucket</strong> is a top-level container for objects in object
 storage.</p>
-<figure><img src="../fig/bucket_and_object_store.png" alt="A diagram showing a bucket containing objects in object storage." class="figure mx-auto d-block"><div class="figcaption"><a href="https://blog.itkonekt.com/" class="external-link">Source</a></div>
+<figure><img src="../fig/bucket_and_object_store.png" alt="A diagram showing a bucket containing objects in object storage." class="figure mx-auto d-block"><div class="figcaption"><a href="https://blog.itkonekt.com/2018/08/27/aws-s3-2/" class="external-link">Source</a></div>
 </figure></div>
 <div class="section level3">
 <h3 id="posix-and-object-store-file-system">POSIX and Object-Store file system<a class="anchor" aria-label="anchor" href="#posix-and-object-store-file-system"></a></h3>
@@ -605,12 +606,13 @@ any links that you are not going to use.
  1. <a href="01-intro.html">Data Formats, Metadata, and Vocabulary</a>
 </td>
 <td>
-“What are the main data formats used to store ocean and atmosphere
-data?”<br>“What is metadata, and how does it help other people find and
-understand my data?”<br>“What is a controlled vocabulary, and why is it
-better than free text?”<br>“Which international standards should I be
-aware of when publishing environmental data?”<br>“How do these
-standards connect to modern cloud‑native formats like Zarr?”
+What are the main data formats used to store ocean and atmosphere
+data?<br>What is metadata, and how does it help other people find and
+understand my data?<br>What is a controlled vocabulary, and why is it
+better than free text?<br>Which international standards should I be
+aware of when publishing environmental data?<br>How do these standards
+connect to modern cloud‑native formats like
+Zarr?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>00h 45m
@@ -620,13 +622,14 @@ standards connect to modern cloud‑native formats like Zarr?”
 Data</a>
 </td>
 <td>
-“How do NetCDF, GRIB, and HDF5 organise large n-dimensional
-arrays?”<br>“Why have typical datasets in meteorology and oceanography
-grown so much in size?”<br>“What happens when we open these files in
-standard tools like xarray?”<br>“Why is it important to share data in a
+How do NetCDF, GRIB, and HDF5 organise large n-dimensional
+arrays?<br>Why have typical datasets in meteorology and oceanography
+grown so much in size?<br>What happens when we open these files in
+standard tools like xarray?<br>Why is it important to share data in a
 way that supports partial access rather than whole-file
-downloads?”<br>“How do chunking and parallel processing affect
-performance, scalability, and memory use?”
+downloads?<br>How do chunking and parallel processing affect
+performance, scalability, and memory
+use?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>01h 30m
@@ -635,11 +638,12 @@ performance, scalability, and memory use?”
  3. <a href="03-cloudnative-formats.html">Cloud-Native Formats</a>
 </td>
 <td>
-“What makes a format cloud-native?”<br>“Why are traditional file-based
-formats not always a good fit for cloud storage?”<br>“Which
-cloud-native or cloud-optimized approaches are relevant for Earth system
-data?”<br>“How do cloud-native formats change the way we work with
-environmental data?”
+What makes a format cloud-native?<br>Why are traditional file-based
+formats not always a good fit for cloud storage?<br>Which cloud-native
+or cloud-optimized approaches are relevant for Earth system
+data?<br>How do cloud-native formats change the way we work with
+environmental
+data?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>01h 55m
@@ -648,11 +652,12 @@ environmental data?”
  4. <a href="04-zarr.html">Zarr Data Model and Chunked Storage</a>
 </td>
 <td>
-“What is Zarr, and how does its data model differ from formats like
-NetCDF or HDF5?”<br>“How does Zarr store metadata about arrays and
-groups?”<br>“What is chunked storage in Zarr, and why is it useful for
-large multidimensional datasets?”<br>“How is Zarr changing the way
-ocean, climate, and meteorological data are stored and accessed?”
+What is Zarr, and how does its data model differ from formats like
+NetCDF or HDF5?<br>How does Zarr store metadata about arrays and
+groups?<br>What is chunked storage in Zarr, and why is it useful for
+large multidimensional datasets?<br>How is Zarr changing the way ocean,
+climate, and meteorological data are stored and
+accessed?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>02h 45m
@@ -661,12 +666,13 @@ ocean, climate, and meteorological data are stored and accessed?”
  5. <a href="05-python-zarr.html">Python for Zarr</a>
 </td>
 <td>
-“What Python packages are commonly used to work with Zarr
-data?”<br>“How can I inspect a Zarr store directly with the
-<code>zarr</code> library?”<br>“How does xarray represent Zarr datasets
-as labelled N-dimensional data?”<br>“When does the data actually get
-loaded into memory?”<br>“What basic xarray operations are useful for
-oceanography, climate, and meteorology?”
+What Python packages are commonly used to work with Zarr data?<br>How
+can I inspect a Zarr store directly with the <code>zarr</code>
+library?<br>How does xarray represent Zarr datasets as labelled
+N-dimensional data?<br>When is the data actually loaded into
+memory?<br>What basic xarray operations are useful for oceanography,
+climate, and
+meteorology?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>03h 35m
@@ -675,12 +681,12 @@ oceanography, climate, and meteorology?”
  6. <a href="06-chunks.html">Choosing Chunks at Scale</a>
 </td>
 <td>
-“What is a chunk, and why does its shape matter for
-performance?”<br>“How should I choose chunk sizes for different types
-of analysis?”<br>“What are the trade-offs between large and small
-chunks?”<br>“How can I rechunk a Zarr dataset and save it for future
-use?”<br>“What is sharding, and how does it help reduce overhead during
-storage and access of many small chunks?”
+What is a chunk, and why does its shape matter for performance?<br>How
+should I choose chunk sizes for different types of analysis?<br>What
+are the trade-offs between large and small chunks?<br>How can I rechunk
+a Zarr dataset and save it for future use?<br>What is sharding, and how
+does it help reduce overhead during storage and access of many small
+chunks?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>04h 40m
@@ -689,10 +695,11 @@ storage and access of many small chunks?”
  7. <a href="07-parallel.html">Parallel Processing with Zarr</a>
 </td>
 <td>
-“Why do we need parallel processing for large Zarr datasets?”<br>“How
-does Dask parallelise xarray and Zarr computations?”<br>“How do
-chunking and lazy loading support parallel work?”<br>“What other
-parallelism tools do Python users sometimes combine with Zarr?”
+Why do we need parallel processing for large Zarr datasets?<br>How does
+Dask parallelise xarray and Zarr computations?<br>How do chunking and
+lazy loading support parallel work?<br>What other parallelism tools do
+Python users sometimes combine with
+Zarr?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>05h 45m
@@ -702,11 +709,12 @@ parallelism tools do Python users sometimes combine with Zarr?”
 Python</a>
 </td>
 <td>
-“Which publicly available Zarr datasets can I use for experimentation
-and learning?”<br>“How do I open Zarr datasets from cloud object
-storage (Google Cloud, AWS S3) with Python?”<br>“How do irregular
-grids, ragged arrays, and ensembles appear in Zarr + xarray?”<br>“How
-do chunks and storage layout influence how I analyse these datasets?”
+Which publicly available Zarr datasets can I use for experimentation and
+learning?<br>How do I open Zarr datasets from cloud object storage
+(Google Cloud, AWS S3) with Python?<br>How do irregular grids, ragged
+arrays, and ensembles appear in Zarr + xarray?<br>How do chunks and
+storage layout influence how I analyse these
+datasets?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>06h 50m
@@ -716,12 +724,12 @@ do chunks and storage layout influence how I analyse these datasets?”
 Organization</a>
 </td>
 <td>
-“What is an object store, and how is it different from storing data on a
-server filesystem?”<br>“Why is object storage a good fit for
-large-scale data sharing and cloud-native science?”<br>“How does object
-storage support secure, concurrent, and parallel access?”<br>“How can I
-use commercial cloud object stores and self-hosted solutions like
-MinIO?”
+What is an object store, and how is it different from storing data on a
+server filesystem?<br>Why is object storage a good fit for large-scale
+data sharing and cloud-native science?<br>How does object storage
+support secure, concurrent, and parallel access?<br>How can I use
+commercial cloud object stores and self-hosted solutions like
+MinIO?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>07h 45m
@@ -731,11 +739,12 @@ MinIO?”
 to Zarr</a>
 </td>
 <td>
-“Why convert NetCDF data to Zarr, and what changes in the way we access
-and process data?”<br>“How do we choose chunk sizes for Zarr when
-starting from NetCDF files?”<br>“How can we use Dask and xarray to
-convert and write data to Zarr efficiently?”<br>“How do we test that
-the converted data is usable and correct (e.g. computing mean values)?”
+Why convert NetCDF data to Zarr, and what changes in the way we access
+and process data?<br>How do we choose chunk sizes for Zarr when
+starting from NetCDF files?<br>How can we use Dask and xarray to
+convert and write data to Zarr efficiently?<br>How do we test that the
+converted data is usable and correct (e.g. computing mean
+values)?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>08h 55m
@@ -744,10 +753,11 @@ the converted data is usable and correct (e.g. computing mean values)?”
 11. <a href="11-case-studies.html">Case Studies</a>
 </td>
 <td>
-“How are different teams and organisations actually converting and
-serving data in practice?”<br>“What problems do they face, and which
-solutions have worked well (or badly)?”<br>“What lessons can we take
-from their architectures and workflows for our own projects?”
+How are different teams and organisations actually converting and
+serving data in practice?<br>What problems do they face, and which
+solutions have worked well (or badly)?<br>What lessons can we take from
+their architectures and workflows for our own
+projects?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>09h 40m
@@ -756,12 +766,12 @@ from their architectures and workflows for our own projects?”
 12. <a href="12-icechunk.html">Versioning Data with Icechunk</a>
 </td>
 <td>
-“What problems arise when we use plain Zarr for shared, evolving
-datasets?”<br>“How does Icechunk add safety, consistency, and
-reproducibility on top of Zarr?”<br>“How can we use transactions to
-update data atomically and avoid partial writes?”<br>“How can we
+What problems arise when we use plain Zarr for shared, evolving
+datasets?<br>How does Icechunk add safety, consistency, and
+reproducibility on top of Zarr?<br>How can we use transactions to
+update data atomically and avoid partial writes?<br>How can we
 reference and replay specific versions of data for reproducible
-analysis?”
+analysis?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>10h 50m
@@ -770,11 +780,11 @@ analysis?”
 13. <a href="13-virtualizarr.html">Virtual Zarr with Virtualizarr</a>
 </td>
 <td>
-“Why might we prefer a virtual Zarr store over fully converting data to
-Zarr?”<br>“How do we create a virtual dataset from NetCDF files already
-on the server?”<br>“How does a virtual Zarr store look when opened with
-xarray?”<br>“What do we gain by virtualising instead of copying all the
-data?”
+Why might we prefer a virtual Zarr store over fully converting data to
+Zarr?<br>How do we create a virtual dataset from NetCDF files already
+on the server?<br>How does a virtual Zarr store look when opened with
+xarray?<br>What do we gain by virtualising instead of copying all the
+data?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>11h 40m
@@ -783,11 +793,12 @@ data?”
 14. <a href="14-stac.html">Organizing Cloud Zarr Data with STAC</a>
 </td>
 <td>
-“How does STAC help us organise and discover Zarr data cubes in the
-cloud?”<br>“What is the difference between a STAC Catalog, Collection,
-and Item?”<br>“How can we programmatically build STAC metadata for our
-Zarr datasets?”<br>“Why might we store STAC metadata in a database
-instead of a set of JSON files?”
+How does STAC help us organise and discover Zarr data cubes in the
+cloud?<br>What is the difference between a STAC Catalog, Collection,
+and Item?<br>How can we programmatically build STAC metadata for our
+Zarr datasets?<br>Why might we store STAC metadata in a database
+instead of a set of JSON
+files?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>12h 35m
@@ -797,12 +808,12 @@ instead of a set of JSON files?”
 GeoZarr</a>
 </td>
 <td>
-“How does chunking affect interactive visualisation of Zarr data in the
-cloud?”<br>“What is a multiscale pyramid, and why does it come from
-Cloud-Optimized GeoTIFF ideas?”<br>“What does GeoZarr add on top of
-Zarr for geospatial visualisation?”<br>“How can we use Topozarr to
-create multiscale Zarr from our example dataset and explore it in a
-browser?”
+How does chunking affect interactive visualisation of Zarr data in the
+cloud?<br>What is a multiscale pyramid, and why does it come from
+Cloud-Optimized GeoTIFF ideas?<br>What does GeoZarr add on top of Zarr
+for geospatial visualisation?<br>How can we use Topozarr to create
+multiscale Zarr from our example dataset and explore it in a
+browser?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>13h 30m
@@ -811,11 +822,11 @@ browser?”
 16. <a href="16-best-practices.html">Architecture and Best Practices</a>
 </td>
 <td>
-“What does a good cloud‑native architecture for geospatial and climate
-data look like?”<br>“How do we decide when to use physical Zarr,
-virtual Zarr, STAC, Icechunk, GeoZarr, and multiscale
-pyramids?”<br>“What practices help keep data systems robust,
-reproducible, and future‑proof?”
+What does a good cloud‑native architecture for geospatial and climate
+data look like?<br>How do we decide when to use physical Zarr, virtual
+Zarr, STAC, Icechunk, GeoZarr, and multiscale pyramids?<br>What
+practices help keep data systems robust, reproducible, and
+future‑proof?<br>::::::::::::::::::::::::::::::::::::::::::::::::::
 </td>
 </tr><tr><td>
 <span class="visually-hidden">Duration: </span>14h 05m
@@ -897,7 +908,7 @@ any links that you are not going to use.
       </div>
       <!-- content for large screens -->
       <div class="d-none d-sm-none d-md-block">
-        <a class="chapter-link float-end" href="../instructor/01-intro.html" rel="next">Next: Data Formats,... <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
+        <a class="chapter-link float-end" href="../instructor/01-intro.html" rel="next">Next: Data Formats, Metadata, and Vocabulary... <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
       </div>
     </nav></div>
 <!-- END  : inst/pkgdown/templates/content-syllabus.html -->
@@ -921,7 +932,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.21.0" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.2" class="external-link">varnish (1.1.2)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -943,8 +954,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/index.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/instructor/index.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-26",
-  "datePublished": "2026-08-26"
+  "dateModified": "2026-08-31",
+  "datePublished": "2026-08-31"
 }
 
   </script><script>

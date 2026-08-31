@@ -407,13 +407,13 @@
           Home
         </a>
         <a class="chapter-link float-end" href="02-ndata-challenges.html" rel="next">
-          Next: Challenges of...
+          Next: Challenges of N-Dimensional Data...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Data Formats, Metadata, and Vocabulary</h1>
-        <p>Last updated on 2026-08-20 |
+        <p>Last updated on 2026-08-31 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/01-intro.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -432,16 +432,16 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>“What are the main data formats used to store ocean and atmosphere
-data?”</li>
-<li>“What is metadata, and how does it help other people find and
-understand my data?”</li>
-<li>“What is a controlled vocabulary, and why is it better than free
-text?”</li>
-<li>“Which international standards should I be aware of when publishing
-environmental data?”</li>
-<li>“How do these standards connect to modern cloud‑native formats like
-Zarr?”</li>
+<ul><li>What are the main data formats used to store ocean and atmosphere
+data?</li>
+<li>What is metadata, and how does it help other people find and
+understand my data?</li>
+<li>What is a controlled vocabulary, and why is it better than free
+text?</li>
+<li>Which international standards should I be aware of when publishing
+environmental data?</li>
+<li>How do these standards connect to modern cloud‑native formats like
+Zarr?</li>
 </ul></div>
 </div>
 </div>
@@ -449,16 +449,16 @@ Zarr?”</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>“Recognize common data formats used in oceanography and meteorology
-(e.g. NetCDF, GRIB, BUFR, Zarr).”</li>
-<li>“Explain what metadata is and why it is essential for discovery and
-reuse.”</li>
-<li>“Describe what controlled vocabularies are and how they support
-consistent metadata.”</li>
-<li>“Identify key international and community standards (CF conventions,
-ISO 19115/INSPIRE, MEDIN, NERC NVS).”</li>
-<li>“Relate traditional formats and standards to emerging cloud‑native
-formats such as Zarr.”</li>
+<ul><li>Recognize common data formats used in oceanography and meteorology
+(e.g. NetCDF, GRIB, BUFR, Zarr).</li>
+<li>Explain what metadata is and why it is essential for discovery and
+reuse.</li>
+<li>Describe what controlled vocabularies are and how they support
+consistent metadata.</li>
+<li>Identify key international and community standards (CF conventions,
+ISO 19115/INSPIRE, MEDIN, NERC NVS).</li>
+<li>Relate traditional formats and standards to emerging cloud‑native
+formats such as Zarr.</li>
 </ul></div>
 </div>
 </div>
@@ -493,31 +493,39 @@ focus on those most relevant to gridded, multidimensional ocean and
 atmosphere data, and then briefly note other formats that appear around
 them in modern workflows.</p>
 <figure><img src="fig/file_formats.png" alt="Common file formats in environmental data, including NetCDF, HDF5, Zarr, GRIB, BUFR, GeoTIFF, GeoJSON, Shapefile, Parquet/GeoParquet, and CSV." class="figure mx-auto d-block"></figure><div class="section level3">
-<h3 id="selfdescribing-array-formats">Self‑describing array formats<a class="anchor" aria-label="anchor" href="#selfdescribing-array-formats"></a></h3>
-<p>These formats store both array data and structural metadata
-(dimensions, variables, units, coordinate systems) in the same file or
-object:</p>
-<ul><li>
-<a href="https://www.unidata.ucar.edu/software/netcdf" class="external-link"><strong>NetCDF
-(Network Common Data Form)</strong></a> is a machine‑independent,
-binary, self‑describing format designed for array‑oriented scientific
-data, widely used to store gridded climate, ocean and meteorological
-variables.</li>
-<li>
-<a href="https://www.hdfgroup.org/solutions/hdf5/" class="external-link"><strong>HDF5
-(Hierarchical Data Format)</strong></a> is another self‑describing
-format supporting large, complex datasets with a “directory‑like”
-internal structure. It is used for satellite products, model output and
-other multidimensional data.</li>
-<li>
-<a href="https://zarr.dev/" class="external-link"><strong>Zarr</strong></a> is a newer,
-cloud‑native format for chunked, N‑dimensional arrays. The GeoZarr
-standard describes how to represent geospatial datasets in Zarr using
+<h3 id="self-describing-array-formats">Self-describing array formats<a class="anchor" aria-label="anchor" href="#self-describing-array-formats"></a></h3>
+<p>These formats store both the array data and the structural metadata
+needed to interpret it—such as dimensions, variables, units,
+coordinates, and attributes—within the same file or dataset:</p>
+<ul><li><p><a href="https://www.unidata.ucar.edu/software/netcdf" class="external-link"><strong>NetCDF
+(Network Common Data Form)</strong></a> is a machine-independent,
+binary, self-describing format designed for array-oriented scientific
+data. It is widely used for gridded climate, oceanographic, and
+meteorological datasets. Example:
+<code>sea_surface_temperature.nc</code>, containing latitude, longitude,
+time, sea-surface temperature values, units, and other
+metadata.</p></li>
+<li><p><a href="https://www.hdfgroup.org/solutions/hdf5/" class="external-link"><strong>HDF5
+(Hierarchical Data Format)</strong></a> is another self-describing
+format designed for large and complex datasets. It supports a
+hierarchical, “directory-like” internal structure containing groups,
+datasets, and attributes. HDF5 is widely used for satellite products,
+model output, and other multidimensional scientific data Example:
+<code>satellite_observations.h5</code>, containing separate groups for
+geolocation, measurements, quality flags, and metadata.</p></li>
+<li><p><a href="https://zarr.dev/" class="external-link"><strong>Zarr</strong></a> is a newer
+format for chunked, N-dimensional arrays, designed to work particularly
+well with cloud and object-storage environments. The GeoZarr standard
+describes how geospatial datasets can be represented in Zarr using
 concepts from the Unidata Common Data Model, including dimensions,
-coordinate variables, attributes and metadata style.</li>
-</ul><p>This “self‑describing” property is particularly important for large
-climate model outputs, reanalysis products and ocean observing systems,
-where many different tools need to interpret the same files without
+coordinate variables, attributes, and metadata conventions. Example:
+<code>ocean_model.zarr</code>, containing chunked temperature, salinity,
+and velocity arrays indexed by time, depth, latitude, and
+longitude.</p></li>
+</ul><p>This self-describing property is particularly important for large
+climate model outputs, reanalysis products, satellite observations, and
+ocean observing systems, where many different tools and users need to
+understand and process the same datasets without relying on separate,
 bespoke documentation.</p>
 </div>
 <div class="section level3">
@@ -691,23 +699,44 @@ attributes such as <code>standard_name</code>, <code>units</code>,
 <code>cell_methods</code>, <code>coordinates</code>, <code>bounds</code>
 and <code>grid_mapping</code>, plus rules for how to represent grids,
 time coordinates and climatological statistics.</p>
-<p>CF has been widely adopted for atmosphere and ocean data, including
-climate model output for major intercomparison projects, and is
-considered a recommended standard for gridded data in programmes like <a href="https://ioos.noaa.gov/" class="external-link">IOOS</a>.</p>
+<p>CF is widely adopted across atmospheric, oceanographic, and climate
+datasets, including model outputs used by major climate intercomparison
+projects.</p>
+<p>Example: A sea-surface temperature variable in a NetCDF file might
+contain:</p>
+<pre class="text"><code><span><span class="va">sea_surface_temperature</span><span class="op">:</span></span>
+<span>    <span class="va">standard_name</span> <span class="op">=</span> <span class="st">"sea_surface_temperature"</span></span>
+<span>    <span class="va">units</span> <span class="op">=</span> <span class="st">"K"</span></span>
+<span>    <span class="va">coordinates</span> <span class="op">=</span> <span class="st">"time latitude longitude"</span></span></code></pre>
+<p>These attributes allow software such as xarray to understand what the
+variable represents and how it relates to the coordinates of the
+dataset.</p>
 </div>
 <div class="section level3">
 <h3 id="iso-19115-inspire-and-profiles">ISO 19115, INSPIRE, and profiles<a class="anchor" aria-label="anchor" href="#iso-19115-inspire-and-profiles"></a></h3>
-<p>ISO 19115 is the international standard for describing geographic
-information and services, covering identification, extent, quality,
-spatial/temporal schema, spatial reference and distribution. The INSPIRE
-Metadata Implementing Rules define how to implement discovery metadata
-using ISO 19115 and related standards for spatial data sets and services
-in the European context.</p>
-<p>MEDIN’s Discovery Metadata Standard is an ISO 19115‑based UK profile,
-ensuring that marine metadata records are compliant with INSPIRE and ISO
-while tailored to national practice. Other marine communities, such as
-<a href="https://www.seadatanet.org/" class="external-link">SeaDataNet</a>, also use ISO
-19115‑based community profiles for their portals.</p>
+<p>ISO 19115 is an international standard for describing geographic
+datasets and services. It defines metadata describing aspects such as
+dataset identification, geographic and temporal extent, data quality,
+coordinate reference systems, responsible organisations, and
+distribution mechanisms.</p>
+<p>The INSPIRE Metadata Implementing Rules define how ISO-based
+discovery metadata should be used for spatial datasets and services in
+the European context.</p>
+<p>Community-specific profiles can further specialise these standards.
+For example, MEDIN’s Discovery Metadata Standard is a UK marine profile
+based on ISO 19115, while communities such as <a href="https://www.seadatanet.org/" class="external-link">SeaDataNet</a> use similar ISO-based
+profiles for marine data discovery.</p>
+<p>Example: A metadata record for a CTD survey might describe:</p>
+<pre class="text"><code>Title: CTD observations from the North Atlantic, 2025
+Organisation: National Oceanography Centre
+Geographic extent: 45°N–60°N, 30°W–10°W
+Temporal extent: 10–25 June 2025
+Keywords: ocean temperature, salinity, CTD
+Coordinate reference system: WGS 84
+Distribution format: NetCDF</code></pre>
+<p>Unlike CF metadata, which primarily describes variables
+<em>inside</em> a scientific dataset, ISO metadata generally describes
+the dataset as a whole so that users can discover and understand it.</p>
 </div>
 <div class="section level3">
 <h3 id="wmo-code-forms-and-operational-formats">WMO code forms and operational formats<a class="anchor" aria-label="anchor" href="#wmo-code-forms-and-operational-formats"></a></h3>
@@ -889,28 +918,28 @@ bounding box are populated.</li>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>“Oceanography and meteorology rely on self‑describing array formats
+<ul><li>Oceanography and meteorology rely on self‑describing array formats
 (NetCDF, HDF5, Zarr) and WMO exchange formats (GRIB, BUFR) for gridded
-and observational data.”</li>
-<li>“Metadata is ‘data about data’ and lives both inside files (e.g. CF
+and observational data.</li>
+<li>Metadata is ‘data about data’ and lives both inside files (e.g. CF
 attributes) and in separate discovery records based on standards such as
-ISO 19115, INSPIRE and MEDIN.”</li>
-<li>“Controlled vocabularies, delivered through services like the NERC
+ISO 19115, INSPIRE and MEDIN.</li>
+<li>Controlled vocabularies, delivered through services like the NERC
 Vocabulary Server, provide standardised terms and identifiers that make
-metadata consistent and machine‑actionable.”</li>
-<li>“CF metadata conventions define how to describe Earth science
+metadata consistent and machine‑actionable.</li>
+<li>CF metadata conventions define how to describe Earth science
 variables, grids and coordinates in self‑describing formats and underpin
-many ocean and climate data tools.”</li>
-<li>“Discovery profiles such as the MEDIN Discovery Metadata Standard
+many ocean and climate data tools.</li>
+<li>Discovery profiles such as the MEDIN Discovery Metadata Standard
 align national practice with international standards (ISO 19115,
 INSPIRE), supporting data discovery across portals and
-organisations.”</li>
-<li>“STAC catalogs (Catalogs, Collections, Items) provide a modern,
+organisations.</li>
+<li>STAC catalogs (Catalogs, Collections, Items) provide a modern,
 JSON‑based way to organise and expose geospatial assets, including
-NetCDF and Zarr stores, in cloud‑native workflows.”</li>
-<li>“Cloud‑native formats like Zarr become interoperable when combined
+NetCDF and Zarr stores, in cloud‑native workflows.</li>
+<li>Cloud‑native formats like Zarr become interoperable when combined
 with established metadata and vocabulary standards (CF, Unidata CDM, ISO
-profiles, NVS) and can be complemented by STAC for discovery.”</li>
+profiles, NVS) and can be complemented by STAC for discovery.</li>
 </ul></div>
 </div>
 </div>
@@ -930,7 +959,7 @@ any links that you are not going to use.
           Home
         </a>
         <a class="chapter-link float-end" href="02-ndata-challenges.html" rel="next">
-          Next: Challenges of...
+          Next: Challenges of N-Dimensional Data...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
@@ -956,7 +985,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.21.0" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.2" class="external-link">varnish (1.1.2)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -978,8 +1007,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/01-intro.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/01-intro.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-20",
-  "datePublished": "2026-08-26"
+  "dateModified": "2026-08-31",
+  "datePublished": "2026-08-31"
 }
 
   </script><script>

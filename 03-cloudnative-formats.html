@@ -404,16 +404,16 @@
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="02-ndata-challenges.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Challenges of
+          Previous: Challenges of N-Dimensional Data...
         </a>
         <a class="chapter-link float-end" href="04-zarr.html" rel="next">
-          Next: Zarr Data Model and...
+          Next: Zarr Data Model and Chunked Storage...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Cloud-Native Formats</h1>
-        <p>Last updated on 2026-08-26 |
+        <p>Last updated on 2026-08-31 |
 
         <a href="https://github.com/noc-oi/cloud-native-geoscience-course/edit/main/episodes/03-cloudnative-formats.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -432,13 +432,13 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>“What makes a format cloud-native?”</li>
-<li>“Why are traditional file-based formats not always a good fit for
-cloud storage?”</li>
-<li>“Which cloud-native or cloud-optimized approaches are relevant for
-Earth system data?”</li>
-<li>“How do cloud-native formats change the way we work with
-environmental data?”</li>
+<ul><li>What makes a format cloud-native?</li>
+<li>Why are traditional file-based formats not always a good fit for
+cloud storage?</li>
+<li>Which cloud-native or cloud-optimized approaches are relevant for
+Earth system data?</li>
+<li>How do cloud-native formats change the way we work with
+environmental data?</li>
 </ul></div>
 </div>
 </div>
@@ -446,14 +446,14 @@ environmental data?”</li>
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>“Explain what is meant by a cloud-native data format.”</li>
-<li>“Describe why traditional file-based formats can be inefficient in
-cloud environments.”</li>
-<li>“Identify cloud-native and cloud-optimized approaches used for
+<ul><li>Explain what is meant by a cloud-native data format.</li>
+<li>Describe why traditional file-based formats can be inefficient in
+cloud environments.</li>
+<li>Identify cloud-native and cloud-optimized approaches used for
 environmental data, including Zarr, Kerchunk, VirtualiZarr, GeoParquet,
-and FlatGeobuf.”</li>
-<li>“Recognise why cloud-native formats matter for scalable access,
-sharing, and analysis.”</li>
+and FlatGeobuf.</li>
+<li>Recognise why cloud-native formats matter for scalable access,
+sharing, and analysis.</li>
 </ul></div>
 </div>
 </div>
@@ -500,9 +500,7 @@ arrays, lightweight metadata access, and layouts that work well with
 object storage rather than assuming a POSIX file system. The goal is not
 to change the meaning of the data, but to change how efficiently we can
 discover, access, and process it.</p>
-<figure><img src="fig/traditional_vs_cloud_native.png" alt="Difference between traditional files and cloud-native objects, with metadata and chunks." class="figure mx-auto d-block"><div class="figcaption">Difference between traditional files and
-cloud-native objects</div>
-</figure><div id="cloud-native-does-not-just-mean-stored-in-the-cloud" class="callout caution">
+<figure><img src="fig/traditional_vs_cloud_native.png" alt="Difference between traditional files and cloud-native objects, with metadata and chunks." class="figure mx-auto d-block"></figure><div id="cloud-native-does-not-just-mean-stored-in-the-cloud" class="callout caution">
 <div class="callout-square">
 <i class="callout-icon" data-feather="alert-triangle"></i>
 </div>
@@ -705,17 +703,17 @@ Zarr datasets.</p>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>“Cloud-native formats are designed for efficient access over object
-storage and web protocols, not just for local file systems.”</li>
-<li>“A cloud-native layout usually combines lightweight metadata with
-addressable chunks so that tools can read only the data they need.”</li>
-<li>“Simply storing NetCDF or HDF5 files in the cloud does not
-automatically make them cloud-native.”</li>
-<li>“In Earth system science, common approaches include Zarr,
+<ul><li>Cloud-native formats are designed for efficient access over object
+storage and web protocols, not just for local filesystems.</li>
+<li>A cloud-native layout usually combines lightweight metadata with
+addressable chunks so that tools can read only the data they need.</li>
+<li>Simply storing NetCDF or HDF5 files in the cloud does not
+automatically make them cloud-native.</li>
+<li>In Earth system science, common approaches include Zarr,
 cloud-optimized NetCDF/HDF5 layouts, Kerchunk, VirtualiZarr, GeoParquet,
-and FlatGeobuf.”</li>
-<li>“Cloud-native approaches can reduce data movement, improve sharing,
-and support scalable analysis of large environmental datasets.”</li>
+and FlatGeobuf.</li>
+<li>Cloud-native approaches can reduce data movement, improve sharing,
+and support scalable analysis of large environmental datasets.</li>
 </ul></div>
 </div>
 </div>
@@ -739,10 +737,10 @@ any links that you are not going to use.
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="02-ndata-challenges.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Challenges of
+          Previous: Challenges of N-Dimensional Data...
         </a>
         <a class="chapter-link float-end" href="04-zarr.html" rel="next">
-          Next: Zarr Data Model and...
+          Next: Zarr Data Model and Chunked Storage...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
@@ -768,7 +766,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY-NC 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.20.2" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.1" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.21.0" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/0.7.9" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/1.1.2" class="external-link">varnish (1.1.2)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -790,8 +788,8 @@ any links that you are not going to use.
   "url": "https://noc-oi.github.io/cloud-native-geoscience-course/03-cloudnative-formats.html",
   "identifier": "https://noc-oi.github.io/cloud-native-geoscience-course/03-cloudnative-formats.html",
   "dateCreated": "2026-07-01",
-  "dateModified": "2026-08-26",
-  "datePublished": "2026-08-26"
+  "dateModified": "2026-08-31",
+  "datePublished": "2026-08-31"
 }
 
   </script><script>
