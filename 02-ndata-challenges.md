@@ -7,22 +7,20 @@ exercises: 20
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Describe how NetCDF, GRIB, and HDF5 organise n-dimensional data and impact file size."
-- "Explain why meteorological and oceanographic datasets have grown so large over the last 30 years."
-- "Recognise practical challenges when opening, sharing, and inspecting NetCDF and GRIB files."
-- "Explain why we do not want to download whole files all the time, and how partial access and chunking help."
-- "Gain hands-on experience exploring file structure and chunks with xarray as a first step toward cloud-native solutions."
-
+- Describe how NetCDF, GRIB, and HDF5 organise n-dimensional data and impact file size.
+- Explain why meteorological and oceanographic datasets have grown so large over the last 30 years.
+- Recognise practical challenges when opening, sharing, and inspecting NetCDF and GRIB files.
+- Explain why we do not want to download whole files all the time, and how partial access and chunking help.
+- Gain hands-on experience exploring file structure and chunks with xarray as a first step toward cloud-native solutions.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "How do NetCDF, GRIB, and HDF5 organise large n-dimensional arrays?"
-- "Why have typical datasets in meteorology and oceanography grown so much in size?"
-- "What happens when we open these files in standard tools like xarray?"
-- "Why is it important to share data in a way that supports partial access rather than whole-file downloads?"
-- "How do chunking and parallel processing affect performance, scalability, and memory use?"
-
+- How do NetCDF, GRIB, and HDF5 organise large n-dimensional arrays?
+- Why have typical datasets in meteorology and oceanography grown so much in size?
+- What happens when we open these files in standard tools like xarray?
+- Why is it important to share data in a way that supports partial access rather than whole-file downloads?
+- How do chunking and parallel processing affect performance, scalability, and memory use?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -75,6 +73,54 @@ Over roughly the last 30 years, several trends have driven data growth in meteor
 These trends have pushed archives from simple files to huge collections, requiring careful selection of formats, file organisation strategies, and access tools.
 
 ![The volume of worldwide climate data is expanding rapidly [^overpeck_etal2011]](fig/data_size_trends.png){alt="Chart showing the growth of climate data volumes over time, with a steep increase in the last decades."}
+
+Together, these trends have transformed environmental data archives from relatively small collections of files into datasets spanning terabytes and even petabytes. The examples below illustrate the scale of this change across different meteorological, oceanographic, and climate applications, showing both the number of files involved and the total volume of data that must be stored, accessed, and processed.
+
+<div style="background-color: #f9f9f9; border-left: 5px solid #ccc; display:flex; justify-content:center; align-items:center; margin-bottom: 1em;">
+  <table>
+    <thead>
+      <tr style="color: black;">
+        <th>Dataset</th>
+        <th>Application</th>
+        <th>Number of files</th>
+        <th>Size</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th style="color: black;">CHESS-SCAPE</th>
+        <td style="color: black;">1 km UK climate projections, 1980–2080</td>
+        <td style="color: black;">387,840</td>
+        <td style="color: black;">~11 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">NOC NEMO NPD</th>
+        <td style="color: black;">Global NEMO ocean simulations at various resolutions</td>
+        <td style="color: black;">not consolidated</td>
+        <td style="color: black;">~71 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">CMIP6 / ESGF</th>
+        <td style="color: black;">Global climate models and tailored experiments</td>
+        <td style="color: black;">millions of variations</td>
+        <td style="color: black;">~21 PB in current aggregation</td>
+      </tr>
+      <tr>
+        <th style="color: black;">ERA5 surface</th>
+        <td style="color: black;">ECMWF atmospheric and surface reanalysis</td>
+        <td style="color: black;">~5.31 million</td>
+        <td style="color: black;">~6 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">ERA5 full</th>
+        <td style="color: black;">Hourly global reanalysis</td>
+        <td style="color: black;">no unique count</td>
+        <td style="color: black;">order of PB</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 
 ## Typical access patterns today
 
@@ -256,13 +302,12 @@ Today, tools such as xarray allow us to open both NetCDF and GRIB as labelled n�
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "NetCDF provides a self‑describing, array‑oriented data model for n‑dimensional scientific datasets and is widely used in meteorology and oceanography."
-- "GRIB is a compact, message‑based WMO format designed for operational transmission of gridded meteorological fields, using tables and codes to represent metadata."
-- "Data volumes have grown dramatically with higher resolution, more frequent output, longer archives, and ensembles over the last three decades."
-- "In many current workflows, large NetCDF and GRIB files are still downloaded in full to local or shared servers, even when only subsets are needed."
-- "Server‑side subsetting (e.g. OPeNDAP) and centralised archives can reduce duplication, but long‑term storage on traditional file systems becomes costly at scale compared to object storage."
-- "Understanding how existing formats organise n‑dimensional data, and where they strain under growth in size and shared use, prepares us to learn about chunking and cloud‑native solutions in later lessons."
-
+- NetCDF provides a self‑describing, array‑oriented data model for n‑dimensional scientific datasets and is widely used in meteorology and oceanography.
+- GRIB is a compact, message‑based WMO format designed for operational transmission of gridded meteorological fields, using tables and codes to represent metadata.
+- Data volumes have grown dramatically with higher resolution, more frequent output, longer archives, and ensembles over the last three decades.
+- In many current workflows, large NetCDF and GRIB files are still downloaded in full to local or shared servers, even when only subsets are needed.
+- Server‑side subsetting (e.g. OPeNDAP) and centralised archives can reduce duplication, but long‑term storage on traditional file systems becomes costly at scale compared to object storage.
+- Understanding how existing formats organise n‑dimensional data, and where they strain under growth in size and shared use, prepares us to learn about chunking and cloud‑native solutions in later lessons.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 [^overpeck_etal2011]: Overpeck, J., Meehl, G., Bony, S., & Easterling, D. (2011). Climate Data Challenges in the 21st Century. Science, 331(6018), 700-702. https://doi.org/10.1126/science.1197869

@@ -6,20 +6,18 @@ exercises: 35
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain why versioning is important for Zarr-based scientific datasets."
-- "Describe Icechunk's core concepts: repositories, transactions, snapshots, branches, and tags."
-- "Use Icechunk with Zarr to perform atomic updates and create reproducible versions."
-- "Recover from mistakes and open specific versions of a dataset."
-
+- Explain why versioning is important for Zarr-based scientific datasets.
+- Describe Icechunk's core concepts: repositories, transactions, snapshots, branches, and tags.
+- Use Icechunk with Zarr to perform atomic updates and create reproducible versions.
+- Recover from mistakes and open specific versions of a dataset.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What problems arise when we use plain Zarr for shared, evolving datasets?"
-- "How does Icechunk add safety, consistency, and reproducibility on top of Zarr?"
-- "How can we use transactions to update data atomically and avoid partial writes?"
-- "How can we reference and replay specific versions of data for reproducible analysis?"
-
+- What problems arise when we use plain Zarr for shared, evolving datasets?
+- How does Icechunk add safety, consistency, and reproducibility on top of Zarr?
+- How can we use transactions to update data atomically and avoid partial writes?
+- How can we reference and replay specific versions of data for reproducible analysis?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Why data versioning matters
@@ -647,10 +645,9 @@ You can compare the results from the tag and the main branch. The results should
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Plain Zarr lacks built-in transactions, history, and recovery."
-- "Icechunk adds repositories, transactions, snapshots, branches, and tags."
-- "Transactions make multi-variable updates atomic."
-- "Branches and tags make reproducible analysis possible."
-- "Version history makes it much easier to recover from mistakes."
-
+- Plain Zarr lacks built-in transactions, history, and recovery.
+- Icechunk adds repositories, transactions, snapshots, branches, and tags.
+- Transactions make multi-variable updates atomic.
+- Branches and tags make reproducible analysis possible.
+- Version history makes it much easier to recover from mistakes.
 ::::::::::::::::::::::::::::::::::::::::::

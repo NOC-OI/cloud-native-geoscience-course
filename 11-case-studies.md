@@ -6,18 +6,16 @@ exercises: 0
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Hear real-world experiences from practitioners applying cloud‑native data workflows."
-- "Understand how different organisations approach data conversion, cataloguing, versioning, and visualisation."
-- "Reflect on how these examples inform your own architectural and best‑practice decisions."
-
+- Hear real-world experiences from practitioners applying cloud‑native data workflows.
+- Understand how different organisations approach data conversion, cataloguing, versioning, and visualisation.
+- Reflect on how these examples inform your own architectural and best‑practice decisions.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "How are different teams and organisations actually converting and serving data in practice?"
-- "What problems do they face, and which solutions have worked well (or badly)?"
-- "What lessons can we take from their architectures and workflows for our own projects?"
-
+- How are different teams and organisations actually converting and serving data in practice?
+- What problems do they face, and which solutions have worked well (or badly)?
+- What lessons can we take from their architectures and workflows for our own projects?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -34,10 +32,9 @@ After each talk, there will be a short Q&A, followed by a joint discussion at th
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Real-world case studies show that cloud-native architectures differ by mission, user needs, scale, and operational constraints."
-- "Successful teams make explicit trade-offs among performance, cost, governance, reproducibility, and maintainability."
-- "Common building blocks include Zarr (physical or virtual), STAC for discovery, and versioning approaches for controlled updates."
-- "Architectural decisions should be guided by concrete workloads and user access patterns, not only by tool popularity."
-- "Cross-team sharing of implementation lessons helps avoid repeated mistakes and speeds up adoption of robust workflows."
-
+- Real-world case studies show that cloud-native architectures differ by mission, user needs, scale, and operational constraints.
+- Successful teams make explicit trade-offs among performance, cost, governance, reproducibility, and maintainability.
+- Common building blocks include Zarr (physical or virtual), STAC for discovery, and versioning approaches for controlled updates.
+- Architectural decisions should be guided by concrete workloads and user access patterns, not only by tool popularity.
+- Cross-team sharing of implementation lessons helps avoid repeated mistakes and speeds up adoption of robust workflows.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

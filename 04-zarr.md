@@ -6,20 +6,18 @@ exercises: 20
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain Zarr's core data model: groups, arrays, stores, and chunks."
-- "Describe how Zarr metadata works and how conventions build on it."
-- "Understand Zarr's chunked storage and why it matters for oceanography, climate, and meteorology."
-- "Practice opening a Zarr store with Python and xarray to see the structure in practice."
-
+- Explain Zarr's core data model: groups, arrays, stores, and chunks.
+- Describe how Zarr metadata works and how conventions build on it.
+- Understand Zarr's chunked storage and why it matters for oceanography, climate, and meteorology.
+- Practice opening a Zarr store with Python and xarray to see the structure in practice.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What is Zarr, and how does its data model differ from formats like NetCDF or HDF5?"
-- "How does Zarr store metadata about arrays and groups?"
-- "What is chunked storage in Zarr, and why is it useful for large multidimensional datasets?"
-- "How is Zarr changing the way ocean, climate, and meteorological data are stored and accessed?"
-
+- What is Zarr, and how does its data model differ from formats like NetCDF or HDF5?
+- How does Zarr store metadata about arrays and groups?
+- What is chunked storage in Zarr, and why is it useful for large multidimensional datasets?
+- How is Zarr changing the way ocean, climate, and meteorological data are stored and accessed?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -98,14 +96,20 @@ To see the `.zgroup`, `.zattrs`, and `.zmetadata` of this zarr dataset, you can 
 ```bash
 # run the following commands in a terminal
 
+echo "Contents of .zgroup:"
 cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zgroup"
+
+echo "Contents of .zattrs:"
 cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zattrs"
+
+echo "Contents of .zmetadata:"
 cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/.zmetadata"
 ```
 
 To see the `.zarray` metadata for the `sst` array, you can run:
 
 ```bash
+echo "Contents of sst/.zarray:"
 cat "${BASE_DATA_PATH}data/era5_sst/ocean_temperature_v2.zarr/sst/.zarray"
 ```
 
@@ -263,6 +267,10 @@ store = zarr.open_group(f"{base_path}data/era5_sst/ocean_temperature_with_groups
 print(store)
 ```
 
+```output
+<Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr>
+```
+
 To see the arrays and groups inside the store, we can list them:
 
 ```python
@@ -270,11 +278,20 @@ print(list(store.arrays()))  # List arrays
 print(list(store.groups()))  # List groups
 ```
 
+```output
+[]
+[('0', <Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/0>), ('1', <Group file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1>)]
+```
+
 Because this Zarr store uses groups, the arrays are not directly in the root group. Instead, they are inside child groups. To see the arrays inside a specific group, we can access that group and list its arrays:
 
 ```python
 # Show arrays inside group "1"
 print(list(store["1"].arrays()))
+```
+
+```output
+[('number', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/number shape=() dtype=int64>), ('spatial_ref', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/spatial_ref shape=() dtype=int64>), ('latitude', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/latitude shape=(360,) dtype=float64>), ('sst', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/sst shape=(10, 360, 720) dtype=float32>), ('longitude', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/longitude shape=(720,) dtype=float64>), ('valid_time', <Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/valid_time shape=(10,) dtype=int64>)]
 ```
 
 To see the information about the array `sst`, we can access it and print its shape, chunk shape, and data type:
@@ -287,6 +304,12 @@ print(sst.shape, sst.chunks, sst.dtype)
 
 # Access attributes
 print(dict(sst.attrs))
+```
+
+```output
+<Array file:///gws/ssde/j25b/atlantis_vis/cloud-native-geoscience-course/data/era5_sst/ocean_temperature_with_groups.zarr/1/sst shape=(10, 360, 720) dtype=float32>
+(10, 360, 720) (1, 360, 360) float32
+{'GRIB_paramId': 34, 'GRIB_dataType': 'an', 'GRIB_numberOfPoints': 1038240, 'GRIB_typeOfLevel': 'surface', 'GRIB_stepUnits': 1, 'GRIB_stepType': 'instant', 'GRIB_gridType': 'regular_ll', 'GRIB_uvRelativeToGrid': 0, 'GRIB_NV': 0, 'GRIB_Nx': 1440, 'GRIB_Ny': 721, 'GRIB_cfName': 'unknown', 'GRIB_cfVarName': 'sst', 'GRIB_gridDefinitionDescription': 'Latitude/Longitude Grid', 'GRIB_iDirectionIncrementInDegrees': 0.25, 'GRIB_iScansNegatively': 0, 'GRIB_jDirectionIncrementInDegrees': 0.25, 'GRIB_jPointsAreConsecutive': 0, 'GRIB_jScansPositively': 0, 'GRIB_latitudeOfFirstGridPointInDegrees': 90.0, 'GRIB_latitudeOfLastGridPointInDegrees': -90.0, 'GRIB_longitudeOfFirstGridPointInDegrees': 0.0, 'GRIB_longitudeOfLastGridPointInDegrees': 359.75, 'GRIB_missingValue': 3.4028234663852886e+38, 'GRIB_name': 'Sea surface temperature', 'GRIB_shortName': 'sst', 'GRIB_units': 'K', 'long_name': 'Sea surface temperature', 'units': 'K', 'standard_name': 'unknown', 'GRIB_surface': 0.0, 'coordinates': 'number spatial_ref'}
 ```
 
 ::::::::::::::::::::::::::::::::::::::: challenge
@@ -407,10 +430,9 @@ This exercise prepares you to think critically about chunking decisions, shardin
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Zarr organises data into groups and arrays stored as addressable chunks, which supports efficient partial reads and writes."
-- "Metadata in Zarr describes array structure, chunking, and attributes, and can be extended through shared conventions for geoscience workflows."
-- "Chunked storage is central to Zarr performance because it lets tools read only the pieces needed for a given query or computation."
-- "Inspecting a Zarr store with Python and xarray helps distinguish cheap metadata exploration from actual data loading."
-- "Understanding data model, metadata, and chunk layout is the foundation for later lessons on rechunking, parallel processing, and cloud-native analysis."
-
+- Zarr organises data into groups and arrays stored as addressable chunks, which supports efficient partial reads and writes.
+- Metadata in Zarr describes array structure, chunking, and attributes, and can be extended through shared conventions for geoscience workflows.
+- Chunked storage is central to Zarr performance because it lets tools read only the pieces needed for a given query or computation.
+- Inspecting a Zarr store with Python and xarray helps distinguish cheap metadata exploration from actual data loading.
+- Understanding data model, metadata, and chunk layout is the foundation for later lessons on rechunking, parallel processing, and cloud-native analysis.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

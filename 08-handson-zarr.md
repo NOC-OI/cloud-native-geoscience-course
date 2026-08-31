@@ -6,20 +6,18 @@ exercises: 35
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Discover several open Zarr datasets for oceanography, climate, and meteorology."
-- "Use Python tools (xarray, zarr, fsspec) to open and explore Zarr datasets hosted in the cloud."
-- "Inspect dimensions, coordinates, and chunk layouts in real-world Zarr stores."
-- "Practice basic analysis and think about how chunking and storage affect performance."
-
+- Discover several open Zarr datasets for oceanography, climate, and meteorology.
+- Use Python tools (xarray, zarr, fsspec) to open and explore Zarr datasets hosted in the cloud.
+- Inspect dimensions, coordinates, and chunk layouts in real-world Zarr stores.
+- Practice basic analysis and think about how chunking and storage affect performance.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "Which publicly available Zarr datasets can I use for experimentation and learning?"
-- "How do I open Zarr datasets from cloud object storage (Google Cloud, AWS S3) with Python?"
-- "How do irregular grids, ragged arrays, and ensembles appear in Zarr + xarray?"
-- "How do chunks and storage layout influence how I analyse these datasets?"
-
+- Which publicly available Zarr datasets can I use for experimentation and learning?
+- How do I open Zarr datasets from cloud object storage (Google Cloud, AWS S3) with Python?
+- How do irregular grids, ragged arrays, and ensembles appear in Zarr + xarray?
+- How do chunks and storage layout influence how I analyse these datasets?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -104,6 +102,7 @@ temperature_2m_local[0,0,0,0].values
 ```
 
 ```output
+# Your output can be different depending on the time of day and the most recent model run, but it should be a single float value, for example:
 array(0.15820312, dtype=float32)
 ```
 
@@ -324,11 +323,11 @@ This dataset was designed to follow the conventions used by NOAA for a similar d
 
 Each Spotter buoy records a different number of observations because of factors such as deployment time, reporting frequency, instrument lifetime, and missing measurements. One way to represent these observations is as an incomplete multidimensional array, where each column corresponds to a Spotter:
 
-![incomplete Array representation](fig/incomplete_array.png){alt="incomplete Array representation"}
+![Incomplete Array representation](fig/incomplete_array.png){alt="Incomplete Array representation"}
 
 Although this representation is intuitive, it requires padding shorter time series with missing values. For large datasets, these unused values can occupy a substantial amount of storage. To avoid this overhead, the GDP and Sofar Spotter Archive use a contiguous ragged array representation:
 
-![Ragged array structure](fig/ragged_array.png){alt="Ragged array structure"}
+![Ragged Array structure](fig/ragged_array.png){alt="Ragged Array structure"}
 
 In a contiguous ragged array, observations from all Spotters are stored sequentially in a single array. Additional index variables identify which observations belong to each Spotter, eliminating the need to store missing values while preserving the original trajectories.
 
@@ -651,9 +650,8 @@ You can share your mini projects with the class or colleagues and discuss differ
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Many open Zarr datasets are available for oceanography, climate, and meteorology, including ERA5 ARCO, Sofar Spotter drifters, ECMWF IFS ensemble forecasts, CMIP6, and marine products."
-- "Python tools like xarray, zarr, and fsspec make it straightforward to open and explore Zarr datasets hosted on cloud object storage."
-- "Real-world Zarr datasets illustrate regular grids, ragged arrays, ensemble dimensions, and more, providing rich practice for accessing, analysing, and understanding chunked data."
-- "Working hands-on with open Zarr datasets helps learners build intuition about data structures, performance, and best practices for cloud-native scientific workflows."
-
+- Many open Zarr datasets are available for oceanography, climate, and meteorology, including ERA5 ARCO, Sofar Spotter drifters, ECMWF IFS ensemble forecasts, CMIP6, and marine products.
+- Python tools like xarray, Zarr, and fsspec make it straightforward to open and explore Zarr datasets hosted on cloud object storage.
+- Real-world Zarr datasets illustrate regular grids, ragged arrays, ensemble dimensions, and more, providing rich practice for accessing, analysing, and understanding chunked data.
+- Working hands-on with open Zarr datasets helps learners build intuition about data structures, performance, and best practices for cloud-native scientific workflows.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

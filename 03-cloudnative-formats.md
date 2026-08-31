@@ -6,20 +6,18 @@ exercises: 10
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain what is meant by a cloud-native data format."
-- "Describe why traditional file-based formats can be inefficient in cloud environments."
-- "Identify cloud-native and cloud-optimized approaches used for environmental data, including Zarr, Kerchunk, VirtualiZarr, GeoParquet, and FlatGeobuf."
-- "Recognise why cloud-native formats matter for scalable access, sharing, and analysis."
-
+- Explain what is meant by a cloud-native data format.
+- Describe why traditional file-based formats can be inefficient in cloud environments.
+- Identify cloud-native and cloud-optimized approaches used for environmental data, including Zarr, Kerchunk, VirtualiZarr, GeoParquet, and FlatGeobuf.
+- Recognise why cloud-native formats matter for scalable access, sharing, and analysis.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What makes a format cloud-native?"
-- "Why are traditional file-based formats not always a good fit for cloud storage?"
-- "Which cloud-native or cloud-optimized approaches are relevant for Earth system data?"
-- "How do cloud-native formats change the way we work with environmental data?"
-
+- What makes a format cloud-native?
+- Why are traditional file-based formats not always a good fit for cloud storage?
+- Which cloud-native or cloud-optimized approaches are relevant for Earth system data?
+- How do cloud-native formats change the way we work with environmental data?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## "Hey, let’s not download the whole file every time."[^cheipesh2018]
@@ -45,7 +43,7 @@ A useful community description from the Cloud-Native Geospatial Formats Guide[^c
 
 For multidimensional environmental data, this usually means chunked arrays, lightweight metadata access, and layouts that work well with object storage rather than assuming a POSIX file system. The goal is not to change the meaning of the data, but to change how efficiently we can discover, access, and process it.
 
-![Difference between traditional files and cloud-native objects](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
+![](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
 
 :::::::::::::::::::::::::::::::::::::::::: caution
 
@@ -159,11 +157,11 @@ Different analyses benefit from different chunk layouts, so choosing an appropri
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Cloud-native formats are designed for efficient access over object storage and web protocols, not just for local file systems."
-- "A cloud-native layout usually combines lightweight metadata with addressable chunks so that tools can read only the data they need."
-- "Simply storing NetCDF or HDF5 files in the cloud does not automatically make them cloud-native."
-- "In Earth system science, common approaches include Zarr, cloud-optimized NetCDF/HDF5 layouts, Kerchunk, VirtualiZarr, GeoParquet, and FlatGeobuf."
-- "Cloud-native approaches can reduce data movement, improve sharing, and support scalable analysis of large environmental datasets."
+- Cloud-native formats are designed for efficient access over object storage and web protocols, not just for local filesystems.
+- A cloud-native layout usually combines lightweight metadata with addressable chunks so that tools can read only the data they need.
+- Simply storing NetCDF or HDF5 files in the cloud does not automatically make them cloud-native.
+- In Earth system science, common approaches include Zarr, cloud-optimized NetCDF/HDF5 layouts, Kerchunk, VirtualiZarr, GeoParquet, and FlatGeobuf.
+- Cloud-native approaches can reduce data movement, improve sharing, and support scalable analysis of large environmental datasets.
 
 ::::::::::::::::::::::::::::::::::::::::::
 

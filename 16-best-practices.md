@@ -6,18 +6,16 @@ exercises: 25
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Reflect on how the different tools and formats fit together into end‑to‑end architectures."
-- "Identify trade‑offs between simplicity, performance, cost, and maintainability."
-- "Discuss best practices for designing cloud‑native workflows with Zarr, STAC, Icechunk, Virtualizarr, and GeoZarr."
-
+- Reflect on how the different tools and formats fit together into end‑to‑end architectures.
+- Identify trade‑offs between simplicity, performance, cost, and maintainability.
+- Discuss best practices for designing cloud‑native workflows with Zarr, STAC, Icechunk, Virtualizarr, and GeoZarr.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What does a good cloud‑native architecture for geospatial and climate data look like?"
-- "How do we decide when to use physical Zarr, virtual Zarr, STAC, Icechunk, GeoZarr, and multiscale pyramids?"
-- "What practices help keep data systems robust, reproducible, and future‑proof?"
-
+- What does a good cloud‑native architecture for geospatial and climate data look like?
+- How do we decide when to use physical Zarr, virtual Zarr, STAC, Icechunk, GeoZarr, and multiscale pyramids?
+- What practices help keep data systems robust, reproducible, and future‑proof?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -78,10 +76,9 @@ Compare your checklist with a neighbour's and refine it into something you might
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Cloud-native workflows are strongest when formats, metadata, storage, and operations are designed together as one architecture."
-- "There is no single best stack: choices between physical Zarr, virtual Zarr, STAC, Icechunk, and GeoZarr depend on workload, governance, and resources."
-- "Practical trade-offs among simplicity, performance, cost, and maintainability should be documented and revisited over time."
-- "Chunking, metadata quality, and discoverability are foundational decisions that strongly affect usability and long-term sustainability."
-- "A short, explicit best-practice checklist helps teams apply course concepts consistently in real projects."
-
+- Cloud-native workflows are strongest when formats, metadata, storage, and operations are designed together as one architecture.
+- There is no single best stack: choices between physical Zarr, virtual Zarr, STAC, Icechunk, and GeoZarr depend on workload, governance, and resources.
+- Practical trade-offs among simplicity, performance, cost, and maintainability should be documented and revisited over time.
+- Chunking, metadata quality, and discoverability are foundational decisions that strongly affect usability and long-term sustainability.
+- A short, explicit best-practice checklist helps teams apply course concepts consistently in real projects.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

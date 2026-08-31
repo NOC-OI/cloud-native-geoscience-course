@@ -6,20 +6,18 @@ exercises: 40
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain the main steps in converting NetCDF datasets to Zarr."
-- "Choose appropriate chunking strategies for the target Zarr dataset."
-- "Use xarray, Dask, and `to_zarr` to convert NetCDF to Zarr in parallel."
-- "Upload Zarr stores to object storage and verify basic analyses on the converted data."
-
+- Explain the main steps in converting NetCDF datasets to Zarr.
+- Choose appropriate chunking strategies for the target Zarr dataset.
+- Use xarray, Dask, and `to_zarr` to convert NetCDF to Zarr in parallel.
+- Upload Zarr stores to object storage and verify basic analyses on the converted data.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "Why convert NetCDF data to Zarr, and what changes in the way we access and process data?"
-- "How do we choose chunk sizes for Zarr when starting from NetCDF files?"
-- "How can we use Dask and xarray to convert and write data to Zarr efficiently?"
-- "How do we test that the converted data is usable and correct (e.g. computing mean values)?"
-
+- Why convert NetCDF data to Zarr, and what changes in the way we access and process data?
+- How do we choose chunk sizes for Zarr when starting from NetCDF files?
+- How can we use Dask and xarray to convert and write data to Zarr efficiently?
+- How do we test that the converted data is usable and correct (e.g. computing mean values)?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -183,7 +181,7 @@ First, create a Dask client to manage parallelism:
 from dask.distributed import Client
 import xarray as xr
 
-client = Client(n_workers=2, threads_per_worker=2)
+client = Client(n_workers=6, threads_per_worker=2)
 ```
 
 Then, open the NetCDF dataset and apply chunking:
@@ -265,19 +263,21 @@ For scientific data, moderate compression is often a good default because it red
 
 After successfully writing Zarr locally, you can upload the Zarr directory store to an object store (AWS S3, GCS, MinIO, etc.).
 
-The following example uses [s3cmd](https://s3tools.org/s3cmd), which is a command-line tool for interacting with S3-compatible object stores. You can also use other tools like `awscli`, `rclone`, or Python libraries like `boto3` or `fsspec`.
+The following example uses [s3cmd](https://s3tools.org/s3cmd), which is a command-line tool for interacting with S3-compatible object stores. You can also use other tools like `awscli`, `rclone`, or Python libraries like `boto3` or `fsspec`. It is important to mention that `s3cmd` is not installed in your conda environment and it is here for demonstration purposes only.
 
 ```bash
 # Create a bucket (if it doesn't exist)
-s3cmd mb s3://my-bucket
+s3cmd mb s3://my-bucket # replace with your bucket name
 
 # Upload the Zarr store recursively
-s3cmd put -r data/glorys.zarr s3://my-bucket/glorys.zarr
+s3cmd put -r data/glorys.zarr s3://my-bucket/glorys.zarr # replace with your bucket name
 ```
 
 Once uploaded, you can access the Zarr store directly from the object store using xarray and filesystem adapters, as in previous lessons.
 
-In our lesson here, instead of generating the zarr dataset locally and upload then later to the object store, we will directly write the zarr dataset to the object store using `fsspec`. This is a more efficient approach and avoids unnecessary local storage usage. In the code below, remember to replace `my-bucket` with the actual bucket name you have access to (please ask the instructor for the bucket name and credentials).
+In our lesson here, instead of generating the zarr dataset locally and upload then later to the object store, we will directly write the zarr dataset to the object store using `fsspec`. This is a more efficient approach and avoids unnecessary local storage usage.
+
+**In the code below, remember to replace `my-bucket` with the actual bucket name you have access to (please ask the instructor for the bucket name and credentials).**
 
 Because the dataset is large, we will use the JASMIN dask cluster to run the conversion and upload, as it has better network access to the object store. You can see an example below, but you can also take a look in the [Parallel Processing for Zarr](./07-parallel.html) episode for more details.
 
@@ -310,7 +310,7 @@ import xarray as xr
 import fsspec
 import os
 
-store_url = "s3://my-bucket/glorys.zarr"
+store_url = "s3://my-bucket/glorys.zarr" # replace with your bucket name
 
 # remember to set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables with your credentials
 os.environ["AWS_ACCESS_KEY_ID"] = "your-access-key"
@@ -360,7 +360,7 @@ mapper = fsspec.get_mapper(
 ds_zarr = xr.open_zarr(mapper, consolidated=True)
 
 # You can also access the dataset directly, as it is in a public bucket (replace with your own bucket if needed):
-ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/glorys.zarr", consolidated=True)
+ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/glorys.zarr", consolidated=True) # replace with your bucket name
 
 # Choose a variable
 var = ds_zarr["zos"]
@@ -542,7 +542,7 @@ storage_options = {
     },
 }
 
-store_url = "s3://my-bucket/era5_swh.zarr"
+store_url = "s3://my-bucket/era5_swh.zarr" # replace with your bucket name
 mapper = fsspec.get_mapper(
     store_url,
     **storage_options,
@@ -603,7 +603,9 @@ print("Total time for NetCDF:", t2 - t0, "seconds")
 
 # Zarr
 t0 = time.time()
-ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/era5_swh.zarr", consolidated=True)
+
+ds_zarr = xr.open_zarr("https://atlantis-vis-o.s3-ext.jc.rl.ac.uk/my-bucket/era5_swh.zarr", consolidated=True) # replace with your bucket name
+
 var_zarr = ds_zarr["swh"]
 var_zarr = var_zarr.isel(time=0)
 t1 = time.time()
@@ -624,10 +626,9 @@ When done carefully, converting NetCDF to Zarr and back preserves scientific val
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Converting NetCDF to Zarr enables cloud-native, chunked, and parallel-friendly access to large scientific datasets."
-- "Effective conversion requires understanding input data, choosing chunk sizes based on workloads, and using xarray's `to_zarr` with appropriate encoding and compression."
-- "Dask can parallelise the conversion process, making it feasible to handle large collections of NetCDF files."
-- "Uploading Zarr stores to object storage allows distributed teams and tools to access the same datasets efficiently."
-- "Checking basic statistics (e.g. mean values) in NetCDF and Zarr versions helps verify that conversions preserve scientific content."
-
+- Converting NetCDF to Zarr enables cloud-native, chunked, and parallel-friendly access to large scientific datasets.
+- Effective conversion requires understanding input data, choosing chunk sizes based on workloads, and using xarray's `to_zarr` with appropriate encoding and compression.
+- Dask can parallelise the conversion process, making it feasible to handle large collections of NetCDF files.
+- Uploading Zarr stores to object storage allows distributed teams and tools to access the same datasets efficiently.
+- Checking basic statistics (e.g. mean values) in NetCDF and Zarr versions helps verify that conversions preserve scientific content.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
