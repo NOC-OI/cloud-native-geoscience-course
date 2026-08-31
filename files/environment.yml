@@ -1,0 +1,40 @@
+name: cloud-native-geoscience-course
+channels:
+  - conda-forge
+channel_priority: strict
+dependencies:
+  - python=3.13
+
+  - tree
+  - jupyterlab
+  - ipykernel
+  - numpy==2.4.3
+  - pandas==3.0.2
+  - xarray==2026.7.0
+  - dask==2026.3.0
+  - distributed==2026.3.0
+  - dask-gateway==2026.3.0
+  - zarr==3.2.1
+  - netcdf4==1.7.4
+  - fsspec==2026.4.0
+  - s3fs==2026.4.0
+  - boto3==1.43.46
+  - matplotlib==3.11.1
+  - cartopy==0.25.0
+  - shapely==2.1.2
+  - cfgrib
+  - eccodes
+  - rich
+  - graphviz
+  - h5py
+  - pooch
+  - pip
+  - pip:
+      - icechunk==2.1.1
+      - virtualizarr==2.7.1
+      - obstore==0.11.0
+      - topozarr==0.1.2
+      - pystac==1.15.2
+      - cubed
+      - "cubed[diagnostics]"
+      - cubed-xarray
