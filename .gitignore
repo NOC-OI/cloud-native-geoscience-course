@@ -49,3 +49,6 @@ docs/
 # translation temp files
 po/*~
 
+pdf/*
+!pdf/*.tex
+!pdf/*.pdf

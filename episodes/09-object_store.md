@@ -6,20 +6,18 @@ exercises: 25
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain what object storage is and how it differs from traditional file and block storage."
-- "Describe why object storage is useful for sharing, durability, and parallel access."
-- "Understand how to access cloud object stores (S3, GCS, Azure Blob) from Python."
-- "Deploy a simple self-hosted S3-compatible object store (MinIO) using Docker."
-
+- Explain what object storage is and how it differs from traditional file and block storage.
+- Describe why object storage is useful for sharing, durability, and parallel access.
+- Understand how to access cloud object stores (S3, GCS, Azure Blob) from Python.
+- Deploy a simple self-hosted S3-compatible object store (MinIO) using Docker.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "What is an object store, and how is it different from storing data on a server filesystem?"
-- "Why is object storage a good fit for large-scale data sharing and cloud-native science?"
-- "How does object storage support secure, concurrent, and parallel access?"
-- "How can I use commercial cloud object stores and self-hosted solutions like MinIO?"
-
+- What is an object store, and how is it different from storing data on a server filesystem?
+- Why is object storage a good fit for large-scale data sharing and cloud-native science?
+- How does object storage support secure, concurrent, and parallel access?
+- How can I use commercial cloud object stores and self-hosted solutions like MinIO?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## What is object storage?
@@ -29,7 +27,7 @@ Object storage stores data as **objects** in a flat address space, usually insid
 Unlike traditional storage systems:
 
 - **File storage** (POSIX filesystems) organises data into directories and files.
-- **Block storage** presents fixed-size blocks to an operating system and is commonly used for disks and databases.
+- **Block storage** presents fixed-size blocks to an operating system. It commonly underlies filesystems, virtual disks, and databases, rather than being accessed directly by users.
 
 Object storage is designed for storing large collections of independent objects that are accessed through APIs such as HTTP or S3. This architecture enables systems to scale across many disks and nodes while providing high durability.
 
@@ -39,13 +37,15 @@ Traditional scientific workflows often store data on local or network filesystem
 
 - Data are stored in directories on one server or a small cluster.
 - Access is provided through SSH, NFS, or mounted drives.
-- Storage capacity and bandwidth are limited by the underlying hardware.
+- Storage capacity and bandwidth depend on the underlying hardware and network.
 
 Object storage takes a different approach:
 
-- Data are distributed across many disks and nodes, often spanning multiple availability zones or data centres.
+- Within a deployment, objects and redundant fragments may be distributed across many disks, nodes, and availability zones. Replication between separate regions or data centres may also be configured for disaster recovery, although the exact arrangement depends on the provider and storage system.
 - Applications access data through standard APIs, such as Amazon S3, Google Cloud Storage (GCS), or Azure Blob Storage.
 - Storage systems can grow incrementally by adding new nodes rather than replacing existing hardware.
+
+Both file and object storage ultimately depend on finite hardware and network capacity. Distributed object storage can make these limits easier to expand by pooling many nodes and adding capacity incrementally.
 
 For scientific datasets, this makes it practical to store millions of independent objects, such as NetCDF files, image tiles, or Zarr chunks. Because each object can be accessed independently, applications running on HPC systems, cloud platforms, or local infrastructure can efficiently process data in parallel while accessing the same shared dataset.
 
@@ -98,11 +98,11 @@ Selecting the appropriate storage class helps balance cost and performance accor
 
 There are several ways to deploy object storage:
 
-- **Traditional file servers:** simple to operate for small groups but limited by local hardware.
-- **Cloud object storage:** provides elastic capacity, managed infrastructure, and high durability, with costs based on storage, requests, and data transfer.
-- **Self-hosted object storage:** allows institutions to use existing hardware while retaining control over their infrastructure, but requires ongoing management, monitoring, backups, and maintenance.
+- **Traditional or shared file storage:** can provide very fast access when located close to compute and usually has no metered data-transfer charges, but capacity, remote sharing, and resilience depend on the local infrastructure.
+- **Cloud object storage:** provides managed scaling and typically high durability, but performance depends on network location and access patterns, and request, retrieval, and data-transfer charges may apply.
+- **Self-hosted object storage:** provides S3-style access, local control, and potentially fast access from on-premise compute without cloud data-transfer fees, but redundancy, backups, monitoring, and hardware maintenance remain the institution's responsibility.
 
-The best choice depends on factors such as dataset size, access patterns, operational expertise, and budget.
+The best choice depends on factors such as dataset size, access patterns, proximity to compute, required performance, durability and disaster-recovery requirements, network bandwidth, data-transfer charges, operational expertise, and budget.
 
 For large scientific archives, the key question is not only "what is cheapest per terabyte?", but also "what is cheapest and safest over the full life of the data?"
 
@@ -148,9 +148,9 @@ The answer will depend on the specific context of the group and their requiremen
 
 ## Accessing cloud object storage from Python
 
-Common cloud object stores include AWS S3, Google Cloud Storage (GCS), Azure Blob Storage, and S3-compatible services such Cloudflare and JASMIN. Each has its own API and client libraries, but they all support S3-style access.
+Common cloud object stores include AWS S3, Google Cloud Storage (GCS), Azure Blob Storage, and S3-compatible services such as Cloudflare and JASMIN. Each service has its own native API and client libraries. Many tools provide a similar object-storage abstraction across them, while some platforms and self-hosted services offer an S3-compatible API.
 
-In Python, different providers have different client libraries, but for scientific workflows the most common pattern is to use S3-style access through `boto3`, `fsspec`, or `s3fs`:
+In Python, different providers have their own client libraries. Scientific workflows can use provider-specific clients or a common filesystem-style interface through `fsspec`. For S3 and S3-compatible services, commonly used libraries include `boto3` and `s3fs`:
 
 - **`boto3`** for AWS S3 and S3-compatible services.
 - **`fsspec` / `s3fs`** for opening remote filesystems from Python and xarray.
@@ -483,10 +483,9 @@ They will gain practice in thinking about organisational schemes that work well 
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Object storage stores data as objects with keys and metadata in buckets, accessed via HTTP/S3-style APIs rather than local filesystems."
-- "Cloud object stores (S3, GCS, Azure Blob, S3-compatible services) offer durable, scalable, and secure storage well suited to large scientific datasets."
-- "Parallel and concurrent access are natural in object storage, making it a good fit for chunked formats and distributed processing frameworks."
-- "Self-hosted object storage solutions like MinIO provide S3-compatible APIs and can be deployed with Docker on your own servers."
-- "Thoughtful bucket and key organisation is essential for efficient data discovery and workflow design in the cloud."
-
+- Object storage stores data as objects with keys and metadata in buckets, accessed via HTTP/S3-style APIs rather than local filesystems.
+- Cloud object stores (S3, GCS, Azure Blob, S3-compatible services) offer durable, scalable, and secure storage well suited to large scientific datasets.
+- Parallel and concurrent access are natural in object storage, making it a good fit for chunked formats and distributed processing frameworks.
+- Self-hosted object storage solutions like MinIO provide S3-compatible APIs and can be deployed with Docker on your own servers.
+- Thoughtful bucket and key organisation is essential for efficient data discovery and workflow design in the cloud.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

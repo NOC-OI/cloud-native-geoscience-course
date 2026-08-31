@@ -6,20 +6,18 @@ exercises: 30
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain why parallel processing matters for large Zarr datasets."
-- "Use Dask with xarray and Zarr to parallelise common array computations."
-- "Understand how chunking, lazy loading, and task graphs work together."
-- "Recognise a few other Python parallelism patterns that are sometimes used with Zarr workflows."
-
+- Explain why parallel processing matters for large Zarr datasets.
+- Use Dask with xarray and Zarr to parallelise common array computations.
+- Understand how chunking, lazy loading, and task graphs work together.
+- Recognise a few other Python parallelism patterns that are sometimes used with Zarr workflows.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "Why do we need parallel processing for large Zarr datasets?"
-- "How does Dask parallelise xarray and Zarr computations?"
-- "How do chunking and lazy loading support parallel work?"
-- "What other parallelism tools do Python users sometimes combine with Zarr?"
-
+- Why do we need parallel processing for large Zarr datasets?
+- How does Dask parallelise xarray and Zarr computations?
+- How do chunking and lazy loading support parallel work?
+- What other parallelism tools do Python users sometimes combine with Zarr?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -73,12 +71,31 @@ cluster.
 
 ### Using the Dask dashboard
 
-In the information about the Dask cluster is a link to a Dashboard webpage. From the Dashboard we can monitor our Dask cluster and see how busy it is, view a graph of task dependencies, memory usage and the status of the Dask workers. This can be really useful when checking if our Dask cluster is behaving correctly and working out how optimally our code is making use of Dask's parallelism. Note that it is not possible (or at least not without significant additional complexity) to access the Dask dashboard when running on the JASMIN notebook service.
+In the information about the Dask cluster is a link to a Dashboard webpage. From the Dashboard we can monitor our Dask cluster and see how busy it is, view a graph of task dependencies, memory usage and the status of the Dask workers. This can be really useful when checking if our Dask cluster is behaving correctly and working out how optimally our code is making use of Dask's parallelism.
 
 ![Dask dashboard graph view](fig/dask_dashboard.png){alt="Dask dashboard showing task progress and worker status."}
 
-
 ![Dask dashboard task view](fig/dask_status.png){alt="Dask dashboard showing task progress and worker status."}
+
+To see the dask dashboard you can click on the link in the `client` object. This will open a new tab in your browser with the dashboard. You can also access the dashboard by going to `http://localhost:8787/status` in your browser.
+
+If you are running this notebook on JASMIN you will need to install a Jupyter extension to allow you to access the dashboard: `jupyter-server-proxy`.
+
+![](fig/server_proxy.png){alt="Jupyter server proxy extension for accessing the Dask dashboard on JASMIN."}
+
+After that, everytime you create a Dask client, you need to create a proxy to the dashboard. You can do this by running the following code:
+
+```python
+import getpass
+
+url = client.dashboard_link
+port = url.split(":")[2].split("/")[0]
+username = getpass.getuser()
+url = f"https://notebooks.jasmin.ac.uk/user/{username}/proxy/{port}"
+print(url)
+```
+
+The `url` variable will contain the link to the Dask dashboard. You can click on the link to open the dashboard in a new tab.
 
 ### Using the JASMIN Dask gateway
 
@@ -191,9 +208,11 @@ npx = np.random.random((20000,20000))
 npx_mean = npx.mean()
 ```
 
-Which went faster overall? Why do you think you got the result you did? Try making the dataset a little larger, going much beyond 25000x25000 might use too much memory. Try running the top command in a terminal while your notebook is running, look at the CPU % when running the Numpy and Dask versions and compare them. Try changing the number of Dask threads and see what effect this has on the CPU %.
+Which went faster overall? Why do you think you got the result you did? Try making the dataset a little larger, going much beyond 25000x25000 might use too much memory. If you are running locally, try running the top command in a terminal while your notebook is running, look at the CPU % when running the Numpy and Dask versions and compare them. Try changing the number of Dask threads and see what effect this has on the CPU %.
 
 To see the CPU % in a terminal you can use the command `top` or `htop`.
+
+It is important to mention that you can't watch CPU usage for Dask in JASMIN cluster.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -486,9 +505,8 @@ cluster.shutdown()
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "Dask is the main parallel tool used here."
-- "Zarr and Dask work well together because Zarr stores data in independent chunks."
-- "Xarray can open Zarr data lazily and hand chunked work to Dask."
-- "Other Python parallelism tools exist, but Dask is the most natural fit for chunked environmental data."
-
+- Dask is the main parallel tool used here.
+- Zarr and Dask work well together because Zarr stores data in independent chunks.
+- Xarray can open Zarr data lazily and hand chunked work to Dask.
+- Other Python parallelism tools exist, but Dask is the most natural fit for chunked environmental data.
 ::::::::::::::::::::::::::::::::::::::::::::::::::

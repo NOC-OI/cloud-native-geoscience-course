@@ -6,20 +6,18 @@ exercises: 25
 
 :::::::::::::::::::::::::::::::::::::::::: objectives
 
-- "Explain what STAC is and why it matters for cloud‑native geospatial workflows."
-- "Describe the roles of STAC Catalogs, Collections, and Items."
-- "Create simple STAC objects (catalog, collection, item) using the PySTAC API."
-- "Link a Zarr dataset as a STAC Item asset and understand options for JSON vs database-backed STAC (e.g. pgSTAC/PgPystac)."
-
+- Explain what STAC is and why it matters for cloud‑native geospatial workflows.
+- Describe the roles of STAC Catalogs, Collections, and Items.
+- Create simple STAC objects (catalog, collection, item) using the PySTAC API.
+- Link a Zarr dataset as a STAC Item asset and understand options for JSON vs database-backed STAC (e.g. pgSTAC/PgPystac).
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::: questions
 
-- "How does STAC help us organise and discover Zarr data cubes in the cloud?"
-- "What is the difference between a STAC Catalog, Collection, and Item?"
-- "How can we programmatically build STAC metadata for our Zarr datasets?"
-- "Why might we store STAC metadata in a database instead of a set of JSON files?"
-
+- How does STAC help us organise and discover Zarr data cubes in the cloud?
+- What is the difference between a STAC Catalog, Collection, and Item?
+- How can we programmatically build STAC metadata for our Zarr datasets?
+- Why might we store STAC metadata in a database instead of a set of JSON files?
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -416,10 +414,9 @@ STAC makes their Zarr datasets visible in a generic browser without writing cust
 
 :::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- "STAC standardises how we describe and organise geospatial assets, including Zarr data cubes, making them easier to discover and integrate into cloud-native workflows."
-- "Catalogs, Collections, and Items form a three-layer hierarchy: Catalog as entry point, Collection as grouped datasets, Item as individual spatiotemporal assets with linked data files."
-- "PySTAC provides a Python API to create and manage STAC Catalogs, Collections, and Items, and to save them as static JSON catalogs or feed them into STAC APIs."
-- "Zarr stores in object storage can be referenced as STAC Item assets, connecting cloud-native array data to the broader STAC ecosystem."
-- "STAC metadata can be stored either as static JSON (simple publishing) or in databases like pgSTAC/PgPystac (scalable, queryable STAC APIs), and tools like STAC Browser can visualise both."
-
+- STAC standardises how we describe and organise geospatial assets, including Zarr data cubes, making them easier to discover and integrate into cloud-native workflows.
+- Catalogs, Collections, and Items form a three-layer hierarchy: Catalog as entry point, Collection as grouped datasets, Item as individual spatiotemporal assets with linked data files.
+- PySTAC provides a Python API to create and manage STAC Catalogs, Collections, and Items, and to save them as static JSON catalogs or feed them into STAC APIs.
+- Zarr stores in object storage can be referenced as STAC Item assets, connecting cloud-native array data to the broader STAC ecosystem.
+- STAC metadata can be stored either as static JSON (simple publishing) or in databases like pgSTAC/PgPystac (scalable, queryable STAC APIs), and tools like STAC Browser can visualise both.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
