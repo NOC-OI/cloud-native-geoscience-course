@@ -74,6 +74,54 @@ These trends have pushed archives from simple files to huge collections, requiri
 
 ![The volume of worldwide climate data is expanding rapidly [^overpeck_etal2011]](fig/data_size_trends.png){alt="Chart showing the growth of climate data volumes over time, with a steep increase in the last decades."}
 
+Together, these trends have transformed environmental data archives from relatively small collections of files into datasets spanning terabytes and even petabytes. The examples below illustrate the scale of this change across different meteorological, oceanographic, and climate applications, showing both the number of files involved and the total volume of data that must be stored, accessed, and processed.
+
+<div style="background-color: #f9f9f9; border-left: 5px solid #ccc; display:flex; justify-content:center; align-items:center; margin-bottom: 1em;">
+  <table>
+    <thead>
+      <tr style="color: black;">
+        <th>Dataset</th>
+        <th>Application</th>
+        <th>Number of files</th>
+        <th>Size</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th style="color: black;">CHESS-SCAPE</th>
+        <td style="color: black;">1 km UK climate projections, 1980–2080</td>
+        <td style="color: black;">387,840</td>
+        <td style="color: black;">~11 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">NOC NEMO NPD</th>
+        <td style="color: black;">Global NEMO ocean simulations at various resolutions</td>
+        <td style="color: black;">not consolidated</td>
+        <td style="color: black;">~71 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">CMIP6 / ESGF</th>
+        <td style="color: black;">Global climate models and tailored experiments</td>
+        <td style="color: black;">millions of variations</td>
+        <td style="color: black;">~21 PB in current aggregation</td>
+      </tr>
+      <tr>
+        <th style="color: black;">ERA5 surface</th>
+        <td style="color: black;">ECMWF atmospheric and surface reanalysis</td>
+        <td style="color: black;">~5.31 million</td>
+        <td style="color: black;">~6 TB</td>
+      </tr>
+      <tr>
+        <th style="color: black;">ERA5 full</th>
+        <td style="color: black;">Hourly global reanalysis</td>
+        <td style="color: black;">no unique count</td>
+        <td style="color: black;">order of PB</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
 ## Typical access patterns today
 
 In many workflows, meteorology and oceanography practitioners:

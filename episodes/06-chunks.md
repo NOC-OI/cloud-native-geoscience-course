@@ -372,7 +372,7 @@ This is especially useful in cloud object storage, where millions of very small 
 
 This means you can keep chunks small for efficient analysis, while using sharding to avoid creating an excessive number of files or objects.
 
-![A sharded Zarr showing how chunk data is grouped into shard files. Source: https://element84.com/software-engineering/is-zarr-the-new-cog/](fig/sharding2.png){alt="A sharded Zarr showing how chunk data is grouped into shard files."}
+![[Source](https://element84.com/software-engineering/is-zarr-the-new-cog/)](fig/sharding2.png){alt="A sharded Zarr showing how chunk data is grouped into shard files."}
 
 ### Benefits
 

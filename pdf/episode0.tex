@@ -54,54 +54,6 @@ Clima e Meteorologia em Escala de Múltiplos Terabytes (Arq-Cloud)}
 \end{frame}
 
 % ------------------------------------------------
-\begin{frame}{Por que este curso?}
-\Large
-A oceanografia, a meteorologia e a climatologia trabalham cada vez mais com dados grandes, distribuídos e difíceis de mover.
-
-\vspace{0.4cm}
-
-Neste curso, vamos discutir como organizar, processar, acessar e visualizar esses dados de forma mais eficiente.
-
-\vspace{0.4cm}
-
-\begin{block}{Ideia central}
-Não basta saber abrir um arquivo: precisamos entender como o dado é armazenado, acessado, processado e compartilhado.
-\end{block}
-\end{frame}
-
-% ------------------------------------------------
-\begin{frame}{Objetivo do workshop}
-\Large
-Este workshop apresenta ferramentas e fluxos práticos para trabalhar com grandes conjuntos de dados científicos N-dimensionais de forma mais compatível com ambientes de nuvem.
-
-\vspace{0.4cm}
-
-\begin{itemize}
-  \item dados de oceanografia;
-  \item dados de clima;
-  \item dados de meteorologia;
-  \item dados ambientais em múltiplas dimensões.
-\end{itemize}
-\end{frame}
-
-% ------------------------------------------------
-\begin{frame}{O que você vai aprender}
-\begin{itemize}
-  \item Migrar dados ambientais de formatos tradicionais, como NetCDF, para formatos cloud-native, como Zarr e VirtualiZarr.
-  \item Armazenar, processar e acessar datasets de múltiplos terabytes usando object storage e processamento paralelo.
-  \item Usar ferramentas como Dask para dividir o trabalho em tarefas menores.
-  \item Construir fluxos escaláveis e reproduzíveis para análise de dados ambientais.
-  \item Visualizar e explorar grandes datasets diretamente a partir da nuvem.
-\end{itemize}
-
-\vspace{0.3cm}
-
-\begin{block}{Mensagem importante}
-O foco não é apenas aprender comandos, mas entender por que essas ferramentas são úteis.
-\end{block}
-\end{frame}
-
-% ------------------------------------------------
 \begin{frame}{Atividade inicial: que dados você usa?}
 Antes de começarmos, vamos entender melhor a experiência do grupo.
 
@@ -120,62 +72,6 @@ No documento compartilhado \textbf{CodiMD}, escreva:
 \begin{block}{Objetivo}
 Conectar os conceitos do curso com problemas reais trazidos pelos participantes.
 \end{block}
-\end{frame}
-
-% ------------------------------------------------
-\begin{frame}{Ambiente do curso}
-Durante o workshop, vamos usar um ambiente Python com as principais bibliotecas necessárias.
-
-\vspace{0.2cm}
-
-\begin{columns}
-\column{0.5\textwidth}
-\begin{itemize}
-  \item \texttt{jupyterlab}
-  \item \texttt{numpy}
-  \item \texttt{netCDF4}
-  \item \texttt{xarray}
-  \item \texttt{zarr}
-  \item \texttt{dask}
-\end{itemize}
-
-\column{0.5\textwidth}
-\begin{itemize}
-  \item \texttt{fsspec}, \texttt{s3fs}, \texttt{boto3}, \texttt{obstore}
-  \item \texttt{matplotlib} e \texttt{cartopy}
-  \item \texttt{icechunk}
-  \item \texttt{virtualizarr}
-  \item \texttt{stac}
-  \item \texttt{topozarr}
-\end{itemize}
-\end{columns}
-
-\vspace{0.2cm}
-
-\begin{block}{Reprodutibilidade}
-O ambiente completo é definido no arquivo \texttt{environment.yml} do repositório do curso.
-\end{block}
-\end{frame}
-
-% ------------------------------------------------
-\begin{frame}{Mapa das ferramentas}
-\begin{table}
-\centering
-\small
-\begin{tabular}{lll}
-\toprule
-Grupo & Ferramentas & Papel no curso \\
-\midrule
-Análise & \texttt{xarray}, \texttt{numpy} & Dados N-dimensionais \\
-Processamento & \texttt{dask} & Paralelismo e escala \\
-Formatos & \texttt{netCDF4}, \texttt{zarr} & Leitura, escrita e conversão \\
-Acesso remoto & \texttt{fsspec}, \texttt{s3fs}, \texttt{boto3} & Object storage \\
-Versionamento & \texttt{icechunk} & Histórico de dados Zarr \\
-Catálogo & STAC & Organização e descoberta \\
-Visualização & \texttt{matplotlib}, \texttt{cartopy} & Mapas e gráficos \\
-\bottomrule
-\end{tabular}
-\end{table}
 \end{frame}
 
 % ------------------------------------------------
@@ -566,7 +462,7 @@ Uma \textbf{pirâmide} é a estrutura em camadas que permite visualizar rapidame
 
 \vspace{0.4cm}
 
-\begin{block}{Fio condutor}
+\begin{block}{Relação com o curso}
 Mover menos dados, processar de forma mais inteligente e tornar o fluxo mais reproduzível.
 \end{block}
 \end{frame}
@@ -578,7 +474,6 @@ Mover menos dados, processar de forma mais inteligente e tornar o fluxo mais rep
   \item O foco está em oceanografia, clima e meteorologia.
   \item Vamos trabalhar com formatos, processamento paralelo, object storage, catálogos e visualização.
   \item Conceitos como CPU, RAM, cluster, chunk, lazy loading e metadados serão usados durante todo o curso.
-  \item A atividade inicial ajuda a conectar o conteúdo aos desafios reais dos participantes.
 \end{itemize}
 \end{frame}
 

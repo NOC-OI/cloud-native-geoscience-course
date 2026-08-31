@@ -43,7 +43,7 @@ A useful community description from the Cloud-Native Geospatial Formats Guide[^c
 
 For multidimensional environmental data, this usually means chunked arrays, lightweight metadata access, and layouts that work well with object storage rather than assuming a POSIX filesystem. The goal is not to change the meaning of the data, but to change how efficiently we can discover, access, and process it.
 
-![Difference between traditional files and cloud-native objects](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
+![](fig/traditional_vs_cloud_native.png){alt="Difference between traditional files and cloud-native objects, with metadata and chunks."}
 
 :::::::::::::::::::::::::::::::::::::::::: caution
 

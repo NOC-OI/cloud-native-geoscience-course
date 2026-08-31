@@ -323,11 +323,11 @@ This dataset was designed to follow the conventions used by NOAA for a similar d
 
 Each Spotter buoy records a different number of observations because of factors such as deployment time, reporting frequency, instrument lifetime, and missing measurements. One way to represent these observations is as an incomplete multidimensional array, where each column corresponds to a Spotter:
 
-![incomplete Array representation](fig/incomplete_array.png){alt="incomplete Array representation"}
+![Incomplete Array representation](fig/incomplete_array.png){alt="Incomplete Array representation"}
 
 Although this representation is intuitive, it requires padding shorter time series with missing values. For large datasets, these unused values can occupy a substantial amount of storage. To avoid this overhead, the GDP and Sofar Spotter Archive use a contiguous ragged array representation:
 
-![Ragged array structure](fig/ragged_array.png){alt="Ragged array structure"}
+![Ragged Array structure](fig/ragged_array.png){alt="Ragged Array structure"}
 
 In a contiguous ragged array, observations from all Spotters are stored sequentially in a single array. Additional index variables identify which observations belong to each Spotter, eliminating the need to store missing values while preserving the original trajectories.
 

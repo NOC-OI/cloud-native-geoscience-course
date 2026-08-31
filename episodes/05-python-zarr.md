@@ -167,7 +167,7 @@ print("SST dims:", sst.dims)
 print("SST attrs:", sst.attrs)
 ```
 
-![Zarr in Xarray](fig/zarr_in_xarray.png){alt="Zarr dataset opened in Xarray."}
+![](fig/zarr_in_xarray.png){alt="Zarr dataset opened in Xarray."}
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
