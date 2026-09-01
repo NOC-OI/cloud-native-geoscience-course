@@ -323,7 +323,7 @@ Opening Zarr datasets with xarray offers a consistent interface across storage f
 
 ::::::::::::::::::::::::::::::::::::::: challenge
 
-## Exercise 3 - Read only a small part
+## Exercise 4 - Read only a small part
 
 Use xarray to open the Zarr dataset, then select only a small part of it. Select temperature data for the first hour of 2025, for a small region in the Brazilian Southest Coast (min lat: -30, max lat: -20, min lon: -50, max lon: -40). Compute the mean of that subset.
 
